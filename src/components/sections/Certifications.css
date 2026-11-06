@@ -1,0 +1,16 @@
+.cert {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+  padding-block: 0.875rem;
+  border-bottom: 1px solid var(--line);
+}
+
+.cert:first-child {
+  padding-top: 0;
+}
+
+.cert:last-child {
+  border-bottom: 0;
+}

@@ -1,0 +1,29 @@
+.skill-groups {
+  display: grid;
+  gap: 1.5rem;
+}
+
+/* Group name on the left and skills on the right. */
+.skill-group {
+  display: grid;
+  grid-template-columns: 8rem 1fr;
+  gap: 0.25rem 1rem;
+}
+
+.skill-name {
+  color: var(--amber);
+  font-size: 1rem;
+  line-height: 1.75;
+}
+
+.skill-learning {
+  margin-top: 0.25rem;
+  color: var(--amber-dim);
+}
+
+/* On phones the name sits on top of its skills. */
+@media (max-width: 520px) {
+  .skill-group {
+    grid-template-columns: 1fr;
+  }
+}

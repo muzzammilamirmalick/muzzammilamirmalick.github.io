@@ -1,0 +1,5 @@
+# Installed packages and build output. Both can be recreated, so git skips them.
+node_modules
+dist
+*.log
+.DS_Store

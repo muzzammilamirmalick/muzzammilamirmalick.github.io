@@ -1,0 +1,6 @@
+/* A limited line length keeps long paragraphs easy to read. */
+.about-text {
+  display: grid;
+  gap: 1.25rem;
+  max-width: 65ch;
+}
