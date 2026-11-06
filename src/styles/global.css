@@ -33,7 +33,6 @@ html {
 body {
   margin: 0;
   color: var(--text);
-  background: var(--bg);
   font-family: var(--font-body);
   font-size: 1.0625rem;
   line-height: 1.65;
@@ -65,6 +64,9 @@ a {
 
 button {
   font: inherit;
+  /* Removes the short delay and the grey flash when tapping on phones. */
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
 }
 
 /* A clear amber outline for anyone moving around with the keyboard. */
@@ -116,6 +118,24 @@ html.intro-active {
     color: var(--bg);
     background: var(--amber);
   }
+}
+
+/* A small press effect, so tapping a button feels like it responded. */
+.btn:active,
+.command-button:active {
+  transform: scale(0.97);
+}
+
+/* Hidden on screen, but screen readers still read it. */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
 }
 
 /* Hidden until a keyboard user tabs to it. */

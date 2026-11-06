@@ -36,8 +36,13 @@
 
 /* On phones the four buttons sit in an even two-by-two grid. */
 @media (max-width: 520px) {
+  .hero {
+    padding-top: 0.75rem;
+  }
+
   .hero-actions {
     display: grid;
     grid-template-columns: 1fr 1fr;
+    margin-top: 0.75rem;
   }
 }

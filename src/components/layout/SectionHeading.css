@@ -7,3 +7,17 @@
 .section-heading-prompt {
   color: var(--amber);
 }
+
+.section-heading-untyped {
+  opacity: 0;
+}
+
+/* The negative margin means the cursor takes up no room, so the letters never shift. */
+.section-heading-cursor {
+  display: inline-block;
+  width: 0.55em;
+  height: 0.85em;
+  margin-right: -0.55em;
+  background: var(--amber);
+  vertical-align: -0.1em;
+}

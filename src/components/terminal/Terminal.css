@@ -24,7 +24,6 @@
   position: relative;
   height: 25rem;
   overflow-y: auto;
-  overscroll-behavior: contain;
   scrollbar-color: var(--line) transparent;
   scrollbar-width: thin;
 }
@@ -190,6 +189,31 @@
 @media (max-width: 360px) {
   .terminal-body-scroll {
     height: 31rem;
+  }
+}
+
+/* On phones the command buttons become one row you can swipe, which keeps the main
+   buttons near the top of the screen. The fade hints that there are more. */
+@media (max-width: 520px) {
+  .command-buttons {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    scrollbar-width: none;
+    mask-image: linear-gradient(to right, #000 calc(100% - 2.5rem), transparent);
+  }
+
+  .command-buttons::-webkit-scrollbar {
+    display: none;
+  }
+
+  /* Empty space after the last button, so it can scroll clear of the fade. */
+  .command-buttons::after {
+    content: "";
+    flex: 0 0 2.5rem;
+  }
+
+  .command-button {
+    flex-shrink: 0;
   }
 }
 

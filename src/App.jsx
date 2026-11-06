@@ -3,8 +3,10 @@
 import { useRef, useState } from "react";
 import { Toaster } from "sonner";
 import Intro from "./components/intro/Intro.jsx";
+import Background from "./components/layout/Background.jsx";
 import MuteButton from "./components/layout/MuteButton.jsx";
 import Nav from "./components/layout/Nav.jsx";
+import { SiteReady } from "./components/layout/SiteReady.js";
 import Hero from "./components/sections/Hero.jsx";
 import About from "./components/sections/About.jsx";
 import Projects from "./components/sections/Projects.jsx";
@@ -50,7 +52,9 @@ export default function App() {
   }
 
   return (
-    <>
+    <SiteReady.Provider value={whoamiMode !== "waiting"}>
+      <Background />
+
       {/* "inert" stops clicks and the Tab key from reaching the site behind the intro. */}
       <div inert={whoamiMode === "waiting"}>
         <a className="skip-link" href="#main">
@@ -89,6 +93,6 @@ export default function App() {
           },
         }}
       />
-    </>
+    </SiteReady.Provider>
   );
 }

@@ -1,0 +1,45 @@
+/* Sits behind everything and stays still while the page scrolls. */
+.background {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+/* The grid is one square bigger than the window. Moving it by exactly one square and
+   starting again makes a seamless loop. Moving it with transform is very cheap to draw. */
+.background-grid {
+  --grid-size: 56px;
+  position: absolute;
+  inset: calc(var(--grid-size) * -1);
+  background-image:
+    linear-gradient(rgba(255, 176, 0, 0.035) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 176, 0, 0.035) 1px, transparent 1px);
+  background-size: var(--grid-size) var(--grid-size);
+  animation: background-drift 40s linear infinite;
+  will-change: transform;
+}
+
+@keyframes background-drift {
+  to {
+    transform: translate(var(--grid-size), var(--grid-size));
+  }
+}
+
+.background-scanlines {
+  position: absolute;
+  inset: 0;
+  background: repeating-linear-gradient(
+    to bottom,
+    rgba(255, 176, 0, 0.012) 0 1px,
+    transparent 1px 4px
+  );
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .background-grid {
+    animation: none;
+    will-change: auto;
+  }
+}

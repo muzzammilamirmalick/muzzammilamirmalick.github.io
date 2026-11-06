@@ -56,7 +56,7 @@
 .intro-skip {
   position: absolute;
   right: 0.75rem;
-  bottom: max(0.75rem, env(safe-area-inset-bottom));
+  bottom: 0.75rem;
   background: var(--bg);
 }
 

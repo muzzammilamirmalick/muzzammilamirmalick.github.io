@@ -52,9 +52,17 @@
     display: none;
   }
 
+  /* The fade at the right edge hints that there are more links to swipe to. */
   .nav nav {
     overflow-x: auto;
     scrollbar-width: none;
+    mask-image: linear-gradient(to right, #000 calc(100% - 2.5rem), transparent);
+  }
+
+  /* Extra room at the end, so the last link can scroll clear of the fade. */
+  .nav-links {
+    width: max-content;
+    padding-right: 3rem;
   }
 
   .nav nav::-webkit-scrollbar {
