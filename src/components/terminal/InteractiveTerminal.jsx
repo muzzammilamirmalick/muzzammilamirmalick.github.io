@@ -6,7 +6,7 @@ import CommandButtons from "./CommandButtons.jsx";
 import OutputLine from "./OutputLine.jsx";
 import TerminalWindow from "./TerminalWindow.jsx";
 
-export default function InteractiveTerminal({ children }) {
+export default function InteractiveTerminal({ children, frameRef }) {
   const [entries, setEntries] = useState([]); // Everything printed so far.
   const [input, setInput] = useState(""); // What is currently typed.
   const [hint, setHint] = useState(""); // Tab suggestions when several commands match.
@@ -116,6 +116,7 @@ export default function InteractiveTerminal({ children }) {
     <TerminalWindow
       scrollable
       bodyRef={bodyRef}
+      frameRef={frameRef}
       onBodyClick={handleBodyClick}
       footer={<CommandButtons onRun={run} />}
     >

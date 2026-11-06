@@ -1,0 +1,108 @@
+/* Covers the whole window. The wall colour is a touch darker than the site's background. */
+.intro {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  overflow: hidden;
+  background: #070705;
+}
+
+/* The room and the figure. One unit in the drawing is one pixel here, then the
+   camera scales it. "overflow: visible" lets the desk run past the drawing's edges. */
+.intro-layer {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 1600px;
+  height: 1800px;
+  overflow: visible;
+  transform-origin: 0 0;
+  pointer-events: none;
+  /* Draw each layer once and let the graphics chip scale it. Redrawing
+     large drawings on every frame is far too slow on phones. */
+  will-change: transform;
+}
+
+/* The terminal on the monitor. It is the real size and scaled down, so it stays sharp. */
+.intro-terminal {
+  position: absolute;
+  top: 0;
+  left: 0;
+  overflow: hidden;
+  transform-origin: 0 0;
+  will-change: transform;
+}
+
+.intro-terminal .terminal {
+  height: 100%;
+  overflow: hidden;
+}
+
+/* The Start button, in the exact middle of the page. */
+.intro-start {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  padding: 1rem;
+  pointer-events: none;
+  animation: intro-fade-in 700ms ease-out both;
+}
+
+.intro-start-button {
+  pointer-events: auto;
+}
+
+.intro-skip {
+  position: absolute;
+  right: 0.75rem;
+  bottom: max(0.75rem, env(safe-area-inset-bottom));
+  background: var(--bg);
+}
+
+/* A very quick, low-contrast flicker with scanlines. It is kept faint and
+   short on purpose, so it is comfortable for people sensitive to flashing. */
+.intro-flicker {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: repeating-linear-gradient(
+    to bottom,
+    rgba(255, 176, 0, 0.14) 0 1px,
+    transparent 1px 3px
+  );
+  animation: intro-flicker 300ms steps(1) both;
+}
+
+@keyframes intro-flicker {
+  0% {
+    opacity: 0.9;
+  }
+  25% {
+    opacity: 0.25;
+  }
+  50% {
+    opacity: 0.7;
+  }
+  75% {
+    opacity: 0.15;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
+@keyframes intro-fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .intro-start {
+    animation: none;
+  }
+}

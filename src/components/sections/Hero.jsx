@@ -1,19 +1,17 @@
 // The first thing on the page: a terminal showing who I am, plus the main buttons.
 import { profile } from "../../data/content.js";
 import { copyEmail } from "../../utils/copyEmail.js";
+import BootLog from "../terminal/BootLog.jsx";
 import InteractiveTerminal from "../terminal/InteractiveTerminal.jsx";
+import Whoami from "./Whoami.jsx";
 import "./Hero.css";
 
-export default function Hero() {
+export default function Hero({ whoamiMode, terminalRef }) {
   return (
     <section className="hero" id="top">
-      <InteractiveTerminal>
-        <p>
-          <span className="terminal-prompt">&gt;</span> whoami
-        </p>
-        <h1 className="hero-name">{profile.name}</h1>
-        <p className="hero-role">{profile.role}</p>
-        <p className="hero-availability">{profile.availability}</p>
+      <InteractiveTerminal frameRef={terminalRef}>
+        <BootLog dimmed={whoamiMode !== "waiting"} />
+        <Whoami mode={whoamiMode} />
       </InteractiveTerminal>
 
       <div className="hero-actions">

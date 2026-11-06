@@ -13,6 +13,13 @@ export const profile = {
   resume: "/resume.pdf",
 };
 
+// The messages typed on the monitor during the intro.
+export const boot = {
+  command: "boot portfolio --user muzzammil",
+  steps: ["Loading skills", "Mounting projects", "Starting flight tracker"],
+  welcome: `Welcome, ${profile.name}`,
+};
+
 // Each string is one paragraph.
 export const about = [
   "I've been writing code since I was 8 and taking computers apart for almost as long. When COVID sent everyone home, I turned that into a business: I repaired phones and computers across the GTA and built home office setups so people could keep working.",

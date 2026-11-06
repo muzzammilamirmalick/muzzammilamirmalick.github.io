@@ -22,7 +22,7 @@
    position: relative lets the code measure where new output starts. */
 .terminal-body-scroll {
   position: relative;
-  height: 22rem;
+  height: 25rem;
   overflow-y: auto;
   overscroll-behavior: contain;
   scrollbar-color: var(--line) transparent;
@@ -32,6 +32,36 @@
 /* The ">" at the start of a typed command. */
 .terminal-prompt {
   color: var(--amber);
+}
+
+/* The blinking block cursor. steps() makes it snap on and off instead of fading. */
+.terminal-cursor {
+  display: inline-block;
+  width: 0.6em;
+  height: 1.1em;
+  margin-left: 0.1em;
+  background: var(--amber);
+  vertical-align: text-bottom;
+  animation: terminal-cursor-blink 1s steps(2, jump-none) infinite;
+}
+
+@keyframes terminal-cursor-blink {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+
+/* The boot messages. They fade to a dim colour once the site is showing. */
+.boot-log {
+  margin-bottom: 1rem;
+  transition: opacity 400ms ease;
+}
+
+.boot-log-dimmed {
+  opacity: 0.6;
 }
 
 /* One command and everything it printed. */
@@ -156,6 +186,13 @@
   }
 }
 
+/* The smallest phones wrap more text, so the terminal needs more height to avoid a scrollbar. */
+@media (max-width: 360px) {
+  .terminal-body-scroll {
+    height: 31rem;
+  }
+}
+
 /* Narrower label column so the text beside it still has room on phones. */
 @media (max-width: 520px) {
   .terminal-row {
@@ -165,7 +202,12 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .command-button {
+  .command-button,
+  .boot-log {
     transition: none;
+  }
+
+  .terminal-cursor {
+    animation: none;
   }
 }

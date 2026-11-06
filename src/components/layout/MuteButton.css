@@ -1,0 +1,23 @@
+/* Sits above everything, including the intro. */
+.mute-button {
+  position: fixed;
+  top: 0.25rem;
+  right: 0.75rem;
+  z-index: 200;
+  display: grid;
+  place-items: center;
+  width: 2.5rem;
+  height: 2.5rem;
+  padding: 0;
+  border: 1px solid var(--line);
+  border-radius: 2px;
+  color: var(--amber);
+  background: var(--bg);
+  cursor: pointer;
+}
+
+@media (hover: hover) {
+  .mute-button:hover {
+    border-color: var(--amber);
+  }
+}
