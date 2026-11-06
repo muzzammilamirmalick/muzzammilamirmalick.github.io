@@ -60,7 +60,7 @@
 }
 
 .boot-log-dimmed {
-  opacity: 0.6;
+  opacity: 0.7; /* Any lower and the amber text fails contrast checks. */
 }
 
 /* One command and everything it printed. */

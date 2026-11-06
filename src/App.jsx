@@ -55,6 +55,9 @@ export default function App() {
     <SiteReady.Provider value={whoamiMode !== "waiting"}>
       <Background />
 
+      {/* First in the page, so keyboard users can reach it with one press of Tab. */}
+      <MuteButton />
+
       {/* "inert" stops clicks and the Tab key from reaching the site behind the intro. */}
       <div inert={whoamiMode === "waiting"}>
         <a className="skip-link" href="#main">
@@ -80,7 +83,6 @@ export default function App() {
         />
       )}
 
-      <MuteButton />
       <Toaster
         position="bottom-center"
         theme="dark"
