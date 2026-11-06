@@ -18,7 +18,154 @@
   padding: 1rem 0.875rem;
 }
 
+/* A fixed height means typing a command never pushes the rest of the page around.
+   position: relative lets the code measure where new output starts. */
+.terminal-body-scroll {
+  position: relative;
+  height: 22rem;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-color: var(--line) transparent;
+  scrollbar-width: thin;
+}
+
 /* The ">" at the start of a typed command. */
 .terminal-prompt {
   color: var(--amber);
+}
+
+/* One command and everything it printed. */
+.terminal-entry {
+  margin-top: 1rem;
+}
+
+.terminal-line {
+  overflow-wrap: anywhere;
+}
+
+.terminal-heading {
+  margin-top: 0.75rem;
+  color: var(--amber);
+  font-weight: 600;
+}
+
+.terminal-dim {
+  color: var(--amber-dim);
+}
+
+.terminal-paragraph {
+  margin-top: 0.5rem;
+}
+
+/* A line with a label on the left and its value on the right. */
+.terminal-row {
+  display: grid;
+  grid-template-columns: 16ch 1fr;
+  gap: 0.75rem;
+}
+
+.terminal-label {
+  color: var(--amber);
+}
+
+/* A button that looks like a link, used for "click to copy" lines. */
+.terminal-action {
+  padding: 0;
+  border: 0;
+  color: var(--amber);
+  background: none;
+  font-family: inherit;
+  font-size: inherit;
+  text-align: left;
+  text-decoration: underline;
+  overflow-wrap: anywhere;
+  cursor: pointer;
+}
+
+/* The line the visitor types on. */
+.terminal-form {
+  display: flex;
+  align-items: center;
+  gap: 1ch;
+  margin-top: 1rem;
+}
+
+.terminal-input {
+  flex: 1;
+  min-width: 0;
+  padding: 0;
+  border: 0;
+  outline: 0;
+  color: var(--text);
+  background: transparent;
+  caret-color: var(--amber);
+  font: inherit;
+}
+
+.terminal-input::placeholder {
+  color: var(--amber-dim);
+  opacity: 1;
+}
+
+/* The input hides its own outline, so an underline shows when it has keyboard focus. */
+.terminal-form:focus-within {
+  box-shadow: 0 2px 0 var(--amber-dim);
+}
+
+.terminal-hint {
+  min-height: 1.6em;
+  margin-top: 0.25rem;
+  color: var(--amber-dim);
+}
+
+.terminal-footer {
+  padding: 0.625rem 0.875rem;
+  border-top: 1px solid var(--line);
+}
+
+.command-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.375rem;
+}
+
+.command-button {
+  min-height: 2.25rem;
+  padding: 0.25rem 0.625rem;
+  border: 1px solid var(--line);
+  border-radius: 2px;
+  color: var(--amber-dim);
+  background: transparent;
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  cursor: pointer;
+  transition: border-color 120ms ease, color 120ms ease;
+}
+
+@media (hover: hover) {
+  .command-button:hover {
+    border-color: var(--amber);
+    color: var(--amber);
+  }
+}
+
+/* iPhones zoom the whole page when focusing text smaller than 16px. */
+@media (pointer: coarse) {
+  .terminal-input {
+    font-size: 1rem;
+  }
+}
+
+/* Narrower label column so the text beside it still has room on phones. */
+@media (max-width: 520px) {
+  .terminal-row {
+    grid-template-columns: 15ch 1fr;
+    gap: 0.5rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .command-button {
+    transition: none;
+  }
 }
