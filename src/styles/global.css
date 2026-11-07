@@ -11,7 +11,10 @@
   --font-mono: "JetBrains Mono Variable", ui-monospace, Consolas, monospace;
   --font-body: "IBM Plex Sans", system-ui, sans-serif;
 
-  --nav-height: 3rem;
+  --window-line: #3f3523;
+
+  --bar-height: 2.5rem; /* Also in src/os/windowLayout.js */
+  --dock-height: 4.75rem; /* Also in src/os/windowLayout.js */
 }
 
 *,
@@ -22,11 +25,7 @@
 
 html {
   background: var(--bg);
-  scroll-behavior: smooth;
-  /* Stops section headings from hiding under the sticky navigation bar. */
-  scroll-padding-top: calc(var(--nav-height) + 1rem);
-  /* Always keeps room for the scrollbar, so the page doesn't shift when the intro ends. */
-  scrollbar-gutter: stable;
+  overflow: hidden;
   -webkit-text-size-adjust: 100%;
 }
 
@@ -73,20 +72,6 @@ button {
 :focus-visible {
   outline: 2px solid var(--amber);
   outline-offset: 3px;
-}
-
-/* The shared width and spacing for every section. */
-.section {
-  width: min(100% - 2rem, 54rem);
-  margin-inline: auto;
-  padding-block: 4rem;
-  border-top: 1px solid var(--line);
-}
-
-/* Stops the page from scrolling behind the intro. */
-html.intro-active {
-  overflow: hidden;
-  background: #070705; /* Matches the room, so the scrollbar space blends in. */
 }
 
 /* Shared button style, used for links and real buttons. */
@@ -143,7 +128,7 @@ html.intro-active {
   position: absolute;
   top: -4rem;
   left: 1rem;
-  z-index: 100;
+  z-index: 8000;
   padding: 0.5rem 1rem;
   color: var(--bg);
   background: var(--amber);
@@ -156,10 +141,6 @@ html.intro-active {
 
 /* Respect visitors who ask their device for less motion. */
 @media (prefers-reduced-motion: reduce) {
-  html {
-    scroll-behavior: auto;
-  }
-
   .btn {
     transition: none;
   }

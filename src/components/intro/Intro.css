@@ -33,9 +33,10 @@
   will-change: transform;
 }
 
-.intro-terminal .terminal {
+.intro-terminal .intro-window {
+  position: static;
   height: 100%;
-  overflow: hidden;
+  box-shadow: none;
 }
 
 /* The Start button, in the exact middle of the page. */

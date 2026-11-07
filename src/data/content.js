@@ -17,7 +17,6 @@ export const profile = {
 export const boot = {
   command: "boot portfolio --user muzzammil",
   steps: ["Loading skills", "Mounting projects", "Starting detailing app"],
-  welcome: `Welcome, ${profile.name}`,
 };
 
 // The full About text. It appears in Simple view. Each string is one paragraph.
@@ -257,12 +256,3 @@ export const detailing = {
   },
 };
 
-// The links in the navigation bar. Each id matches a section on the page.
-export const navLinks = [
-  { id: "about", label: "About" },
-  { id: "projects", label: "Projects" },
-  { id: "experience", label: "Experience" },
-  { id: "skills", label: "Skills" },
-  { id: "certifications", label: "Certifications" },
-  { id: "contact", label: "Contact" },
-];

@@ -1,4 +1,4 @@
-// The "whoami" command and its answer at the top of the hero terminal.
+// The "whoami" command and its answer at the top of the terminal.
 // mode: "waiting" (hidden behind the intro), "typing" (plays out) or "done" (already finished).
 import { useEffect, useState } from "react";
 import { playClick } from "../../audio/sounds.js";
@@ -33,8 +33,7 @@ export default function Whoami({ mode }) {
   const visibleLines = isDone ? LINE_TIMES.length : linesPrinted;
   const commandText = isDone ? COMMAND : COMMAND.slice(0, typedChars);
 
-  // Hidden lines stay in the page with opacity 0, so nothing moves when they print
-  // and search engines and screen readers can always read them.
+  // Hidden lines stay in place with opacity 0, so nothing moves when they print.
   const lineClass = (name, lineNumber) =>
     visibleLines >= lineNumber ? name : `${name} whoami-hidden`;
 
@@ -44,9 +43,9 @@ export default function Whoami({ mode }) {
         <span className="terminal-prompt">&gt;</span> {commandText}
         {mode === "typing" && !typingFinished && <span className="terminal-cursor" />}
       </p>
-      <h1 className={lineClass("hero-name", 1)}>{profile.name}</h1>
-      <p className={lineClass("hero-role", 2)}>{profile.role}</p>
-      <p className={lineClass("hero-availability", 3)}>{profile.availability}</p>
+      <p className={lineClass("whoami-name", 1)}>{profile.name}</p>
+      <p className={lineClass("whoami-role", 2)}>{profile.role}</p>
+      <p className={lineClass("whoami-availability", 3)}>{profile.availability}</p>
     </>
   );
 }

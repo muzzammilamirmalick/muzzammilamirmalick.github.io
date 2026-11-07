@@ -2,12 +2,12 @@
 .mute-button {
   position: fixed;
   top: 0.25rem;
-  right: 0.75rem;
-  z-index: 200;
+  right: 0.5rem;
+  z-index: 7000;
   display: grid;
   place-items: center;
-  width: 2.5rem;
-  height: 2.5rem;
+  width: 2rem;
+  height: 2rem;
   padding: 0;
   border: 1px solid var(--line);
   border-radius: 2px;

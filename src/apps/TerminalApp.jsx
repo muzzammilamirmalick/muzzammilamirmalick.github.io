@@ -1,12 +1,16 @@
 // The terminal visitors can type in. It keeps the printed output and the command history,
 // and handles the Enter, Up, Down and Tab keys.
 import { useEffect, useRef, useState } from "react";
-import { findMatches, isClearCommand, runCommand } from "../../terminal/commands.js";
-import CommandButtons from "./CommandButtons.jsx";
-import OutputLine from "./OutputLine.jsx";
-import TerminalWindow from "./TerminalWindow.jsx";
+import BootLog from "../components/terminal/BootLog.jsx";
+import CommandButtons from "../components/terminal/CommandButtons.jsx";
+import OutputLine from "../components/terminal/OutputLine.jsx";
+import Whoami from "../components/terminal/Whoami.jsx";
+import { useOs } from "../os/OsContext.js";
+import { findMatches, isClearCommand, runCommand } from "../terminal/commands.js";
+import "../components/terminal/Terminal.css";
 
-export default function InteractiveTerminal({ children, frameRef }) {
+export default function TerminalApp() {
+  const os = useOs();
   const [entries, setEntries] = useState([]); // Everything printed so far.
   const [input, setInput] = useState(""); // What is currently typed.
   const [hint, setHint] = useState(""); // Tab suggestions when several commands match.
@@ -38,7 +42,7 @@ export default function InteractiveTerminal({ children, frameRef }) {
       return;
     }
 
-    const lines = runCommand(command);
+    const lines = runCommand(command, os, inputRef.current);
     const id = nextId.current++;
     setEntries((past) => [...past, { id, command, lines }]);
   }
@@ -113,57 +117,65 @@ export default function InteractiveTerminal({ children, frameRef }) {
   }
 
   return (
-    <TerminalWindow
-      scrollable
-      bodyRef={bodyRef}
-      frameRef={frameRef}
-      onBodyClick={handleBodyClick}
-      footer={<CommandButtons onRun={run} />}
-    >
-      {children}
+    <div className="terminal">
+      <div
+        className="terminal-body"
+        ref={bodyRef}
+        onClick={handleBodyClick}
+        tabIndex={0}
+        role="region"
+        aria-label="Terminal"
+      >
+        <BootLog dimmed={os.whoamiMode !== "waiting"} />
+        <Whoami mode={os.whoamiMode} />
 
-      {/* Screen readers announce anything new that appears in this log. */}
-      <div role="log" aria-live="polite" aria-label="Command output">
-        {entries.map((entry, index) => (
-          <div
-            className="terminal-entry"
-            key={entry.id}
-            ref={index === entries.length - 1 ? latestEntryRef : null}
-          >
-            <p className="terminal-line">
-              <span className="terminal-prompt">&gt;</span> {entry.command}
-            </p>
-            {entry.lines.map((line, lineIndex) => (
-              <OutputLine line={line} key={lineIndex} />
-            ))}
-          </div>
-        ))}
+        {/* Screen readers announce anything new that appears in this log. */}
+        <div role="log" aria-live="polite" aria-label="Command output">
+          {entries.map((entry, index) => (
+            <div
+              className="terminal-entry"
+              key={entry.id}
+              ref={index === entries.length - 1 ? latestEntryRef : null}
+            >
+              <p className="terminal-line">
+                <span className="terminal-prompt">&gt;</span> {entry.command}
+              </p>
+              {entry.lines.map((line, lineIndex) => (
+                <OutputLine line={line} key={lineIndex} />
+              ))}
+            </div>
+          ))}
+        </div>
+
+        <form className="terminal-form" onSubmit={handleSubmit}>
+          <label className="terminal-prompt" htmlFor="terminal-input">
+            &gt;
+          </label>
+          <input
+            className="terminal-input"
+            id="terminal-input"
+            ref={inputRef}
+            data-autofocus
+            type="text"
+            value={input}
+            onChange={handleChange}
+            onKeyDown={handleKeyDown}
+            placeholder={'Type "help"'}
+            aria-label="Terminal command"
+            autoComplete="off"
+            autoCapitalize="off"
+            autoCorrect="off"
+            spellCheck="false"
+            enterKeyHint="send"
+          />
+        </form>
+        <p className="terminal-hint" role="status">
+          {hint}
+        </p>
       </div>
-
-      <form className="terminal-form" onSubmit={handleSubmit}>
-        <label className="terminal-prompt" htmlFor="terminal-input">
-          &gt;
-        </label>
-        <input
-          className="terminal-input"
-          id="terminal-input"
-          ref={inputRef}
-          type="text"
-          value={input}
-          onChange={handleChange}
-          onKeyDown={handleKeyDown}
-          placeholder={'Type "help"'}
-          aria-label="Terminal command"
-          autoComplete="off"
-          autoCapitalize="off"
-          autoCorrect="off"
-          spellCheck="false"
-          enterKeyHint="send"
-        />
-      </form>
-      <p className="terminal-hint" role="status">
-        {hint}
-      </p>
-    </TerminalWindow>
+      <div className="terminal-footer">
+        <CommandButtons onRun={run} />
+      </div>
+    </div>
   );
 }

@@ -1,17 +1,15 @@
 // The boot messages. The intro passes in how much has been typed so far.
-// The hero shows the same component fully typed, which is what makes the handoff seamless.
+// The Terminal app shows the same component fully typed, which makes the handoff seamless.
 import { boot } from "../../data/content.js";
 
 export default function BootLog({
   commandChars = boot.command.length,
   stepsShown = boot.steps.length,
-  welcomeChars = boot.welcome.length,
   showCursor = false,
   dimmed = false,
 }) {
   const cursor = showCursor ? <span className="terminal-cursor" /> : null;
   const commandFinished = commandChars >= boot.command.length;
-  const welcomeStarted = welcomeChars > 0;
 
   // Only for decoration: screen readers skip this and go straight to my name.
   return (
@@ -25,13 +23,7 @@ export default function BootLog({
           <span className="terminal-prompt">[ OK ]</span> {step}
         </p>
       ))}
-      {welcomeStarted && (
-        <p>
-          {boot.welcome.slice(0, welcomeChars)}
-          {cursor}
-        </p>
-      )}
-      {commandFinished && !welcomeStarted && <p>{cursor}</p>}
+      {commandFinished && cursor && <p>{cursor}</p>}
     </div>
   );
 }

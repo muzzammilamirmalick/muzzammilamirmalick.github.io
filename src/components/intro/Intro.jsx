@@ -12,7 +12,9 @@ import {
 import { playBeep, playClick, unlockAudio } from "../../audio/sounds.js";
 import { boot } from "../../data/content.js";
 import BootLog from "../terminal/BootLog.jsx";
-import TerminalWindow from "../terminal/TerminalWindow.jsx";
+import WindowChrome from "../../os/WindowChrome.jsx";
+import { appById } from "../../os/appList.js";
+import "../terminal/Terminal.css";
 import { FADE_SECONDS, TIMELINE, ZOOM_EASE } from "./introTimeline.js";
 import { HoodedFigure, RoomBackground } from "./RoomScene.jsx";
 import {
@@ -24,15 +26,28 @@ import {
 } from "./sceneLayout.js";
 import "./Intro.css";
 
-const NOTHING_TYPED = { command: 0, steps: 0, welcome: 0 };
+const NOTHING_TYPED = { command: 0, steps: 0 };
 
-// Measures the window and the hero terminal (leaving out its button row).
-function measureLayout(heroTerminal) {
-  const frame = heroTerminal.getBoundingClientRect();
-  const footer = heroTerminal.querySelector(".terminal-footer");
+// Measures the screen and the Terminal window (leaving out its button row).
+// Phones have no Terminal window on arrival, so the terminal aims for the top of the screen.
+function measureLayout() {
+  const screenWidth = document.documentElement.clientWidth;
+  const terminal = document.querySelector('[data-window="terminal"]');
+  if (!terminal) {
+    const width = Math.min(screenWidth - 32, 600);
+    return computeLayout(screenWidth, window.innerHeight, {
+      left: (screenWidth - width) / 2,
+      top: 56,
+      width,
+      height: 320,
+    });
+  }
+
+  const frame = terminal.getBoundingClientRect();
+  const footer = terminal.querySelector(".terminal-footer");
   const footerHeight = footer ? footer.getBoundingClientRect().height : 0;
 
-  return computeLayout(document.documentElement.clientWidth, window.innerHeight, {
+  return computeLayout(screenWidth, window.innerHeight, {
     left: frame.left,
     top: frame.top,
     width: frame.width,
@@ -40,7 +55,7 @@ function measureLayout(heroTerminal) {
   });
 }
 
-export default function Intro({ heroTerminalRef, onReveal, onFinish }) {
+export default function Intro({ onReveal, onFinish }) {
   // gate: waiting for Start. playing: the sequence is running. leaving: fading away.
   const [phase, setPhase] = useState("gate");
   const [fadeSeconds, setFadeSeconds] = useState(FADE_SECONDS.normal);
@@ -60,21 +75,14 @@ export default function Intro({ heroTerminalRef, onReveal, onFinish }) {
   const terminalHeightStyle = useTransform([layout, progress], ([l, p]) => terminalHeight(l, p));
   const terminalWidthStyle = useTransform(layout, (l) => l.terminal.width);
 
-  // Lock page scrolling while the intro is showing, and start from the top of the page.
-  useLayoutEffect(() => {
-    document.documentElement.classList.add("intro-active");
-    window.scrollTo(0, 0);
-    return () => document.documentElement.classList.remove("intro-active");
-  }, []);
-
   // Measure now, and again whenever the window or the loaded fonts change the layout.
   useLayoutEffect(() => {
-    const update = () => layout.set(measureLayout(heroTerminalRef.current));
+    const update = () => layout.set(measureLayout());
     update();
     window.addEventListener("resize", update);
     document.fonts?.ready.then(update);
     return () => window.removeEventListener("resize", update);
-  }, [heroTerminalRef, layout]);
+  }, [layout]);
 
   function leave(seconds) {
     setFadeSeconds(seconds);
@@ -86,11 +94,7 @@ export default function Intro({ heroTerminalRef, onReveal, onFinish }) {
 
     // Reduced motion: no typing, zoom or flicker. Show the text and fade to the site.
     if (reducedMotion) {
-      setTyped({
-        command: boot.command.length,
-        steps: boot.steps.length,
-        welcome: boot.welcome.length,
-      });
+      setTyped({ command: boot.command.length, steps: boot.steps.length });
       playBeep();
       onReveal(false);
       leave(FADE_SECONDS.reducedMotion);
@@ -132,13 +136,6 @@ export default function Intro({ heroTerminalRef, onReveal, onFinish }) {
     });
 
     at(TIMELINE.welcomeStart, playBeep);
-    const welcomeCharTime =
-      (TIMELINE.welcomeEnd - TIMELINE.welcomeStart) / boot.welcome.length;
-    for (let chars = 1; chars <= boot.welcome.length; chars++) {
-      at(TIMELINE.welcomeStart + chars * welcomeCharTime, () => {
-        setTyped((current) => ({ ...current, welcome: chars }));
-      });
-    }
 
     at(TIMELINE.zoomStart, () => {
       zoom = animate(progress, 1, {
@@ -200,14 +197,18 @@ export default function Intro({ heroTerminalRef, onReveal, onFinish }) {
           height: terminalHeightStyle,
         }}
       >
-        <TerminalWindow>
-          <BootLog
-            commandChars={typed.command}
-            stepsShown={typed.steps}
-            welcomeChars={typed.welcome}
-            showCursor={!flickering && phase !== "leaving"}
-          />
-        </TerminalWindow>
+        <div className="window intro-window">
+          <WindowChrome app={appById.terminal} />
+          <div className="terminal">
+            <div className="terminal-body">
+              <BootLog
+                commandChars={typed.command}
+                stepsShown={typed.steps}
+                showCursor={!flickering && phase !== "leaving"}
+              />
+            </div>
+          </div>
+        </div>
       </motion.div>
 
       <HoodedFigure style={{ transform: figureStyle, opacity: figureOpacity }} />
