@@ -6,6 +6,7 @@ import TerminalApp from "../apps/TerminalApp.jsx";
 import WelcomeApp from "../apps/WelcomeApp.jsx";
 
 const ComingUp = lazy(() => import("../apps/ComingUpApp.jsx"));
+const JourneyApp = lazy(() => import("../apps/JourneyApp.jsx"));
 const ExperienceApp = lazy(() => import("../apps/ExperienceApp.jsx"));
 const SkillsApp = lazy(() => import("../apps/SkillsApp.jsx"));
 const CertificationsApp = lazy(() => import("../apps/CertificationsApp.jsx"));
@@ -14,9 +15,9 @@ const ResumeApp = lazy(() => import("../apps/ResumeApp.jsx"));
 
 export const apps = [
   { id: "terminal", label: "Terminal", icon: "terminal", width: 600, height: 460, Component: TerminalApp },
-  { id: "journey", label: "Journey", icon: "journey", width: 640, height: 560, Component: ComingUp },
-  { id: "projects", label: "Projects", icon: "projects", width: 720, height: 560, Component: ComingUp },
-  { id: "detailing", label: "M&M Detailing", icon: "car", width: 680, height: 580, Component: ComingUp },
+  { id: "journey", label: "Journey", icon: "journey", width: 620, height: 610, Component: JourneyApp },
+  { id: "projects", label: "Projects", icon: "projects", width: 780, height: 610, Component: ComingUp },
+  { id: "detailing", label: "M&M Detailing", icon: "car", width: 700, height: 610, Component: ComingUp },
   { id: "experience", label: "Experience", icon: "experience", width: 560, height: 480, Component: ExperienceApp },
   { id: "skills", label: "Skills", icon: "skills", width: 520, height: 400, Component: SkillsApp },
   { id: "certifications", label: "Certifications", icon: "certifications", width: 540, height: 360, Component: CertificationsApp },
