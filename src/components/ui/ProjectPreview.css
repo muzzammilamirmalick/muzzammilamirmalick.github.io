@@ -1,0 +1,182 @@
+.preview {
+  position: relative;
+  display: block;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  padding: 0;
+  overflow: hidden;
+  border: 0;
+  border-bottom: 1px solid var(--line);
+  background: var(--bg);
+  cursor: pointer;
+}
+
+.preview video {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* The small play badge disappears while the preview is playing. */
+.preview-play {
+  position: absolute;
+  right: 0.5rem;
+  bottom: 0.5rem;
+  display: grid;
+  place-items: center;
+  width: 1.75rem;
+  height: 1.75rem;
+  border: 1px solid var(--amber);
+  border-radius: 50%;
+  color: var(--amber);
+  background: var(--bg);
+  transition: opacity 150ms ease;
+}
+
+.is-playing .preview-play {
+  opacity: 0;
+}
+
+/* The stand-in scenes. Their animations wait until the preview is playing. */
+.scene {
+  position: absolute;
+  inset: 0;
+}
+
+.preview:not(.is-playing) .scene * {
+  animation-play-state: paused;
+}
+
+/* Portfolio: little windows opening and moving. */
+.mini-window {
+  position: absolute;
+  border: 1px solid var(--amber);
+  border-top-width: 5px;
+  border-radius: 2px;
+  background: var(--surface);
+  animation: mini-window-float 3s ease-in-out infinite alternate;
+}
+
+.mini-window-a {
+  top: 18%;
+  left: 12%;
+  width: 40%;
+  height: 48%;
+}
+
+.mini-window-b {
+  top: 34%;
+  left: 42%;
+  width: 34%;
+  height: 44%;
+  animation-delay: -1s;
+}
+
+.mini-window-c {
+  top: 12%;
+  left: 66%;
+  width: 22%;
+  height: 30%;
+  animation-delay: -2s;
+}
+
+@keyframes mini-window-float {
+  from {
+    transform: translate(-6%, 4%) scale(0.96);
+  }
+  to {
+    transform: translate(6%, -4%) scale(1);
+  }
+}
+
+/* Booking app: appointment slots filling up on a calendar. */
+.scene-calendar {
+  inset: 12% 10%;
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 4px;
+}
+
+.calendar-cell {
+  border: 1px solid var(--line);
+  border-radius: 2px;
+  background: var(--amber);
+  opacity: 0.08;
+  animation: calendar-book 2.4s linear infinite;
+  animation-delay: calc(var(--cell) * 90ms);
+}
+
+/* Only some slots get "booked", which looks more natural than all of them. */
+.calendar-cell:nth-child(3n + 1) {
+  animation-name: calendar-book;
+}
+
+.calendar-cell:not(:nth-child(3n + 1)) {
+  animation: none;
+}
+
+@keyframes calendar-book {
+  0%,
+  100% {
+    opacity: 0.08;
+  }
+  40%,
+  70% {
+    opacity: 0.9;
+  }
+}
+
+/* Shot AI: a ball following a tracked arc into the hoop. */
+.court {
+  width: 100%;
+  height: 100%;
+}
+
+.shot-arc {
+  fill: none;
+  stroke: var(--amber);
+  stroke-dasharray: 0.02 0.02;
+  stroke-width: 1.5;
+  opacity: 0.55;
+}
+
+.hoop {
+  fill: none;
+  stroke: var(--amber);
+  stroke-width: 2;
+}
+
+.ball {
+  fill: var(--amber);
+  offset-path: path("M40 150 C110 10 210 10 262 62 L262 150");
+  animation: ball-shot 2s ease-in-out infinite;
+}
+
+@keyframes ball-shot {
+  from {
+    offset-distance: 0%;
+  }
+  to {
+    offset-distance: 100%;
+  }
+}
+
+/* With reduced motion the scenes stay still, but videos can still be started by clicking. */
+@media (prefers-reduced-motion: reduce) {
+  .scene * {
+    animation: none !important;
+  }
+
+  .calendar-cell:nth-child(3n + 1) {
+    opacity: 0.7;
+  }
+
+  .ball {
+    offset-distance: 45%;
+  }
+
+  .preview-play {
+    transition: none;
+  }
+}

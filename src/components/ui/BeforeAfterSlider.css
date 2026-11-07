@@ -1,0 +1,84 @@
+.ba-slider {
+  position: relative;
+  overflow: hidden;
+  border: 1px solid var(--window-line);
+  border-radius: 6px;
+  aspect-ratio: 8 / 5;
+  background: var(--bg);
+}
+
+.ba-image {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* Only the left part of the "before" photo shows, up to the slider's position. */
+.ba-before {
+  clip-path: inset(0 calc(100% - var(--position)) 0 0);
+}
+
+.ba-label {
+  position: absolute;
+  top: 0.5rem;
+  padding: 0.125rem 0.5rem;
+  border-radius: 2px;
+  color: var(--amber);
+  background: rgba(10, 10, 8, 0.85);
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  pointer-events: none;
+}
+
+.ba-label-before {
+  left: 0.5rem;
+}
+
+.ba-label-after {
+  right: 0.5rem;
+}
+
+/* The dividing line and its round grip. */
+.ba-handle {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: var(--position);
+  width: 2px;
+  margin-left: -1px;
+  background: var(--amber);
+  pointer-events: none;
+}
+
+.ba-handle::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 1.75rem;
+  height: 1.75rem;
+  border: 2px solid var(--amber);
+  border-radius: 50%;
+  background: var(--bg);
+  transform: translate(-50%, -50%);
+}
+
+/* The real slider is invisible and stretched over the whole photo. Swiping up
+   and down still scrolls the page on phones, and sideways moves the slider. */
+.ba-input {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  opacity: 0;
+  cursor: ew-resize;
+  touch-action: pan-y;
+}
+
+.ba-slider:has(.ba-input:focus-visible) {
+  outline: 2px solid var(--amber);
+  outline-offset: 2px;
+}
