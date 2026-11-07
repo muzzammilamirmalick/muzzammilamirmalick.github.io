@@ -16,59 +16,134 @@ export const profile = {
 // The messages typed on the monitor during the intro.
 export const boot = {
   command: "boot portfolio --user muzzammil",
-  steps: ["Loading skills", "Mounting projects", "Starting flight tracker"],
+  steps: ["Loading skills", "Mounting projects", "Starting detailing app"],
   welcome: `Welcome, ${profile.name}`,
 };
 
-// Each string is one paragraph.
+// The full About text. It appears in Simple view. Each string is one paragraph.
 export const about = [
   "I've been writing code since I was 8 and taking computers apart for almost as long. When COVID sent everyone home, I turned that into a business: I repaired phones and computers across the GTA and built home office setups so people could keep working.",
   "Today I'm a Logistics Coordinator at IKEA, where I find what slows the team down and fix it, with software and on the floor. I study software development at Mohawk College, and I'm happiest where code meets hardware: embedded systems, aviation and logistics.",
   "I build things that work in the real world, and I'm looking for a summer 2027 co-op where I can do that on a real team.",
 ];
 
+// The two lines the "about" terminal command prints.
+export const aboutShort = [
+  "I'm happiest where code meets hardware: embedded systems, aviation and logistics.",
+  "I build things that work in the real world.",
+];
+
+// The stops on the Journey timeline. "detail" appears when someone clicks a stop.
+// "icon" is a name from src/components/ui/Icon.jsx.
+export const journey = [
+  {
+    when: "Age 8",
+    title: "Wrote my first code",
+    icon: "terminal",
+  },
+  {
+    when: "2020",
+    title: "Started a repair business",
+    detail:
+      "A phone and computer repair business in the GTA during COVID. I built home office setups so people could keep working.",
+    icon: "wrench",
+  },
+  {
+    when: "2022",
+    title: "Started M&M Detailing",
+    detail: "With a wagon, going door to door in my neighbourhood.",
+    icon: "car",
+  },
+  {
+    when: "2024",
+    title: "Logistics Coordinator at IKEA",
+    detail: "Building systems and processes that make daily work faster.",
+    icon: "experience",
+  },
+  {
+    when: "2025",
+    title: "Started Software Development at Mohawk College",
+    icon: "school",
+  },
+  {
+    when: "Now",
+    title: "Building the M&M Detailing app, with Shot AI up next",
+    icon: "spark",
+  },
+];
+
+// The numbers that count up on the Journey app.
+export const stats = [
+  { value: 1000, prefix: "About ", label: "cars detailed" },
+  { value: 100, suffix: "+", label: "customers" },
+  { value: 2, label: "businesses started" },
+  { value: 2.5, decimals: 1, label: "years at IKEA" },
+];
+
+export const codingSince = "Coding since age 8";
+
 // To add a project, copy one block and change the values.
-// Status can be any short label, such as "Live", "Building", "Up next" or "Planned".
+// Status can be "Live", "Building", "Up next" or "Planned". Planned projects go in the
+// "Coming later" folder. To add a video preview, put the file in public/videos/ and
+// add a line like this to the project: video: "/videos/shot-ai.mp4",
+// "preview" picks the animated placeholder shown until there is a video.
 export const projects = [
   {
-    name: "Portfolio website",
+    name: "Portfolio website (MuzzOS)",
     description:
-      "A terminal-style portfolio with a cinematic intro, an interactive command line and sound design",
+      "A hacker desktop in the browser with a cinematic intro, draggable windows and sound design.",
     tech: ["React", "Vite", "Motion"],
     status: "Live",
+    preview: "desktop",
+  },
+  {
+    name: "M&M Detailing booking app and website",
+    description:
+      "Online booking, an admin dashboard, retainer accounts for dealerships and a before and after gallery for my detailing business.",
+    tech: ["React", "C#", "ASP.NET Core", "SQL", "Azure"],
+    status: "Building",
+    preview: "calendar",
+  },
+  {
+    name: "Shot AI",
+    description:
+      "An AI basketball coach that counts my makes and misses, tracks my shot arc, checks my form and maps my hot spots.",
+    tech: ["Computer vision", "Python", "OpenCV"],
+    status: "Up next",
+    preview: "basketball",
   },
   {
     name: "Live flight tracker",
     description:
-      "A real-time map of aircraft in the sky right now, with search by flight number or airport and a saved history of each flight's path",
+      "A real-time map of aircraft in the sky right now, with search by flight number or airport and a saved history of each flight's path.",
     tech: ["C#", "ASP.NET Core", "SQL", "REST APIs"],
-    status: "Building",
+    status: "Planned",
   },
   {
     name: "ADS-B receiver",
     description:
-      "My own ground station: a Raspberry Pi and radio antenna that catch signals broadcast by planes overhead, decode them and feed my flight tracker",
+      "My own ground station: a Raspberry Pi and radio antenna that catch signals broadcast by planes overhead, decode them and feed my flight tracker.",
     tech: ["Raspberry Pi", "RTL-SDR", "Python", "Linux"],
-    status: "Up next",
+    status: "Planned",
   },
   {
     name: "PC health monitor",
     description:
-      "A custom desk display that shows my PC's live temperatures and CPU and GPU usage, streamed from the computer over USB",
+      "A custom desk display that shows my PC's live temperatures and CPU and GPU usage, streamed from the computer over USB.",
     tech: ["ESP32", "C++", "serial communication"],
     status: "Planned",
   },
   {
     name: "Logistics workflow tool",
     description:
-      "A web app that tracks and schedules warehouse tasks, built around real bottlenecks I see at work",
+      "A web app that tracks and schedules warehouse tasks, built around real bottlenecks I see at work.",
     tech: ["C#", "ASP.NET Core", "SQL"],
     status: "Planned",
   },
   {
     name: "Mini flight instrument",
     description:
-      "A working artificial horizon like the one in a cockpit, driven by a motion sensor and drawn on a small screen in real time",
+      "A working artificial horizon like the one in a cockpit, driven by a motion sensor and drawn on a small screen in real time.",
     tech: ["Microcontroller", "C++", "motion sensor"],
     status: "Planned",
   },
@@ -83,6 +158,17 @@ export const experience = [
       "Plan and run logistics projects from start to finish.",
       "Design new systems and processes, in software and on the floor, that make daily operations faster and more accurate.",
       "Trusted to lead the team and solve problems as they happen.",
+    ],
+  },
+  {
+    role: "Owner",
+    company: "M&M Detailing",
+    period: "2022 to present",
+    location: "GTA",
+    points: [
+      "Started with a wagon in my neighbourhood, then grew through door-to-door sales and advertising.",
+      "About 1,000 cars detailed for 100+ customers.",
+      "Businesses and dealerships on monthly retainers.",
     ],
   },
   {
@@ -133,6 +219,43 @@ export const certifications = [
   { name: "Oracle Cloud Infrastructure Foundations", status: "Planned" },
   { name: "Cisco Networking Academy: Linux and IoT", status: "Planned" },
 ];
+
+// Everything in the M&M Detailing app.
+export const detailing = {
+  name: "M&M Detailing",
+  tagline: "From a wagon to monthly retainers.",
+  // Placeholder link. Replace this with the real Instagram address.
+  instagram: "https://www.instagram.com/",
+  story: [
+    { title: "A wagon", text: "Started with a wagon in my neighbourhood.", icon: "wagon" },
+    { title: "Door to door", text: "Sold door to door.", icon: "door" },
+    { title: "Advertising", text: "Used advertising to grow.", icon: "megaphone" },
+    { title: "Retainers", text: "Businesses and dealerships on monthly retainers.", icon: "building" },
+  ],
+  stats: [
+    { value: 1000, prefix: "About ", label: "cars detailed" },
+    { value: 100, suffix: "+", label: "customers" },
+    { value: 2022, plain: true, label: "started in the GTA" },
+  ],
+  services: [
+    { name: "Interior", icon: "seat" },
+    { name: "Exterior", icon: "car" },
+    { name: "Engine bay", icon: "engine" },
+    { name: "Disaster detail", icon: "alert" },
+    { name: "Ceramic coating", icon: "shield" },
+    { name: "Mobile detailing", icon: "van" },
+  ],
+  // To use real photos, put them in public/detailing/ and change these two paths.
+  // Both photos should be the same size so the slider lines up.
+  beforeAfter: {
+    before: "/detailing/before-placeholder.svg",
+    after: "/detailing/after-placeholder.svg",
+  },
+  comingSoon: {
+    title: "Booking app and website",
+    text: "Online booking, an admin dashboard and retainer accounts.",
+  },
+};
 
 // The links in the navigation bar. Each id matches a section on the page.
 export const navLinks = [
