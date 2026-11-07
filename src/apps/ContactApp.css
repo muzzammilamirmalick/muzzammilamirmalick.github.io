@@ -1,0 +1,21 @@
+.contact {
+  display: grid;
+  gap: 0.5rem;
+}
+
+.contact-line {
+  margin-bottom: 0.25rem;
+  color: var(--amber);
+  font-family: var(--font-mono);
+  font-size: 0.875rem;
+}
+
+.contact-button {
+  gap: 0.625rem;
+}
+
+/* Long email addresses may wrap on the smallest phones instead of overflowing. */
+.contact-email {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}

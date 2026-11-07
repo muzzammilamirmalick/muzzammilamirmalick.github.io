@@ -1,0 +1,20 @@
+.resume {
+  display: grid;
+  gap: 0.5rem;
+  justify-items: center;
+}
+
+.resume-icon {
+  color: var(--amber);
+}
+
+.resume-name {
+  margin-bottom: 0.5rem;
+  font-family: var(--font-mono);
+  font-size: 0.9375rem;
+}
+
+.resume-button {
+  gap: 0.5rem;
+  width: 100%;
+}

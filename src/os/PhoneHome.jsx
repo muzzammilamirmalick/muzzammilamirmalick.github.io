@@ -34,7 +34,7 @@ function PhoneApp({ id, onBack, isTop }) {
       exit={hidden}
       transition={{ duration: reducedMotion ? 0.12 : 0.3, ease: EASE_OUT }}
     >
-      <header className="phone-app-bar">
+      <div className="phone-app-bar">
         <button ref={backRef} type="button" className="phone-back" onClick={onBack}>
           <Icon name="back" size={18} />
           Back
@@ -42,7 +42,7 @@ function PhoneApp({ id, onBack, isTop }) {
         <span className="phone-app-title" id={`phone-title-${id}`}>
           {app.label}
         </span>
-      </header>
+      </div>
       <div className="phone-app-body">
         <Suspense fallback={<p className="app-pad app-loading">Loading...</p>}>
           <app.Component />
