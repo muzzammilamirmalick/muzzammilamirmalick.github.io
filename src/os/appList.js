@@ -5,27 +5,29 @@ import { lazy } from "react";
 import TerminalApp from "../apps/TerminalApp.jsx";
 import WelcomeApp from "../apps/WelcomeApp.jsx";
 
-const ComingUp = lazy(() => import("../apps/ComingUpApp.jsx"));
-const JourneyApp = lazy(() => import("../apps/JourneyApp.jsx"));
-const ProjectsApp = lazy(() => import("../apps/ProjectsApp.jsx"));
-const DetailingApp = lazy(() => import("../apps/DetailingApp.jsx"));
-const ExperienceApp = lazy(() => import("../apps/ExperienceApp.jsx"));
-const SkillsApp = lazy(() => import("../apps/SkillsApp.jsx"));
-const CertificationsApp = lazy(() => import("../apps/CertificationsApp.jsx"));
-const ContactApp = lazy(() => import("../apps/ContactApp.jsx"));
-const ResumeApp = lazy(() => import("../apps/ResumeApp.jsx"));
+const loaders = {
+  journey: () => import("../apps/JourneyApp.jsx"),
+  projects: () => import("../apps/ProjectsApp.jsx"),
+  detailing: () => import("../apps/DetailingApp.jsx"),
+  experience: () => import("../apps/ExperienceApp.jsx"),
+  skills: () => import("../apps/SkillsApp.jsx"),
+  certifications: () => import("../apps/CertificationsApp.jsx"),
+  contact: () => import("../apps/ContactApp.jsx"),
+  resume: () => import("../apps/ResumeApp.jsx"),
+  trash: () => import("../apps/TrashApp.jsx"),
+};
 
 export const apps = [
   { id: "terminal", label: "Terminal", icon: "terminal", width: 600, height: 460, Component: TerminalApp },
-  { id: "journey", label: "Journey", icon: "journey", width: 620, height: 610, Component: JourneyApp },
-  { id: "projects", label: "Projects", icon: "projects", width: 780, height: 610, Component: ProjectsApp },
-  { id: "detailing", label: "M&M Detailing", icon: "car", width: 700, height: 610, Component: DetailingApp },
-  { id: "experience", label: "Experience", icon: "experience", width: 560, height: 480, Component: ExperienceApp },
-  { id: "skills", label: "Skills", icon: "skills", width: 520, height: 400, Component: SkillsApp },
-  { id: "certifications", label: "Certifications", icon: "certifications", width: 540, height: 360, Component: CertificationsApp },
-  { id: "contact", label: "Contact", icon: "contact", width: 400, height: 270, Component: ContactApp },
-  { id: "resume", label: "Resume.pdf", icon: "resume", width: 320, height: 290, Component: ResumeApp },
-  { id: "trash", label: "Trash", icon: "trash", width: 420, height: 320, Component: ComingUp },
+  { id: "journey", label: "Journey", icon: "journey", width: 620, height: 610, Component: lazy(loaders.journey) },
+  { id: "projects", label: "Projects", icon: "projects", width: 780, height: 610, Component: lazy(loaders.projects) },
+  { id: "detailing", label: "M&M Detailing", icon: "car", width: 700, height: 610, Component: lazy(loaders.detailing) },
+  { id: "experience", label: "Experience", icon: "experience", width: 560, height: 480, Component: lazy(loaders.experience) },
+  { id: "skills", label: "Skills", icon: "skills", width: 520, height: 400, Component: lazy(loaders.skills) },
+  { id: "certifications", label: "Certifications", icon: "certifications", width: 540, height: 360, Component: lazy(loaders.certifications) },
+  { id: "contact", label: "Contact", icon: "contact", width: 400, height: 270, Component: lazy(loaders.contact) },
+  { id: "resume", label: "Resume.pdf", icon: "resume", width: 320, height: 290, Component: lazy(loaders.resume) },
+  { id: "trash", label: "Trash", icon: "trash", width: 400, height: 260, Component: lazy(loaders.trash) },
   // Welcome opens by itself on arrival, so it has no desktop icon.
   { id: "welcome", label: "Welcome", icon: "spark", width: 360, height: 330, Component: WelcomeApp, hidden: true },
 ];
@@ -37,3 +39,10 @@ export const desktopApps = apps.filter((app) => !app.hidden);
 
 // The apps that always sit in the dock.
 export const dockAppIds = ["terminal", "projects", "journey", "contact"];
+
+// Quietly downloads the other apps once the browser is idle, so they open instantly later.
+export function preloadApps() {
+  const loadAll = () => Object.values(loaders).forEach((load) => load());
+  if (window.requestIdleCallback) window.requestIdleCallback(loadAll);
+  else setTimeout(loadAll, 1500); // Safari doesn't have requestIdleCallback yet.
+}

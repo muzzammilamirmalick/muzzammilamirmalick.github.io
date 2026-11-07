@@ -1,6 +1,7 @@
 // MuzzOS on a computer: the top bar, desktop icons, windows and dock.
 import { useEffect, useMemo, useRef, useState } from "react";
 import { AnimatePresence } from "motion/react";
+import { playWindowClose, playWindowOpen } from "../audio/sounds.js";
 import AppIcon from "./AppIcon.jsx";
 import { appById, desktopApps, dockAppIds } from "./appList.js";
 import { OsContext } from "./OsContext.js";
@@ -29,6 +30,7 @@ export default function Desktop({ whoamiMode, reboot }) {
   // Welcome grows open as the intro hands over to the desktop.
   useEffect(() => {
     if (startedBehindIntro && siteRevealed) {
+      playWindowOpen();
       dispatch({
         type: "open",
         id: "welcome",
@@ -54,6 +56,7 @@ export default function Desktop({ whoamiMode, reboot }) {
 
   function closeWindow(id) {
     const opener = openers.current.get(id);
+    playWindowClose();
     dispatch({ type: "close", id });
     openers.current.delete(id);
     // Send keyboard focus back to where the visitor came from.
@@ -61,6 +64,7 @@ export default function Desktop({ whoamiMode, reboot }) {
   }
 
   function minimizeWindow(id) {
+    playWindowClose();
     dispatch({ type: "minimize", id });
     document.querySelector(`[data-dock-icon="${id}"]`)?.focus({ preventScroll: true });
   }
@@ -81,6 +85,7 @@ export default function Desktop({ whoamiMode, reboot }) {
       reboot,
       openApp(id, opener) {
         if (opener) openers.current.set(id, opener);
+        playWindowOpen();
         dispatch({ type: "open", id, area: getDesktopArea() });
       },
     }),

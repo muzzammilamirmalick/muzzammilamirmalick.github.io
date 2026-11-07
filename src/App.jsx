@@ -7,6 +7,7 @@ import { playRisingTone, unlockAudio } from "./audio/sounds.js";
 import Intro from "./components/intro/Intro.jsx";
 import MuteButton from "./components/layout/MuteButton.jsx";
 import { useKonami } from "./easterEggs/useKonami.js";
+import { preloadApps } from "./os/appList.js";
 import Desktop from "./os/Desktop.jsx";
 import PhoneHome from "./os/PhoneHome.jsx";
 import { useIsPhone } from "./os/useIsPhone.js";
@@ -54,6 +55,12 @@ export default function App() {
       window.removeEventListener("keydown", unlockAudio);
     };
   }, []);
+
+  // Once the desktop is showing, quietly fetch the other apps so they open instantly.
+  const siteRevealed = whoamiMode !== "waiting";
+  useEffect(() => {
+    if (siteRevealed) preloadApps();
+  }, [siteRevealed]);
 
   // The "reboot" command: back to the room, with a fresh desktop underneath.
   const reboot = useCallback(() => {

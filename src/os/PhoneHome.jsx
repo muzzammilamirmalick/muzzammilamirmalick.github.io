@@ -2,6 +2,7 @@
 // Each open app is added to the browser's history, so the phone's back button closes it.
 import { Suspense, useEffect, useMemo, useRef, useState } from "react";
 import { AnimatePresence, motion, useReducedMotion } from "motion/react";
+import { playWindowClose, playWindowOpen } from "../audio/sounds.js";
 import WelcomeApp from "../apps/WelcomeApp.jsx";
 import Icon from "../components/ui/Icon.jsx";
 import AppIcon from "./AppIcon.jsx";
@@ -71,7 +72,10 @@ export default function PhoneHome({ whoamiMode, reboot }) {
 
   // The browser's back button removes the top app.
   useEffect(() => {
-    const handlePopState = () => setStack((current) => current.slice(0, -1));
+    const handlePopState = () => {
+      playWindowClose();
+      setStack((current) => current.slice(0, -1));
+    };
     window.addEventListener("popstate", handlePopState);
     return () => window.removeEventListener("popstate", handlePopState);
   }, []);
@@ -93,6 +97,7 @@ export default function PhoneHome({ whoamiMode, reboot }) {
       openApp(id, opener) {
         if (stackRef.current.includes(id)) return;
         if (opener) openers.current.set(id, opener);
+        playWindowOpen();
         window.history.pushState({ muzzosApp: id }, "");
         setStack((current) => [...current, id]);
       },
