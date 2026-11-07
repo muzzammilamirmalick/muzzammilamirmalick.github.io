@@ -6,9 +6,9 @@ export const profile = {
   role: "Software development student at Mohawk College",
   availability: "Looking for a summer 2027 co-op",
   email: "muzzammilmalick@gmail.com",
-  // Placeholder links. Replace these with your real profile addresses.
+  // Placeholder link. Replace this with your real LinkedIn address.
   linkedin: "https://www.linkedin.com/",
-  github: "https://github.com/",
+  github: "https://github.com/muzzammilamirmalick",
   // Replace public/resume.pdf with your real resume. This path can stay the same.
   resume: "/resume.pdf",
 };

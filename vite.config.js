@@ -14,7 +14,7 @@ function simplePagePlugin() {
 }
 
 // base "/" is correct because the site lives at the root of
-// https://muzzammilmalick.github.io
+// https://muzzammilamirmalick.github.io
 export default defineConfig({
   plugins: [react(), simplePagePlugin()],
   base: "/",

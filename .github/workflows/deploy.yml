@@ -1,9 +1,11 @@
-# Builds the site and publishes it to GitHub Pages every time you push to main.
+# Builds the site and publishes it to GitHub Pages.
+# It only runs by hand for now, so pushing keeps a backup without the site going live.
+# To publish on every push instead, add this under "on:":
+#   push:
+#     branches: [main]
 name: Deploy to GitHub Pages
 
 on:
-  push:
-    branches: [main]
   # Adds a "Run workflow" button on the GitHub Actions tab, for deploying by hand.
   workflow_dispatch:
 
