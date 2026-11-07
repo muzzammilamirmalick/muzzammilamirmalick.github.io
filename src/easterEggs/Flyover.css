@@ -1,0 +1,86 @@
+.flyover {
+  position: fixed;
+  inset: 0;
+  z-index: 6500;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+/* The plane crosses the whole screen, climbing a little. */
+.flyover-plane {
+  position: absolute;
+  top: 58%;
+  left: 0;
+  width: 240px;
+  height: 60px;
+  animation: flyover-cross 2.6s cubic-bezier(0.35, 0, 0.65, 1) both;
+}
+
+@keyframes flyover-cross {
+  from {
+    transform: translate(-260px, 0) rotate(-3deg);
+  }
+  to {
+    transform: translate(calc(100vw + 40px), -28vh) rotate(-8deg);
+  }
+}
+
+.flyover-body {
+  fill: var(--amber);
+}
+
+.flyover-trail {
+  fill: none;
+  stroke: var(--amber);
+  stroke-dasharray: 6 8;
+  stroke-width: 2;
+  opacity: 0.6;
+}
+
+/* Radar rings spreading from the middle of the screen. */
+.flyover-ping {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 70vmax;
+  height: 70vmax;
+  margin: -35vmax 0 0 -35vmax;
+  border: 2px solid var(--amber);
+  border-radius: 50%;
+  opacity: 0;
+  animation: flyover-ping 1.6s ease-out both;
+}
+
+.flyover-ping-late {
+  animation-delay: 0.7s;
+}
+
+@keyframes flyover-ping {
+  from {
+    opacity: 0.5;
+    transform: scale(0.05);
+  }
+  to {
+    opacity: 0;
+    transform: scale(1);
+  }
+}
+
+/* The icons do a little wave at the same time. See the "is-celebrating" class in App.jsx. */
+.is-celebrating .app-icon-tile {
+  animation: icon-wave 600ms ease-in-out both;
+}
+
+.is-celebrating .app-icon:nth-child(3n + 1) .app-icon-tile {
+  animation-delay: 80ms;
+}
+
+.is-celebrating .app-icon:nth-child(3n + 2) .app-icon-tile {
+  animation-delay: 180ms;
+}
+
+@keyframes icon-wave {
+  40% {
+    transform: translateY(-10px);
+  }
+}

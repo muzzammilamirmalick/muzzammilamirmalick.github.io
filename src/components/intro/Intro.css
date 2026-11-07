@@ -61,8 +61,14 @@
   background: var(--bg);
 }
 
-/* A very quick, low-contrast flicker with scanlines. It is kept faint and
-   short on purpose, so it is comfortable for people sensitive to flashing. */
+/* Holds every part of the scene that shakes. */
+.intro-stage {
+  position: absolute;
+  inset: 0;
+}
+
+/* One fade of scanlines as the screen becomes the desktop. It is deliberately a single
+   soft fade, not a flicker, to stay within the limit of 3 flashes in a second. */
 .intro-flicker {
   position: absolute;
   inset: 0;
@@ -72,23 +78,190 @@
     rgba(255, 176, 0, 0.14) 0 1px,
     transparent 1px 3px
   );
-  animation: intro-flicker 300ms steps(1) both;
+  animation: intro-scanline-fade 300ms ease-out both;
 }
 
-@keyframes intro-flicker {
-  0% {
+@keyframes intro-scanline-fade {
+  from {
     opacity: 0.9;
   }
-  25% {
-    opacity: 0.25;
+  to {
+    opacity: 0;
   }
-  50% {
-    opacity: 0.7;
+}
+
+/* Light streaks that rush past during the zoom, for a sense of speed. They are one
+   image that only changes opacity, which is much cheaper to draw than real blur. */
+.intro-streaks {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  pointer-events: none;
+  background: repeating-conic-gradient(
+    from 0deg at 50% 50%,
+    rgba(255, 176, 0, 0.1) 0deg 0.6deg,
+    transparent 0.6deg 3.4deg,
+    rgba(255, 176, 0, 0.05) 3.4deg 3.8deg,
+    transparent 3.8deg 7deg
+  );
+  mask-image: radial-gradient(circle at 50% 50%, transparent 22%, #000 72%);
+}
+
+/* The room's red light fades in with the alert. Red only ever appears during the alert. */
+.intro-red-glow {
+  opacity: 0;
+  transition: opacity 220ms ease-out;
+}
+
+.intro-red-glow.is-visible {
+  opacity: 1;
+}
+
+/* ---------- The breach, drawn on the monitor's screen ---------- */
+
+/* Sizes are in drawing units, so the text scales with the monitor on every screen. */
+.breach {
+  position: absolute;
+  top: 210px;
+  left: 500px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 26px;
+  width: 600px;
+  height: 360px;
+  padding: 0 44px 34px;
+  overflow: hidden;
+  background: #190605;
+  color: #ff5247;
+  font-family: var(--font-mono);
+  pointer-events: none;
+}
+
+.breach-alert {
+  font-size: 32px;
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+.firewalls {
+  display: grid;
+  gap: 16px;
+}
+
+.firewall {
+  display: grid;
+  grid-template-columns: 170px 1fr;
+  gap: 18px;
+  align-items: center;
+}
+
+.firewall-bar {
+  position: relative;
+  height: 24px;
+}
+
+/* The two halves meet along a jagged line. */
+.firewall-half {
+  position: absolute;
+  inset: 0;
+  background: #ff3b30;
+  transition: transform 180ms ease-out, opacity 180ms ease-out;
+}
+
+.firewall-left {
+  clip-path: polygon(0 0, 52% 0, 44% 35%, 56% 55%, 46% 100%, 0 100%);
+}
+
+.firewall-right {
+  clip-path: polygon(52% 0, 100% 0, 100% 100%, 46% 100%, 56% 55%, 44% 35%);
+}
+
+.firewall.is-cracked .firewall-left {
+  opacity: 0.45;
+  transform: translate(-10px, 3px) rotate(-3deg);
+}
+
+.firewall.is-cracked .firewall-right {
+  opacity: 0.45;
+  transform: translate(10px, -2px) rotate(3deg);
+}
+
+.firewall-label {
+  font-size: 21px;
+  white-space: nowrap;
+}
+
+/* The RGB split: the text separates into red and blue copies, once, for a moment. */
+.breach.is-glitch .breach-alert,
+.breach.is-glitch .firewalls {
+  animation: breach-rgb-split 300ms steps(5) both;
+}
+
+@keyframes breach-rgb-split {
+  0% {
+    text-shadow: -7px 0 #ff0033, 7px 0 #00e5ff;
+    transform: translate(5px, 0) skewX(-5deg);
   }
-  75% {
-    opacity: 0.15;
+  40% {
+    text-shadow: 9px 2px #ff0033, -9px -2px #00e5ff;
+    transform: translate(-7px, 2px) skewX(6deg);
+  }
+  70% {
+    text-shadow: -4px 0 #ff0033, 4px 0 #00e5ff;
+    transform: translate(3px, -2px);
   }
   100% {
+    text-shadow: none;
+    transform: none;
+  }
+}
+
+/* Amber takes over from red for the payoff. */
+.breach-granted {
+  color: var(--amber);
+  font-size: 62px;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  line-height: 1.05;
+  text-align: center;
+  animation: breach-granted-in 260ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.breach.is-granted {
+  background: #0a0a08;
+  padding: 0 24px;
+}
+
+@keyframes breach-granted-in {
+  from {
+    opacity: 0;
+    transform: scale(1.35);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* One flash each time something happens. See FLASH_TIMES in introTimeline.js. */
+.breach-flash {
+  position: absolute;
+  inset: 0;
+  background: #ff5247;
+  opacity: 0;
+  animation: breach-flash 200ms ease-out both;
+}
+
+.breach.is-granted .breach-flash {
+  background: var(--amber);
+}
+
+@keyframes breach-flash {
+  from {
+    opacity: 0.4;
+  }
+  to {
     opacity: 0;
   }
 }

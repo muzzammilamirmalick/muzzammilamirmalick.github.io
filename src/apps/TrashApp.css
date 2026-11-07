@@ -1,0 +1,31 @@
+.trash-file {
+  display: flex;
+  align-items: center;
+  gap: 0.625rem;
+  width: 100%;
+  min-height: 2.75rem;
+  padding: 0.5rem 0.625rem;
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  color: var(--amber);
+  background: var(--bg);
+  font-family: var(--font-mono);
+  font-size: 0.875rem;
+  text-align: left;
+  cursor: pointer;
+}
+
+.trash-file-size {
+  margin-left: auto;
+  color: var(--amber-dim);
+  font-size: 0.75rem;
+}
+
+.trash-contents {
+  display: grid;
+  gap: 0.75rem;
+  justify-items: start;
+  padding-top: 0.875rem;
+  font-size: 0.9375rem;
+  line-height: 1.5;
+}

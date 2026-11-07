@@ -85,6 +85,27 @@ export function RoomBackground({ style }) {
   );
 }
 
+// The room turning red during the alert. It fades in and stays steady instead of
+// pulsing, because large areas that flash are the most uncomfortable kind.
+export function RedAlertGlow({ style, visible }) {
+  return (
+    <motion.svg
+      className={visible ? "intro-layer intro-red-glow is-visible" : "intro-layer intro-red-glow"}
+      viewBox={VIEW_BOX}
+      style={style}
+      aria-hidden="true"
+    >
+      <defs>
+        <radialGradient id="red-glow" gradientUnits="userSpaceOnUse" cx="800" cy="390" r="760">
+          <stop offset="0" stopColor="#ff2a1f" stopOpacity="0.3" />
+          <stop offset="1" stopColor="#ff2a1f" stopOpacity="0" />
+        </radialGradient>
+      </defs>
+      <rect x="40" y="-370" width="1520" height="1520" fill="url(#red-glow)" />
+    </motion.svg>
+  );
+}
+
 export function HoodedFigure({ style }) {
   return (
     <motion.svg className="intro-layer" viewBox={VIEW_BOX} style={style} aria-hidden="true">

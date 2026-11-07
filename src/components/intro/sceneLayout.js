@@ -12,8 +12,8 @@ const SCREEN_CENTER = {
 
 // The figure sits nearer the camera, so it grows faster and drops out of frame.
 const FIGURE_ANCHOR = { x: 650, y: 900 };
-const FIGURE_EXTRA_SCALE = 0.7;
-const FIGURE_DROP = 0.35; // How far it falls, as a share of the window height.
+const FIGURE_EXTRA_SCALE = 1.1;
+const FIGURE_DROP = 0.5; // How far it falls, as a share of the window height.
 
 export function computeLayout(windowWidth, windowHeight, terminalRect) {
   // Phones show a smaller monitor, so more of the room fits and the zoom feels bigger.
@@ -38,6 +38,7 @@ export function computeLayout(windowWidth, windowHeight, terminalRect) {
   );
 
   return {
+    isNarrow,
     startScale,
     endScale,
     startCenter,
