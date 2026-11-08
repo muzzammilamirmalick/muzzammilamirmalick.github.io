@@ -3,8 +3,17 @@
   overflow: hidden;
   border: 1px solid var(--window-line);
   border-radius: 6px;
-  aspect-ratio: 8 / 5;
+  /* Tall photos are capped so the whole photo fits in the window. */
+  width: 100%;
+  max-width: 21rem;
+  margin-inline: auto;
+  aspect-ratio: 3 / 4;
   background: var(--bg);
+}
+
+.ba-wide {
+  max-width: 36rem;
+  aspect-ratio: 4 / 3;
 }
 
 .ba-image {

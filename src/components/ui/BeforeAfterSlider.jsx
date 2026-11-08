@@ -1,21 +1,24 @@
 // Two photos stacked on top of each other, with a slider that reveals one over the other.
 // A real range input does the work, so it works with a mouse, a finger and the arrow keys.
+// Photos are 3:4 (tall) by default, or 4:3 when "wide" is set.
 import { useState } from "react";
 import "./BeforeAfterSlider.css";
 
-export default function BeforeAfterSlider({ before, after }) {
+export default function BeforeAfterSlider({ before, after, caption, wide = false }) {
   const [position, setPosition] = useState(50);
+  const [width, height] = wide ? [960, 720] : [720, 960];
+  const what = caption || "The car";
 
   return (
-    <div className="ba-slider" style={{ "--position": `${position}%` }}>
-      <img src={after} alt="The car after detailing" className="ba-image" loading="lazy" width="800" height="500" />
+    <div className={`ba-slider${wide ? " ba-wide" : ""}`} style={{ "--position": `${position}%` }}>
+      <img src={after} alt={`After: ${what}`} className="ba-image" loading="lazy" width={width} height={height} />
       <img
         src={before}
-        alt="The car before detailing"
+        alt={`Before: ${what}`}
         className="ba-image ba-before"
         loading="lazy"
-        width="800"
-        height="500"
+        width={width}
+        height={height}
       />
       <span className="ba-label ba-label-before" aria-hidden="true">
         Before

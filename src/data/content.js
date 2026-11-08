@@ -2,7 +2,7 @@
 // To change the site's text, add a project or update a certification, edit it here.
 
 // Your IKEA job title. It is used in About, Journey and Experience.
-const ikeaTitle = "[YOUR IKEA TITLE]";
+const ikeaTitle = "Logistics and Fulfillment Coordinator";
 
 export const profile = {
   name: "Muzzammil Malick",
@@ -200,6 +200,9 @@ export const experience = [
     company: "Tim Hortons",
     period: "Oct 2022 to Feb 2024",
     location: "Burlington",
+    points: [
+      "Led shifts of 10 team members in a high-volume store, running daily operations and the guest experience.",
+    ],
   },
   {
     role: "Owner",
@@ -272,12 +275,37 @@ export const detailing = {
     { name: "Ceramic coating", icon: "shield" },
     { name: "Mobile detailing", icon: "van" },
   ],
-  // To use real photos, put them in public/detailing/ and change these two paths.
-  // Both photos should be the same size so the slider lines up.
-  beforeAfter: {
-    before: "/detailing/before-placeholder.svg",
-    after: "/detailing/after-placeholder.svg",
-  },
+  // Before and after photos. Each pair gets a button above the slider.
+  // To add a pair, put the two JPGs in photos/detailing/, run
+  // "python scripts/detailing-photos.py", then add a block here.
+  // "label" is the short button text, "caption" sits under the photo.
+  beforeAfter: [
+    {
+      label: "Mini",
+      caption: "Interior detail, Mini Cooper",
+      before: "/detailing/mini-interior-before.webp",
+      after: "/detailing/mini-interior-after.webp",
+    },
+    {
+      label: "Truck",
+      caption: "Interior detail, pickup truck",
+      before: "/detailing/truck-interior-before.webp",
+      after: "/detailing/truck-interior-after.webp",
+    },
+    {
+      label: "Subaru",
+      caption: "Engine bay detail, Subaru",
+      before: "/detailing/subaru-engine-before.webp",
+      after: "/detailing/subaru-engine-after.webp",
+      wide: true,
+    },
+    {
+      label: "Tiguan",
+      caption: "Interior detail, VW Tiguan",
+      before: "/detailing/tiguan-interior-before.webp",
+      after: "/detailing/tiguan-interior-after.webp",
+    },
+  ],
   comingSoon: {
     title: "Booking app and website",
     text: "Online booking, an admin dashboard and retainer accounts.",

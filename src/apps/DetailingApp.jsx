@@ -1,4 +1,5 @@
 // My detailing business, styled like a small brand page of its own.
+import { useState } from "react";
 import { motion, useReducedMotion } from "motion/react";
 import BeforeAfterSlider from "../components/ui/BeforeAfterSlider.jsx";
 import Icon from "../components/ui/Icon.jsx";
@@ -31,6 +32,35 @@ function Story() {
         </motion.li>
       ))}
     </ol>
+  );
+}
+
+// Buttons to pick a before and after pair, with the slider and a caption below.
+function Results() {
+  const [index, setIndex] = useState(0);
+  const pair = detailing.beforeAfter[index];
+
+  return (
+    <>
+      <div className="dt-pairs">
+        {detailing.beforeAfter.map((item, i) => (
+          <button
+            type="button"
+            className="btn dt-pair"
+            key={item.label}
+            aria-pressed={i === index}
+            onClick={() => setIndex(i)}
+          >
+            {item.label}
+          </button>
+        ))}
+      </div>
+      <figure className="dt-figure">
+        {/* The key resets the slider to the middle when the pair changes. */}
+        <BeforeAfterSlider key={pair.label} {...pair} />
+        <figcaption className="dt-caption">{pair.caption}</figcaption>
+      </figure>
+    </>
   );
 }
 
@@ -75,7 +105,7 @@ export default function DetailingApp() {
         <h3 className="dt-heading" id="dt-results">
           Before and after
         </h3>
-        <BeforeAfterSlider before={detailing.beforeAfter.before} after={detailing.beforeAfter.after} />
+        <Results />
       </section>
 
       <aside className="dt-soon">

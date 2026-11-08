@@ -97,6 +97,31 @@
   text-align: center;
 }
 
+.dt-pairs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-bottom: 0.75rem;
+}
+
+.dt-pair[aria-pressed="true"] {
+  border-color: var(--amber);
+  color: var(--bg);
+  background: var(--amber);
+}
+
+.dt-figure {
+  display: grid;
+  gap: 0.5rem;
+  margin: 0;
+}
+
+.dt-caption {
+  color: var(--text);
+  font-size: 0.8125rem;
+  text-align: center;
+}
+
 .dt-soon {
   display: grid;
   gap: 0.25rem;
