@@ -19,11 +19,13 @@ export default function ExperienceApp() {
               {job.location ? `, ${job.location}` : ""}
             </span>
           </summary>
-          <ul className="job-points">
-            {job.points.map((point) => (
-              <li key={point}>{point}</li>
-            ))}
-          </ul>
+          {job.points && (
+            <ul className="job-points">
+              {job.points.map((point) => (
+                <li key={point}>{point}</li>
+              ))}
+            </ul>
+          )}
         </details>
       ))}
 

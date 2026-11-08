@@ -12,7 +12,7 @@ import {
   skills,
 } from "../data/content.js";
 
-// Makes text safe to put inside HTML, so "M&M" doesn't break the page.
+// Makes text safe to put inside HTML, so "Click & Collect" doesn't break the page.
 function escape(text) {
   return String(text)
     .replaceAll("&", "&amp;")
@@ -36,7 +36,7 @@ function renderJob(job) {
   return `<li>
     <h3>${escape(job.role)}, ${escape(job.company)}</h3>
     <p class="meta">${escape(job.period)}${place}</p>
-    <ul class="points">${list(job.points, (point) => `<li>${escape(point)}</li>`)}</ul>
+    ${job.points ? `<ul class="points">${list(job.points, (point) => `<li>${escape(point)}</li>`)}</ul>` : ""}
   </li>`;
 }
 
@@ -65,7 +65,7 @@ export function renderSimplePage() {
     <li><a href="mailto:${escape(profile.email)}">${escape(profile.email)}</a></li>
     <li><a href="${escape(profile.linkedin)}">LinkedIn</a></li>
     <li><a href="${escape(profile.github)}">GitHub</a></li>
-    <li><a href="${escape(profile.resume)}" download>Download resume</a></li>
+    ${profile.resume ? `<li><a href="${escape(profile.resume)}" download>Download resume</a></li>` : ""}
   </ul>
   <p><a href="/">Open the full MuzzOS experience</a></p>
 </header>

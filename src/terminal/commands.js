@@ -31,12 +31,13 @@ const commands = {
   },
   projects: opensApp("projects", "Projects", "What I'm building"),
   journey: opensApp("journey", "Journey", "How I got here"),
-  detailing: opensApp("detailing", "M&M Detailing", "My detailing business"),
+  detailing: opensApp("detailing", "MXM Detailing", "My detailing business"),
   experience: opensApp("experience", "Experience", "Work and education"),
   skills: opensApp("skills", "Skills", "Software, hardware and tools"),
   certifications: opensApp("certifications", "Certifications", "Certification status"),
   contact: opensApp("contact", "Contact", "How to reach me"),
-  resume: {
+  // Left out until profile.resume is set in content.js.
+  resume: profile.resume && {
     description: "Download my resume",
     run: () => {
       downloadResume();
@@ -61,6 +62,11 @@ const secretCommands = {
     return [plain("Rebooting...")];
   },
 };
+
+// Drop commands that are switched off, like resume before there is a resume.
+for (const name of Object.keys(commands)) {
+  if (!commands[name]) delete commands[name];
+}
 
 // The visible command names, used by the buttons and by Tab autocomplete.
 export const commandNames = Object.keys(commands);

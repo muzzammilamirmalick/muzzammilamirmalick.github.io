@@ -1,16 +1,19 @@
 // All of the website's content lives in this one file.
 // To change the site's text, add a project or update a certification, edit it here.
 
+// Your IKEA job title. It is used in About, Journey and Experience.
+const ikeaTitle = "[YOUR IKEA TITLE]";
+
 export const profile = {
   name: "Muzzammil Malick",
   role: "Software development student at Mohawk College",
   availability: "Looking for a summer 2027 co-op",
   email: "muzzammilmalick@gmail.com",
-  // Placeholder link. Replace this with your real LinkedIn address.
-  linkedin: "https://www.linkedin.com/",
+  linkedin: "https://www.linkedin.com/in/muzzammil-malick-2a8346346/",
   github: "https://github.com/muzzammilamirmalick",
-  // Replace public/resume.pdf with your real resume. This path can stay the same.
-  resume: "/resume.pdf",
+  // The Resume buttons stay hidden while this is null. When you add public/resume.pdf,
+  // change this to "/resume.pdf".
+  resume: null,
 };
 
 // The messages typed on the monitor during the intro.
@@ -22,7 +25,7 @@ export const boot = {
 // The full About text. It appears in Simple view. Each string is one paragraph.
 export const about = [
   "I've been writing code since I was 8 and taking computers apart for almost as long. When COVID sent everyone home, I turned that into a business: I repaired phones and computers across the GTA and built home office setups so people could keep working.",
-  "Today I'm a Logistics Coordinator at IKEA, where I find what slows the team down and fix it, with software and on the floor. I study software development at Mohawk College, and I'm happiest where code meets hardware: embedded systems, aviation and logistics.",
+  `Today I'm a ${ikeaTitle} at IKEA, where I find what slows the team down and fix it, with software and on the floor. I study software development at Mohawk College, and I'm happiest where code meets hardware: embedded systems, aviation and logistics.`,
   "I build things that work in the real world, and I'm looking for a summer 2027 co-op where I can do that on a real team.",
 ];
 
@@ -49,13 +52,13 @@ export const journey = [
   },
   {
     when: "2022",
-    title: "Started M&M Detailing",
+    title: "Started MXM Detailing",
     detail: "With a wagon, going door to door in my neighbourhood.",
     icon: "car",
   },
   {
     when: "2024",
-    title: "Logistics Coordinator at IKEA",
+    title: `${ikeaTitle} at IKEA`,
     detail: "Building systems and processes that make daily work faster.",
     icon: "experience",
   },
@@ -65,8 +68,21 @@ export const journey = [
     icon: "school",
   },
   {
+    when: "March 2026",
+    title: "Project Lead, Riipen Labs consulting project for EduTutor",
+    detail:
+      "Built a growth strategy for EduTutor, a Toronto tutoring company, and kept the team on track after two members left.",
+    icon: "projects",
+  },
+  {
+    when: "April 2026",
+    title: "Operations Lead, Riipen Labs project for the Art Circle of Alberta",
+    detail: "Built a revenue strategy and a new website in Next.js.",
+    icon: "projects",
+  },
+  {
     when: "Now",
-    title: "Building the M&M Detailing app, with Shot AI up next",
+    title: "Building the MXM Detailing app, with Shot AI up next",
     icon: "spark",
   },
 ];
@@ -76,7 +92,7 @@ export const stats = [
   { value: 1000, prefix: "About ", label: "cars detailed" },
   { value: 100, suffix: "+", label: "customers" },
   { value: 2, label: "businesses started" },
-  { value: 2.5, decimals: 1, label: "years at IKEA" },
+  { value: 2, suffix: "+", label: "years at IKEA" },
 ];
 
 export const codingSince = "Coding since age 8";
@@ -96,7 +112,7 @@ export const projects = [
     preview: "desktop",
   },
   {
-    name: "M&M Detailing booking app and website",
+    name: "MXM Detailing booking app and website",
     description:
       "Online booking, an admin dashboard, retainer accounts for dealerships and a before and after gallery for my detailing business.",
     tech: ["React", "C#", "ASP.NET Core", "SQL", "Azure"],
@@ -148,27 +164,42 @@ export const projects = [
   },
 ];
 
+// "points" is optional. Leave it out when a job has no details to show.
 export const experience = [
   {
-    role: "Logistics Coordinator",
+    role: ikeaTitle,
     company: "IKEA",
-    period: "2024 to present",
+    period: "Aug 2024 to present",
+    location: "Burlington",
     points: [
-      "Plan and run logistics projects from start to finish.",
-      "Design new systems and processes, in software and on the floor, that make daily operations faster and more accurate.",
-      "Trusted to lead the team and solve problems as they happen.",
+      "Found that evening home delivery staging lost 4 to 5 hours of labour per shift because the delivery platform and the warehouse picking system shared order data with no automated link.",
+      "Proposed an automated sync between the two systems and a 3-person picking pod that sorts carts by route; the process was adopted, cutting up to 4 to 5 hours of staging per shift for staff who use it.",
+      "Built an interactive web simulation to present the old and new process to management.",
+      "Trained 15+ coworkers on the Click & Collect process using an interactive training page I built.",
     ],
   },
   {
-    role: "Owner",
-    company: "M&M Detailing",
-    period: "2022 to present",
+    role: "Founder and Owner",
+    company: "MXM Detailing",
+    period: "Jan 2022 to present",
     location: "GTA",
     points: [
       "Started with a wagon in my neighbourhood, then grew through door-to-door sales and advertising.",
       "About 1,000 cars detailed for 100+ customers.",
       "Businesses and dealerships on monthly retainers.",
     ],
+  },
+  {
+    role: "Academic Tutor",
+    company: "Tutor Teach",
+    period: "Nov 2024 to Feb 2026",
+    points: ["Tutored computer science and general subjects."],
+  },
+  {
+    role: "Team Lead",
+    company: "Tim Hortons",
+    period: "Oct 2022 to Feb 2024",
+    location: "Burlington",
   },
   {
     role: "Owner",
@@ -214,17 +245,14 @@ export const skills = [
 export const certifications = [
   { name: "GitHub Foundations", status: "In progress" },
   { name: "Foundational C# with Microsoft (freeCodeCamp)", status: "In progress" },
-  { name: "Transport Canada drone pilot certificate (Basic)", status: "In progress" },
   { name: "Oracle Cloud Infrastructure Foundations", status: "Planned" },
-  { name: "Cisco Networking Academy: Linux and IoT", status: "Planned" },
 ];
 
-// Everything in the M&M Detailing app.
+// Everything in the MXM Detailing app.
 export const detailing = {
-  name: "M&M Detailing",
+  name: "MXM Detailing",
   tagline: "From a wagon to monthly retainers.",
-  // Placeholder link. Replace this with the real Instagram address.
-  instagram: "https://www.instagram.com/",
+  instagram: "https://www.instagram.com/mxmdetailing/",
   story: [
     { title: "A wagon", text: "Started with a wagon in my neighbourhood.", icon: "wagon" },
     { title: "Door to door", text: "Sold door to door.", icon: "door" },
