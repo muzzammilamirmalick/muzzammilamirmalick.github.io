@@ -2,7 +2,9 @@
 // Stops with more to say open when clicked.
 import { useState } from "react";
 import { motion, useReducedMotion } from "motion/react";
+import StatusLabel from "../components/layout/StatusLabel.jsx";
 import Icon from "../components/ui/Icon.jsx";
+import LiveSiteButton from "../components/ui/LiveSiteButton.jsx";
 import StatTiles from "../components/ui/StatTiles.jsx";
 import { codingSince, journey, stats } from "../data/content.js";
 import "./JourneyApp.css";
@@ -63,7 +65,13 @@ function Stop({ stop, index, skipAnimation }) {
         ) : (
           <div className="stop-heading">{heading}</div>
         )}
-        {open && <p className="stop-detail">{stop.detail}</p>}
+        {open && (
+          <div className="stop-detail">
+            {stop.status && <StatusLabel status={stop.status} />}
+            <p>{stop.detail}</p>
+            {stop.link && <LiveSiteButton url={stop.link} primary={false} className="stop-link" />}
+          </div>
+        )}
       </div>
     </motion.li>
   );

@@ -44,6 +44,38 @@
   font-size: 0.75rem;
 }
 
+/* A live project's screenshot, credit line and buttons. */
+.project-image {
+  display: block;
+  width: 100%;
+  height: auto;
+  aspect-ratio: 16 / 10;
+  object-fit: cover;
+  object-position: top;
+  border-bottom: 1px solid var(--window-line);
+  background: #000;
+}
+
+.project-credit {
+  color: var(--text);
+  font-size: 0.8125rem;
+  font-weight: 600;
+  line-height: 1.4;
+}
+
+.project-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: 0.25rem;
+}
+
+.project-code-note {
+  color: var(--amber-dim);
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+}
+
 /* The "Coming later" folder. */
 .later-folder {
   margin-top: 0.75rem;

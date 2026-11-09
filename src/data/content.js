@@ -80,8 +80,16 @@ export const journey = [
     icon: "projects",
   },
   {
+    when: "Nov 2026",
+    title: "Launched the MXM Detailing booking app",
+    detail: "Designed and built by Muzzammil Malick for my own detailing business",
+    status: "Live",
+    link: "https://mxmdetailing.com",
+    icon: "car",
+  },
+  {
     when: "Now",
-    title: "Building the MXM Detailing app, with Shot AI up next",
+    title: "Shot AI is up next",
     icon: "spark",
   },
 ];
@@ -95,6 +103,51 @@ export const stats = [
 ];
 
 export const codingSince = "Coding since age 8";
+
+// The MXM Detailing booking app. Projects, the MXM Detailing app, Journey and Simple view
+// all read from here, so a change made once shows up everywhere.
+export const mxmApp = {
+  name: "MXM Detailing booking app and website",
+  status: "Live",
+  url: "https://mxmdetailing.com",
+  credit: "Designed and built by Muzzammil Malick for my own detailing business",
+  description:
+    "Online booking with photo quotes, an owner dashboard and retainer accounts for dealerships, running live for my detailing business.",
+  tech: ["React", "C#", "ASP.NET Core", "SQL Server", "Azure"],
+  highlights: [
+    "Approval-based booking with photo quotes",
+    "Owner dashboard with two-factor login and retainer tracking",
+    "380+ automated tests",
+    "GitHub Actions deploy pipeline",
+  ],
+  // The code is in a private repository.
+  codeNote: "Code walkthrough available on request",
+  // Screenshots of the live site, saved as WebP in public/projects/mxm/.
+  screenshots: [
+    {
+      src: "/projects/mxm/home-desktop.webp",
+      width: 1200,
+      height: 750,
+      alt: "The MXM Detailing home page on a desktop, with a Book now button and a car you can wipe clean",
+      caption: "Home page, desktop",
+    },
+    {
+      src: "/projects/mxm/booking-builder.webp",
+      width: 1200,
+      height: 750,
+      alt: "The booking builder, with Full Detail chosen and an estimated total of $150",
+      caption: "Booking builder with a live estimate",
+    },
+    {
+      src: "/projects/mxm/home-phone.webp",
+      width: 390,
+      height: 844,
+      alt: "The MXM Detailing home page on a phone",
+      caption: "Home page, phone",
+      phone: true,
+    },
+  ],
+};
 
 // To add a project, copy one block and change the values.
 // Status can be "Live", "Building", "Up next" or "Planned". Planned projects go in the
@@ -111,11 +164,16 @@ export const projects = [
     preview: "desktop",
   },
   {
-    name: "MXM Detailing booking app and website",
-    description:
-      "Online booking, an admin dashboard, retainer accounts for dealerships and a before and after gallery for my detailing business.",
-    tech: ["React", "C#", "ASP.NET Core", "SQL", "Azure"],
-    status: "Building",
+    name: mxmApp.name,
+    description: mxmApp.description,
+    credit: mxmApp.credit,
+    tech: mxmApp.tech,
+    status: mxmApp.status,
+    url: mxmApp.url,
+    codeNote: mxmApp.codeNote,
+    // Shows the first screenshot on the card, and opens the MXM project window.
+    image: mxmApp.screenshots[0],
+    opensApp: "mxm",
     preview: "calendar",
   },
   {
@@ -186,6 +244,7 @@ export const experience = [
       "Started with a wagon in my neighbourhood, then grew through door-to-door sales and advertising.",
       "About 1,000 cars detailed for 100+ customers.",
       "Businesses and dealerships on monthly retainers.",
+      "Designed and built the business's booking app, live at mxmdetailing.com.",
     ],
   },
   {
@@ -305,9 +364,5 @@ export const detailing = {
       after: "/detailing/tiguan-interior-after.webp",
     },
   ],
-  comingSoon: {
-    title: "Booking app and website",
-    text: "Online booking, an admin dashboard and retainer accounts.",
-  },
 };
 

@@ -32,6 +32,7 @@ const commands = {
   projects: opensApp("projects", "Projects", "What I'm building"),
   journey: opensApp("journey", "Journey", "How I got here"),
   detailing: opensApp("detailing", "MXM Detailing", "My detailing business"),
+  mxm: opensApp("mxm", "MXM booking app", "The live booking app I built"),
   experience: opensApp("experience", "Experience", "Work and education"),
   skills: opensApp("skills", "Skills", "Software, hardware and tools"),
   certifications: opensApp("certifications", "Certifications", "Certification status"),

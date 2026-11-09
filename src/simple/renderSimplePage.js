@@ -7,6 +7,7 @@ import {
   education,
   experience,
   journey,
+  mxmApp,
   profile,
   projects,
   skills,
@@ -24,10 +25,15 @@ function escape(text) {
 const list = (items, render) => items.map(render).join("\n");
 
 function renderProject(project) {
+  const isMxm = project.name === mxmApp.name;
   return `<li>
     <h3>${escape(project.name)} <span class="status">${escape(project.status)}</span></h3>
+    ${project.credit ? `<p><strong>${escape(project.credit)}</strong></p>` : ""}
     <p>${escape(project.description)}</p>
+    ${isMxm ? `<ul class="points">${list(mxmApp.highlights, (item) => `<li>${escape(item)}</li>`)}</ul>` : ""}
     <p class="meta">${escape(project.tech.join(", "))}</p>
+    ${project.url ? `<p><a href="${escape(project.url)}" target="_blank" rel="noopener noreferrer">Visit live site</a></p>` : ""}
+    ${project.codeNote ? `<p class="meta">${escape(project.codeNote)}</p>` : ""}
   </li>`;
 }
 
@@ -77,7 +83,7 @@ export function renderSimplePage() {
   <section>
     <h2>Journey</h2>
     <ul class="stack">
-      ${list(journey, (stop) => `<li><strong>${escape(stop.when)}:</strong> ${escape(stop.title)}.${stop.detail ? ` ${escape(stop.detail)}` : ""}</li>`)}
+      ${list(journey, (stop) => `<li><strong>${escape(stop.when)}:</strong> ${escape(stop.title)}.${stop.detail ? ` ${escape(stop.detail)}.` : ""}${stop.status ? ` <span class="status">${escape(stop.status)}</span>` : ""}${stop.link ? ` <a href="${escape(stop.link)}" target="_blank" rel="noopener noreferrer">Visit live site</a>` : ""}</li>`)}
     </ul>
   </section>
   <section>
@@ -98,6 +104,7 @@ export function renderSimplePage() {
     <ol class="points">${list(detailing.story, (step) => `<li>${escape(step.text)}</li>`)}</ol>
     <p>About 1,000 cars detailed and 100+ customers, including businesses and dealerships on monthly retainers. Started in 2022 in the GTA.</p>
     <p>Services: ${escape(detailing.services.map((service) => service.name).join(", "))}.</p>
+    <p><span class="status">${escape(mxmApp.status)}</span> Booking app: <a href="${escape(mxmApp.url)}" target="_blank" rel="noopener noreferrer">${escape(mxmApp.url.replace("https://", ""))}</a>. ${escape(mxmApp.credit)}.</p>
     <p><a href="${escape(detailing.instagram)}">${escape(detailing.name)} on Instagram</a></p>
   </section>
   <section>

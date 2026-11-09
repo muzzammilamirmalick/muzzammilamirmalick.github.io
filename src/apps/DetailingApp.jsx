@@ -1,10 +1,13 @@
 // My detailing business, styled like a small brand page of its own.
 import { useState } from "react";
 import { motion, useReducedMotion } from "motion/react";
+import StatusLabel from "../components/layout/StatusLabel.jsx";
 import BeforeAfterSlider from "../components/ui/BeforeAfterSlider.jsx";
 import Icon from "../components/ui/Icon.jsx";
+import LiveSiteButton from "../components/ui/LiveSiteButton.jsx";
 import StatTiles from "../components/ui/StatTiles.jsx";
-import { detailing } from "../data/content.js";
+import { detailing, mxmApp } from "../data/content.js";
+import { useOs } from "../os/OsContext.js";
 import "./DetailingApp.css";
 
 const EASE_OUT = [0.22, 1, 0.36, 1];
@@ -65,6 +68,8 @@ function Results() {
 }
 
 export default function DetailingApp() {
+  const { openApp } = useOs();
+
   return (
     <div className="dt">
       <div className="dt-hero">
@@ -108,10 +113,19 @@ export default function DetailingApp() {
         <Results />
       </section>
 
-      <aside className="dt-soon">
-        <span className="dt-soon-tag">Coming soon</span>
-        <h3 className="dt-soon-title">{detailing.comingSoon.title}</h3>
-        <p className="dt-soon-text">{detailing.comingSoon.text}</p>
+      <aside className="dt-live" aria-labelledby="dt-live-title">
+        <StatusLabel status={mxmApp.status} />
+        <h3 className="dt-live-title" id="dt-live-title">
+          {mxmApp.name}
+        </h3>
+        <p className="dt-live-credit">{mxmApp.credit}</p>
+        <div className="dt-live-actions">
+          <LiveSiteButton url={mxmApp.url} />
+          <button type="button" className="btn" onClick={(event) => openApp("mxm", event.currentTarget)}>
+            Screenshots
+          </button>
+        </div>
+        <p className="dt-live-note">{mxmApp.codeNote}</p>
       </aside>
     </div>
   );
