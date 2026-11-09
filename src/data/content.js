@@ -2,7 +2,7 @@
 // To change the site's text, add a project or update a certification, edit it here.
 
 // Your IKEA job title. It is used in About, Journey and Experience.
-const ikeaTitle = "Logistics and Fulfillment Coordinator";
+const ikeaTitle = "Logistics Associate, Level 3 (Acting Warehouse Supervisor)";
 
 export const profile = {
   name: "Muzzammil Malick",
@@ -11,9 +11,8 @@ export const profile = {
   email: "muzzammilmalick@gmail.com",
   linkedin: "https://www.linkedin.com/in/muzzammil-malick-2a8346346/",
   github: "https://github.com/muzzammilamirmalick",
-  // The Resume buttons stay hidden while this is null. When you add public/resume.pdf,
-  // change this to "/resume.pdf".
-  resume: null,
+  // Set to null to hide the Resume window, terminal command and Simple view link.
+  resume: "/resume.pdf",
 };
 
 // The messages typed on the monitor during the intro.
