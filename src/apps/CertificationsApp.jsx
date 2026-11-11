@@ -10,8 +10,18 @@ export default function CertificationsApp() {
       {certifications.map((cert) => (
         <li className="cert" key={cert.name}>
           <Icon name="certifications" size={18} />
-          <span className="cert-name">{cert.name}</span>
-          <StatusLabel status={cert.status} date={cert.date} />
+          <div className="cert-body">
+            <div className="cert-top">
+              <span className="cert-name">{cert.name}</span>
+              <StatusLabel status={cert.status} date={cert.date} />
+            </div>
+            {cert.image && (
+              <a className="cert-image" href={cert.url} target="_blank" rel="noreferrer">
+                <img src={cert.image} alt={`${cert.name} certificate`} loading="lazy" />
+                <span className="cert-verify">Verify certificate</span>
+              </a>
+            )}
+          </div>
         </li>
       ))}
     </ul>

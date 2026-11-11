@@ -303,9 +303,16 @@ export const skills = [
 
 // When you earn one, change its status and add the date, like this:
 // { name: "GitHub Foundations", status: "Earned", date: "June 2027" },
+// image and url are optional: a picture of the certificate and the link to verify it.
 export const certifications = [
+  {
+    name: "Foundational C# with Microsoft (freeCodeCamp)",
+    status: "Earned",
+    date: "November 2026",
+    image: "/certifications/foundational-csharp.webp",
+    url: "https://freecodecamp.org/certification/fcc26fe8de7-3980-49b0-ac7e-e56cce1c8cf8/foundational-c-sharp-with-microsoft",
+  },
   { name: "GitHub Foundations", status: "In progress" },
-  { name: "Foundational C# with Microsoft (freeCodeCamp)", status: "In progress" },
   { name: "Oracle Cloud Infrastructure Foundations", status: "Planned" },
 ];
 

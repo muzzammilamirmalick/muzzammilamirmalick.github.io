@@ -59,7 +59,8 @@ function renderSkill(skill) {
 
 function renderCertification(cert) {
   const date = cert.date ? ` ${escape(cert.date)}` : "";
-  return `<li>${escape(cert.name)} <span class="status">${escape(cert.status)}${date}</span></li>`;
+  const verify = cert.url ? ` <a href="${escape(cert.url)}">Verify</a>` : "";
+  return `<li>${escape(cert.name)} <span class="status">${escape(cert.status)}${date}</span>${verify}</li>`;
 }
 
 export function renderSimplePage() {
