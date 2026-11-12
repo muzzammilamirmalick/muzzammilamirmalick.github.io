@@ -88,6 +88,15 @@ export const journey = [
     icon: "car",
   },
   {
+    when: "Nov 2026",
+    title: "Built the My Sky flight tracker",
+    detail:
+      "A live map of planes over Hamilton from my own ADS-B antenna on a Raspberry Pi.",
+    status: "Built",
+    link: "https://github.com/muzzammilamirmalick/flight-tracker",
+    icon: "projects",
+  },
+  {
     when: "Now",
     title: "Shot AI is up next",
     icon: "spark",
@@ -149,6 +158,67 @@ export const mxmApp = {
   ],
 };
 
+// The My Sky flight tracker. Projects, the My Sky window, Journey and Simple view
+// all read from here, so a change made once shows up everywhere.
+export const flightApp = {
+  name: "My Sky flight tracker",
+  status: "Built",
+  repo: "https://github.com/muzzammilamirmalick/flight-tracker",
+  credit: "Built by Muzzammil Malick",
+  description:
+    "A live map of planes over Hamilton, picked up by my own ADS-B antenna on a Raspberry Pi. It tells you which way to look in the sky and what the plane is, in plain words.",
+  tech: ["C#", "ASP.NET Core", "PostgreSQL", "React", "TypeScript", "Raspberry Pi"],
+  highlights: [
+    "Reads planes from my own antenna, with OpenSky as a backup source behind one interface",
+    "Look Up card: the compass direction and angle to find the plane in the real sky",
+    "Live map with altitude colours, smooth motion and fading trails",
+    "Split-flap board, a day replay and a Today over Hamilton stats page",
+    "xUnit and Vitest tests, with a GitHub Actions pipeline",
+  ],
+  codeNote: "Open source on GitHub",
+  // When the demo video is ready, put it in public/videos/ and set:
+  // video: "/videos/my-sky.mp4",
+  screenshots: [
+    {
+      src: "/projects/flight-tracker/flight-replay.webp",
+      width: 1440,
+      height: 900,
+      alt: "The My Sky live map replaying the evening planes over Hamilton",
+      caption: "Replaying the day over Hamilton",
+    },
+    {
+      src: "/projects/flight-tracker/flight-details.webp",
+      width: 1440,
+      height: 900,
+      alt: "Tapping a plane shows its airline, type, altitude, speed and route",
+      caption: "Plane details in plain words",
+    },
+    {
+      src: "/projects/flight-tracker/flight-today.webp",
+      width: 1440,
+      height: 900,
+      alt: "The Today over Hamilton page, showing the planes picked up and the busiest hour",
+      caption: "Today over Hamilton",
+    },
+    {
+      src: "/projects/flight-tracker/flight-phone-live.webp",
+      width: 390,
+      height: 844,
+      alt: "The live map on a phone",
+      caption: "Live map, phone",
+      phone: true,
+    },
+    {
+      src: "/projects/flight-tracker/flight-phone-board.webp",
+      width: 390,
+      height: 844,
+      alt: "The nearest planes board on a phone",
+      caption: "Nearest planes, phone",
+      phone: true,
+    },
+  ],
+};
+
 // To add a project, copy one block and change the values.
 // Status can be "Live", "Building", "Up next" or "Planned". Planned projects go in the
 // "Coming later" folder. To add a video preview, put the file in public/videos/ and
@@ -177,26 +247,23 @@ export const projects = [
     preview: "calendar",
   },
   {
+    name: flightApp.name,
+    description: flightApp.description,
+    credit: flightApp.credit,
+    tech: flightApp.tech,
+    status: flightApp.status,
+    codeNote: flightApp.codeNote,
+    // Shows the first screenshot on the card, and opens the My Sky project window.
+    image: flightApp.screenshots[0],
+    opensApp: "flight",
+  },
+  {
     name: "Shot AI",
     description:
       "An AI basketball coach that counts my makes and misses, tracks my shot arc, checks my form and maps my hot spots.",
     tech: ["Computer vision", "Python", "OpenCV"],
     status: "Up next",
     preview: "basketball",
-  },
-  {
-    name: "Live flight tracker",
-    description:
-      "A real-time map of aircraft in the sky right now, with search by flight number or airport and a saved history of each flight's path.",
-    tech: ["C#", "ASP.NET Core", "SQL", "REST APIs"],
-    status: "Planned",
-  },
-  {
-    name: "ADS-B receiver",
-    description:
-      "My own ground station: a Raspberry Pi and radio antenna that catch signals broadcast by planes overhead, decode them and feed my flight tracker.",
-    tech: ["Raspberry Pi", "RTL-SDR", "Python", "Linux"],
-    status: "Planned",
   },
   {
     name: "PC health monitor",

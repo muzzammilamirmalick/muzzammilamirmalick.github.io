@@ -13,7 +13,8 @@
 
 /* Finished things are solid amber. */
 .status-live,
-.status-earned {
+.status-earned,
+.status-built {
   border-color: var(--amber);
   color: var(--bg);
   background: var(--amber);

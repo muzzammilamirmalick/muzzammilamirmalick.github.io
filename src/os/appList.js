@@ -11,6 +11,7 @@ const loaders = {
   projects: () => import("../apps/ProjectsApp.jsx"),
   detailing: () => import("../apps/DetailingApp.jsx"),
   mxm: () => import("../apps/MxmProjectApp.jsx"),
+  flight: () => import("../apps/FlightProjectApp.jsx"),
   experience: () => import("../apps/ExperienceApp.jsx"),
   skills: () => import("../apps/SkillsApp.jsx"),
   certifications: () => import("../apps/CertificationsApp.jsx"),
@@ -26,6 +27,8 @@ export const apps = [
   { id: "detailing", label: "MXM Detailing", icon: "car", width: 700, height: 610, Component: lazy(loaders.detailing) },
   // The MXM booking app project. It opens from Projects, MXM Detailing and the terminal, so it has no desktop icon.
   { id: "mxm", label: "MXM booking app", icon: "car", width: 760, height: 620, Component: lazy(loaders.mxm), hidden: true },
+  // The My Sky flight tracker project. Opens from Projects, so it has no desktop icon.
+  { id: "flight", label: "My Sky flight tracker", icon: "projects", width: 800, height: 640, Component: lazy(loaders.flight), hidden: true },
   { id: "experience", label: "Experience", icon: "experience", width: 560, height: 480, Component: lazy(loaders.experience) },
   { id: "skills", label: "Skills", icon: "skills", width: 520, height: 400, Component: lazy(loaders.skills) },
   { id: "certifications", label: "Certifications", icon: "certifications", width: 540, height: 360, Component: lazy(loaders.certifications) },
