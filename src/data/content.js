@@ -99,7 +99,7 @@ export const journey = [
   {
     when: "Nov 2026",
     title: "Built gesture control for my computer",
-    detail: "Hand gestures from my webcam turned into real clicks, cursor moves and media keys.",
+    detail: "Hand gestures from my webcam turned into real clicks, cursor moves and media keys, plus ASL letter spelling and blink control.",
     status: "Built",
     link: "https://github.com/muzzammilamirmalick/gesture-desktop",
     icon: "projects",
@@ -284,8 +284,8 @@ export const projects = [
   {
     name: "Gesture control (desktop)",
     description:
-      "Control my computer with hand gestures from my webcam. Pinch to click, point to move the cursor, swipe to switch windows, and thumbs up or down for volume. Control starts off and each gesture fires once until I reset with a fist.",
-    tech: ["Python", "MediaPipe", "OpenCV", "pyautogui", "pytest"],
+      "Control my computer with hand gestures from my webcam. Point to move the mouse, pinch to click, pinch and hold to close a window, and swipe to switch apps. It also reads ASL letters to spell words, and blinking twice plays or pauses music. Works on Windows and Mac.",
+    tech: ["Python", "MediaPipe", "OpenCV", "pyautogui", "pytest", "Windows and macOS"],
     status: "Built",
     repo: "https://github.com/muzzammilamirmalick/gesture-desktop",
     codeNote: "Open source on GitHub",
