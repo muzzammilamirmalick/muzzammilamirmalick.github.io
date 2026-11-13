@@ -97,6 +97,14 @@ export const journey = [
     icon: "projects",
   },
   {
+    when: "Nov 2026",
+    title: "Built gesture control for my computer",
+    detail: "Hand gestures from my webcam turned into real clicks, cursor moves and media keys.",
+    status: "Built",
+    link: "https://github.com/muzzammilamirmalick/gesture-desktop",
+    icon: "projects",
+  },
+  {
     when: "Now",
     title: "Shot AI is up next",
     icon: "spark",
@@ -272,6 +280,15 @@ export const projects = [
     // Shows the first screenshot on the card, and opens the My Sky project window.
     image: flightApp.screenshots[0],
     opensApp: "flight",
+  },
+  {
+    name: "Gesture control (desktop)",
+    description:
+      "Control my computer with hand gestures from my webcam. Pinch to click, point to move the cursor, swipe to switch windows, and thumbs up or down for volume. Control starts off and each gesture fires once until I reset with a fist.",
+    tech: ["Python", "MediaPipe", "OpenCV", "pyautogui", "pytest"],
+    status: "Built",
+    repo: "https://github.com/muzzammilamirmalick/gesture-desktop",
+    codeNote: "Open source on GitHub",
   },
   {
     name: "Shot AI",

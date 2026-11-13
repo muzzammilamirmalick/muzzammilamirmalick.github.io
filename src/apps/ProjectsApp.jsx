@@ -51,9 +51,15 @@ export default function ProjectsApp() {
               {project.credit && <p className="project-credit">{project.credit}</p>}
               <p className="project-description">{project.description}</p>
               <TechList tech={project.tech} />
-              {(project.url || project.opensApp) && (
+              {(project.url || project.repo || project.opensApp) && (
                 <div className="project-actions">
                   {project.url && <LiveSiteButton url={project.url} />}
+                  {project.repo && (
+                    <a className="btn" href={project.repo} target="_blank" rel="noopener noreferrer">
+                      View code
+                      <span className="sr-only"> (opens in a new tab)</span>
+                    </a>
+                  )}
                   {project.opensApp && (
                     <button
                       type="button"
