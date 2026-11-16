@@ -37,7 +37,47 @@ function BasketballScene() {
   );
 }
 
-const scenes = { desktop: DesktopScene, calendar: CalendarScene, basketball: BasketballScene };
+// Gesture control: a tracked hand skeleton moving the cursor, with its finger count.
+// Each line is one finger, from the wrist out to the tip, like MediaPipe's landmarks.
+const HAND_LINES = [
+  "M160 160 L140 148 L125 135 L113 121 L103 108",
+  "M160 160 L145 110 L141 88 L139 74 L137 60",
+  "M160 106 L160 82 L160 67 L160 52",
+  "M174 110 L177 88 L179 75 L181 63",
+  "M160 160 L186 118 L192 101 L195 90 L198 80",
+  "M145 110 L160 106 L174 110 L186 118",
+];
+const FINGERTIPS = [
+  [103, 108],
+  [137, 60],
+  [160, 52],
+  [181, 63],
+  [198, 80],
+];
+
+function HandScene() {
+  return (
+    <div className="scene scene-hand">
+      <svg viewBox="40 40 256 144" aria-hidden="true">
+        <g className="hand">
+          {HAND_LINES.map((line) => (
+            <path key={line} d={line} />
+          ))}
+          {FINGERTIPS.map(([x, y]) => (
+            <circle key={x} cx={x} cy={y} r="4" />
+          ))}
+          <rect className="hand-tag" x="176" y="146" width="56" height="16" rx="2" />
+          <text className="hand-tag-text" x="204" y="158">
+            Right 5
+          </text>
+        </g>
+        <path className="hand-cursor" d="M0 0 L0 16 L4 12 L8 20 L11 19 L7 11 L13 11 Z" />
+      </svg>
+    </div>
+  );
+}
+
+const scenes = { desktop: DesktopScene, calendar: CalendarScene, basketball: BasketballScene, hand: HandScene };
 
 export default function ProjectPreview({ project }) {
   const [playing, setPlaying] = useState(false);

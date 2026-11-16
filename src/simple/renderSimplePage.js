@@ -6,6 +6,7 @@ import {
   detailing,
   education,
   experience,
+  flightApp,
   journey,
   mxmApp,
   profile,
@@ -24,15 +25,33 @@ function escape(text) {
 
 const list = (items, render) => items.map(render).join("\n");
 
+// Ends a line with a full stop, unless it already has one.
+const sentence = (text) => (/[.!?]$/.test(text) ? text : `${text}.`);
+
+// A journey link goes either to the code on GitHub or to a live site.
+const linkLabel = (url) => (url.includes("github.com") ? "View code" : "Visit live site");
+
+function renderJourneyStop(stop) {
+  const detail = stop.detail ? ` ${escape(sentence(stop.detail))}` : "";
+  const status = stop.status ? ` <span class="status">${escape(stop.status)}</span>` : "";
+  const link = stop.link
+    ? ` <a href="${escape(stop.link)}" target="_blank" rel="noopener noreferrer">${linkLabel(stop.link)}</a>`
+    : "";
+  return `<li><strong>${escape(stop.when)}:</strong> ${escape(sentence(stop.title))}${detail}${status}${link}</li>`;
+}
+
 function renderProject(project) {
   const isMxm = project.name === mxmApp.name;
+  const isFlight = project.name === flightApp.name;
+  const highlights = isMxm ? mxmApp.highlights : isFlight ? flightApp.highlights : null;
   return `<li>
     <h3>${escape(project.name)} <span class="status">${escape(project.status)}</span></h3>
     ${project.credit ? `<p><strong>${escape(project.credit)}</strong></p>` : ""}
     <p>${escape(project.description)}</p>
-    ${isMxm ? `<ul class="points">${list(mxmApp.highlights, (item) => `<li>${escape(item)}</li>`)}</ul>` : ""}
+    ${highlights ? `<ul class="points">${list(highlights, (item) => `<li>${escape(item)}</li>`)}</ul>` : ""}
     <p class="meta">${escape(project.tech.join(", "))}</p>
     ${project.url ? `<p><a href="${escape(project.url)}" target="_blank" rel="noopener noreferrer">Visit live site</a></p>` : ""}
+    ${project.repo ? `<p><a href="${escape(project.repo)}" target="_blank" rel="noopener noreferrer">View on GitHub</a></p>` : ""}
     ${project.codeNote ? `<p class="meta">${escape(project.codeNote)}</p>` : ""}
   </li>`;
 }
@@ -77,14 +96,15 @@ export function renderSimplePage() {
   <p><a href="/">Open the full MuzzOS experience</a></p>
 </header>
 <main>
-  <section>
-    <h2>About</h2>
-    ${list(about, (paragraph) => `<p>${escape(paragraph)}</p>`)}
-  </section>
-  <section>
-    <h2>Journey</h2>
-    <ul class="stack">
-      ${list(journey, (stop) => `<li><strong>${escape(stop.when)}:</strong> ${escape(stop.title)}.${stop.detail ? ` ${escape(stop.detail)}.` : ""}${stop.status ? ` <span class="status">${escape(stop.status)}</span>` : ""}${stop.link ? ` <a href="${escape(stop.link)}" target="_blank" rel="noopener noreferrer">Visit live site</a>` : ""}</li>`)}
+  <section class="snapshot">
+    <h2>In 30 seconds</h2>
+    <ul class="points">
+      <li>Software development student at Mohawk College, looking for a May 2027 co-op.</li>
+      <li>Built and launched <a href="${escape(mxmApp.url)}" target="_blank" rel="noopener noreferrer">mxmdetailing.com</a>, a full booking platform for my own detailing business, with React, C#, ASP.NET Core and Azure.</li>
+      <li>Built My Sky, a live flight tracker fed by my own ADS-B antenna on a Raspberry Pi. <a href="${escape(flightApp.repo)}" target="_blank" rel="noopener noreferrer">Code on GitHub</a>.</li>
+      <li>Built gesture control for my computer: both hands tracked at 60 fps, gestures I train myself and offline voice commands. <a href="https://github.com/muzzammilamirmalick/gesture-desktop" target="_blank" rel="noopener noreferrer">Code on GitHub</a>.</li>
+      <li>Promoted through five roles at IKEA to acting warehouse supervisor, and ran my own detailing business to about 1,000 cars.</li>
+      <li>Certified in Foundational C# with Microsoft.</li>
     </ul>
   </section>
   <section>
@@ -100,6 +120,24 @@ export function renderSimplePage() {
     </ul>
   </section>
   <section>
+    <h2>Skills</h2>
+    <ul class="stack">${list(skills, renderSkill)}</ul>
+  </section>
+  <section>
+    <h2>Certifications</h2>
+    <ul class="stack">${list(certifications, renderCertification)}</ul>
+  </section>
+  <section>
+    <h2>About</h2>
+    ${list(about, (paragraph) => `<p>${escape(paragraph)}</p>`)}
+  </section>
+  <section>
+    <h2>Journey</h2>
+    <ul class="stack">
+      ${list(journey, renderJourneyStop)}
+    </ul>
+  </section>
+  <section>
     <h2>${escape(detailing.name)}</h2>
     <p>${escape(detailing.tagline)}</p>
     <ol class="points">${list(detailing.story, (step) => `<li>${escape(step.text)}</li>`)}</ol>
@@ -109,16 +147,9 @@ export function renderSimplePage() {
     <p><a href="${escape(detailing.instagram)}">${escape(detailing.name)} on Instagram</a></p>
   </section>
   <section>
-    <h2>Skills</h2>
-    <ul class="stack">${list(skills, renderSkill)}</ul>
-  </section>
-  <section>
-    <h2>Certifications</h2>
-    <ul class="stack">${list(certifications, renderCertification)}</ul>
-  </section>
-  <section>
     <h2>Contact</h2>
     <p><a href="mailto:${escape(profile.email)}">${escape(profile.email)}</a></p>
+    <p><a href="/">Open the full MuzzOS experience</a></p>
   </section>
 </main>`;
 }

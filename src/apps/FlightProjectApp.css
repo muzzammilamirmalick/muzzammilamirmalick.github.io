@@ -20,11 +20,6 @@
   font-size: 1.125rem;
 }
 
-.flight-credit {
-  color: var(--text);
-  font-weight: 600;
-}
-
 .flight-description {
   font-size: 0.875rem;
   line-height: 1.5;
@@ -40,12 +35,6 @@
 
 .flight-repo {
   gap: 0.5rem;
-}
-
-.flight-code-note {
-  color: var(--amber-dim);
-  font-family: var(--font-mono);
-  font-size: 0.75rem;
 }
 
 .flight-heading {

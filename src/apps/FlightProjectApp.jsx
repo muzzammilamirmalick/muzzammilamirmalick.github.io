@@ -12,7 +12,6 @@ export default function FlightProjectApp() {
           <h2 className="flight-name">{flightApp.name}</h2>
           <StatusLabel status={flightApp.status} />
         </div>
-        <p className="flight-credit">{flightApp.credit}</p>
         <p className="flight-description">{flightApp.description}</p>
         <div className="flight-actions">
           <a
@@ -25,7 +24,6 @@ export default function FlightProjectApp() {
             View on GitHub
             <span className="sr-only"> (opens in a new tab)</span>
           </a>
-          <p className="flight-code-note">{flightApp.codeNote}</p>
         </div>
       </header>
 

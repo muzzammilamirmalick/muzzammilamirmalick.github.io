@@ -7,7 +7,7 @@ const ikeaTitle = "Logistics Associate, Level 3 (Acting Warehouse Supervisor)";
 export const profile = {
   name: "Muzzammil Malick",
   role: "Software development student at Mohawk College",
-  availability: "Looking for a summer 2027 co-op",
+  availability: "Looking for a May 2027 co-op",
   email: "muzzammilmalick@gmail.com",
   linkedin: "https://www.linkedin.com/in/muzzammil-malick-2a8346346/",
   github: "https://github.com/muzzammilamirmalick",
@@ -23,9 +23,9 @@ export const boot = {
 
 // The full About text. It appears in Simple view. Each string is one paragraph.
 export const about = [
-  "I've been writing code since I was 8 and taking computers apart for almost as long. When COVID sent everyone home, I turned that into a business: I repaired phones and computers across the GTA and built home office setups so people could keep working.",
-  `Today I'm a ${ikeaTitle} at IKEA, where I find what slows the team down and fix it, with software and on the floor. I study software development at Mohawk College, and I'm happiest where code meets hardware: embedded systems, aviation and logistics.`,
-  "I build things that work in the real world, and I'm looking for a summer 2027 co-op where I can do that on a real team.",
+  "I've been writing code since I was 8 and taking computers apart for almost as long. During COVID I turned that into a business, repairing phones and computers across the GTA and setting up home offices.",
+  `Today I'm a ${ikeaTitle} at IKEA, where I find what slows the team down and fix it. I study software development at Mohawk College, and I'm happiest where code meets hardware: embedded systems, aviation and logistics.`,
+  "I build things that work in the real world, and I'm looking for a May 2027 co-op where I can do that on a real team.",
 ];
 
 // The two lines the "about" terminal command prints.
@@ -82,7 +82,7 @@ export const journey = [
   {
     when: "Nov 2026",
     title: "Launched the MXM Detailing booking app",
-    detail: "Designed and built by Muzzammil Malick for my own detailing business",
+    detail: "Built for my own detailing business",
     status: "Live",
     link: "https://mxmdetailing.com",
     icon: "car",
@@ -99,7 +99,7 @@ export const journey = [
   {
     when: "Nov 2026",
     title: "Built gesture control for my computer",
-    detail: "Hand gestures from my webcam turned into real clicks, cursor moves and media keys, plus ASL letter spelling and blink control.",
+    detail: "Hand and voice control for my computer: both hands tracked, finger counting, gestures I train myself and offline voice commands.",
     status: "Built",
     link: "https://github.com/muzzammilamirmalick/gesture-desktop",
     icon: "projects",
@@ -127,9 +127,9 @@ export const mxmApp = {
   name: "MXM Detailing booking app and website",
   status: "Live",
   url: "https://mxmdetailing.com",
-  credit: "Designed and built by Muzzammil Malick for my own detailing business",
+  credit: "Built for my own detailing business",
   description:
-    "Online booking with photo quotes, an owner dashboard and retainer accounts for dealerships, running live for my detailing business.",
+    "Online booking with photo quotes, an owner dashboard and retainer accounts for dealerships.",
   tech: ["React", "C#", "ASP.NET Core", "SQL Server", "Azure"],
   highlights: [
     "Approval-based booking with photo quotes",
@@ -172,9 +172,8 @@ export const flightApp = {
   name: "My Sky flight tracker",
   status: "Built",
   repo: "https://github.com/muzzammilamirmalick/flight-tracker",
-  credit: "Built by Muzzammil Malick",
   description:
-    "A live map of planes over Hamilton, picked up by my own ADS-B antenna on a Raspberry Pi. It tells you which way to look in the sky and what the plane is, in plain words.",
+    "A live map of planes over Hamilton from my own ADS-B antenna on a Raspberry Pi. It shows which way to look and what each plane is.",
   tech: ["C#", "ASP.NET Core", "PostgreSQL", "React", "TypeScript", "Raspberry Pi"],
   highlights: [
     "Reads planes from my own antenna, with OpenSky as a backup source behind one interface",
@@ -184,7 +183,6 @@ export const flightApp = {
     "Aviation history: 10 famous flights mapped from official accident reports, with the ATC exchange and the safety lessons",
     "xUnit and Vitest tests, with a GitHub Actions pipeline",
   ],
-  codeNote: "Open source on GitHub",
   // When the demo video is ready, put it in public/videos/ and set:
   // video: "/videos/my-sky.mp4",
   screenshots: [
@@ -260,7 +258,6 @@ export const projects = [
   {
     name: mxmApp.name,
     description: mxmApp.description,
-    credit: mxmApp.credit,
     tech: mxmApp.tech,
     status: mxmApp.status,
     url: mxmApp.url,
@@ -273,22 +270,21 @@ export const projects = [
   {
     name: flightApp.name,
     description: flightApp.description,
-    credit: flightApp.credit,
     tech: flightApp.tech,
     status: flightApp.status,
-    codeNote: flightApp.codeNote,
+    repo: flightApp.repo,
     // Shows the first screenshot on the card, and opens the My Sky project window.
     image: flightApp.screenshots[0],
     opensApp: "flight",
   },
   {
-    name: "Gesture control (desktop)",
+    name: "Gesture control",
     description:
-      "Control my computer with hand gestures from my webcam. Point to move the mouse, pinch to click, pinch and hold to close a window, and swipe to switch apps. It also reads ASL letters to spell words, and blinking twice plays or pauses music. Works on Windows and Mac.",
-    tech: ["Python", "MediaPipe", "OpenCV", "pyautogui", "pytest", "Windows and macOS"],
+      "Control my computer with my hands and voice. It tracks both hands at 60 fps, counts fingers, learns gestures I record and changes controls for the app in front. Voice runs offline.",
+    tech: ["Python", "MediaPipe", "OpenCV", "Vosk", "PyInstaller", "pytest"],
     status: "Built",
     repo: "https://github.com/muzzammilamirmalick/gesture-desktop",
-    codeNote: "Open source on GitHub",
+    preview: "hand",
   },
   {
     name: "Shot AI",
@@ -329,8 +325,8 @@ export const experience = [
     period: "Aug 2024 to present",
     location: "Burlington",
     points: [
-      "Found that evening home delivery staging lost 4 to 5 hours of labour per shift because the delivery platform and the warehouse picking system shared order data with no automated link.",
-      "Proposed an automated sync between the two systems and a 3-person picking pod that sorts carts by route; the process was adopted, cutting up to 4 to 5 hours of staging per shift for staff who use it.",
+      "Found that evening home delivery staging lost 4 to 5 hours of labour per shift because the delivery platform and the picking system had no automated link.",
+      "Proposed an automated sync and a 3-person picking pod that sorts carts by route. It was adopted and cuts up to 4 to 5 hours of staging per shift.",
       "Built an interactive web simulation to present the old and new process to management.",
       "Trained 15+ coworkers on the Click & Collect process using an interactive training page I built.",
     ],

@@ -307,9 +307,27 @@ export default function Intro({ autoStart, onReveal, onFinish }) {
             exit={{ opacity: 0 }}
             transition={{ duration: 0.2, ease: "easeOut" }}
           >
-            <button className="btn btn-primary intro-start-button" type="button" onClick={start} autoFocus>
-              Click or press Enter to start
-            </button>
+            <div className="intro-chooser">
+              <p className="intro-chooser-name">Muzzammil Malick</p>
+              <p className="intro-chooser-role">
+                Software developer, looking for a May 2027 co-op
+              </p>
+              <div className="intro-chooser-buttons">
+                <a className="btn intro-chooser-pick" href="/simple.html">
+                  Quick view
+                  <span className="intro-chooser-note">A 30 second summary</span>
+                </a>
+                <button
+                  className="btn btn-primary intro-chooser-pick"
+                  type="button"
+                  onClick={start}
+                  autoFocus
+                >
+                  Full experience
+                  <span className="intro-chooser-note">Animated MuzzOS desktop</span>
+                </button>
+              </div>
+            </div>
           </motion.div>
         )}
       </AnimatePresence>

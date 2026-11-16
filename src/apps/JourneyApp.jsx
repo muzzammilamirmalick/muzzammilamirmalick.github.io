@@ -69,7 +69,14 @@ function Stop({ stop, index, skipAnimation }) {
           <div className="stop-detail">
             {stop.status && <StatusLabel status={stop.status} />}
             <p>{stop.detail}</p>
-            {stop.link && <LiveSiteButton url={stop.link} primary={false} className="stop-link" />}
+            {stop.link && (
+              <LiveSiteButton
+                url={stop.link}
+                primary={false}
+                className="stop-link"
+                label={stop.link.includes("github.com") ? "View code" : "Visit live site"}
+              />
+            )}
           </div>
         )}
       </div>

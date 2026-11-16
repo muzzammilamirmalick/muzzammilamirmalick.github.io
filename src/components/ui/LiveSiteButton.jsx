@@ -1,8 +1,9 @@
 // "Visit live site": opens a project's real website in a new tab.
+// Pass a different label for other links, like "View code" for GitHub.
 import Icon from "./Icon.jsx";
 import "./LiveSiteButton.css";
 
-export default function LiveSiteButton({ url, primary = true, className = "" }) {
+export default function LiveSiteButton({ url, primary = true, className = "", label = "Visit live site" }) {
   return (
     <a
       className={`btn ${primary ? "btn-primary" : ""} live-site-button ${className}`.trim()}
@@ -11,7 +12,7 @@ export default function LiveSiteButton({ url, primary = true, className = "" }) 
       rel="noopener noreferrer"
     >
       <Icon name="link" size={18} />
-      Visit live site
+      {label}
       <span className="sr-only"> (opens in a new tab)</span>
     </a>
   );

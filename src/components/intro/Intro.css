@@ -39,10 +39,12 @@
   box-shadow: none;
 }
 
-/* The Start button, in the exact middle of the page. */
+/* The chooser, in the exact middle of the page. The layer itself lets clicks through,
+   so the card turns them back on for itself and everything inside it. */
 .intro-start {
   position: absolute;
   inset: 0;
+  z-index: 10;
   display: grid;
   place-items: center;
   padding: 1rem;
@@ -50,8 +52,64 @@
   animation: intro-fade-in 700ms ease-out both;
 }
 
-.intro-start-button {
+.intro-chooser {
+  position: relative;
+  display: grid;
+  gap: 0.75rem;
+  justify-items: center;
+  width: min(100%, 30rem);
+  padding: 1.75rem 1.5rem 1.5rem;
+  text-align: center;
+  background: rgba(10, 10, 8, 0.92);
+  border: 1px solid var(--window-line);
+  border-top: 2px solid var(--amber);
+  border-radius: 4px;
+  box-shadow: 0 0 0 1px rgba(255, 176, 0, 0.06), 0 24px 64px rgba(0, 0, 0, 0.7);
   pointer-events: auto;
+  /* Sit a little above centre, on the monitor and clear of the person in front of it. */
+  margin-bottom: min(14vh, 8rem);
+}
+
+.intro-chooser-name {
+  color: var(--amber);
+  font-family: var(--font-mono);
+  font-size: clamp(1.25rem, 5vw, 1.5rem);
+  font-weight: 600;
+  line-height: 1.2;
+}
+
+.intro-chooser-role {
+  color: var(--text);
+  font-size: 0.9375rem;
+  line-height: 1.5;
+}
+
+.intro-chooser-buttons {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.75rem;
+  width: 100%;
+  margin-top: 0.5rem;
+}
+
+.intro-chooser-pick {
+  display: grid;
+  gap: 0.125rem;
+  padding: 0.75rem 1rem;
+  line-height: 1.3;
+  pointer-events: auto;
+}
+
+.intro-chooser-note {
+  font-size: 0.75rem;
+  font-weight: 400;
+  opacity: 0.8;
+}
+
+@media (max-width: 420px) {
+  .intro-chooser-buttons {
+    grid-template-columns: 1fr;
+  }
 }
 
 .intro-skip {
