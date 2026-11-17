@@ -36,6 +36,10 @@ jobs:
       - name: Install packages
         run: npm ci
 
+      # A failing test stops the deploy, so a broken site never goes live.
+      - name: Run tests
+        run: npm test
+
       - name: Build the site
         run: npm run build
 
