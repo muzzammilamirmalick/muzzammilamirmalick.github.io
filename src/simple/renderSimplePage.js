@@ -41,12 +41,10 @@ function renderJourneyStop(stop) {
 }
 
 function renderProject(project) {
-  const isMxm = project.name === mxmApp.name;
-  const isFlight = project.name === flightApp.name;
-  const highlights = isMxm ? mxmApp.highlights : isFlight ? flightApp.highlights : null;
+  const { highlights } = project;
   return `<li>
     <h3>${escape(project.name)} <span class="status">${escape(project.status)}</span></h3>
-    ${project.credit ? `<p><strong>${escape(project.credit)}</strong></p>` : ""}
+
     <p>${escape(project.description)}</p>
     ${highlights ? `<ul class="points">${list(highlights, (item) => `<li>${escape(item)}</li>`)}</ul>` : ""}
     <p class="meta">${escape(project.tech.join(", "))}</p>

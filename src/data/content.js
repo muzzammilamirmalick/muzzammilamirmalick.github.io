@@ -262,6 +262,7 @@ export const projects = [
     status: mxmApp.status,
     url: mxmApp.url,
     codeNote: mxmApp.codeNote,
+    highlights: mxmApp.highlights, // Only Simple view lists these.
     // Shows the first screenshot on the card, and opens the MXM project window.
     image: mxmApp.screenshots[0],
     opensApp: "mxm",
@@ -273,6 +274,7 @@ export const projects = [
     tech: flightApp.tech,
     status: flightApp.status,
     repo: flightApp.repo,
+    highlights: flightApp.highlights,
     // Shows the first screenshot on the card, and opens the My Sky project window.
     image: flightApp.screenshots[0],
     opensApp: "flight",
