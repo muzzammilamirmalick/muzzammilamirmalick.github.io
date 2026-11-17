@@ -44,7 +44,6 @@ function renderProject(project) {
   const { highlights } = project;
   return `<li>
     <h3>${escape(project.name)} <span class="status">${escape(project.status)}</span></h3>
-
     <p>${escape(project.description)}</p>
     ${highlights ? `<ul class="points">${list(highlights, (item) => `<li>${escape(item)}</li>`)}</ul>` : ""}
     <p class="meta">${escape(project.tech.join(", "))}</p>
