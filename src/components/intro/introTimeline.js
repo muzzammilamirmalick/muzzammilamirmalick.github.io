@@ -12,14 +12,8 @@ export const TIMELINE = {
   zoomEnd: 5300, // The screen fills the page, and the intro starts fading.
 };
 
-// SAFETY: each of these moments flashes the monitor once. To stay comfortable for people
-// sensitive to flashing, there must never be more than 3 of them in any one second.
-export const FLASH_TIMES = [
-  TIMELINE.alertStart,
-  ...TIMELINE.crackTimes,
-  TIMELINE.glitchStart,
-  TIMELINE.grantedStart,
-];
+// Safety: alertStart, each crack, glitchStart and grantedStart flash the monitor once.
+// To stay comfortable for people sensitive to flashing, keep it to 3 flashes in any one second.
 
 // How long the intro takes to fade away, in seconds.
 export const FADE_SECONDS = {

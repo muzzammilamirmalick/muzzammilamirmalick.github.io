@@ -302,7 +302,7 @@
   }
 }
 
-/* One flash each time something happens. See FLASH_TIMES in introTimeline.js. */
+/* One flash each time something happens. See the safety note in introTimeline.js. */
 .breach-flash {
   position: absolute;
   inset: 0;

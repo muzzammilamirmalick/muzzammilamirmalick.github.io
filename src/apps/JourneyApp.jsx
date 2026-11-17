@@ -107,7 +107,7 @@ export default function JourneyApp() {
         />
         <ol className="timeline">
           {journey.map((stop, index) => (
-            <Stop key={stop.when} stop={stop} index={index} skipAnimation={reducedMotion} />
+            <Stop key={stop.title} stop={stop} index={index} skipAnimation={reducedMotion} />
           ))}
         </ol>
       </div>

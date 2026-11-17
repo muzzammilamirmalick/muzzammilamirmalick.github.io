@@ -106,20 +106,6 @@
   color: var(--amber);
 }
 
-/* A button that looks like a link, used for "click to copy" lines. */
-.terminal-action {
-  padding: 0;
-  border: 0;
-  color: var(--amber);
-  background: none;
-  font-family: inherit;
-  font-size: inherit;
-  text-align: left;
-  text-decoration: underline;
-  overflow-wrap: anywhere;
-  cursor: pointer;
-}
-
 /* The line the visitor types on. */
 .terminal-form {
   display: flex;

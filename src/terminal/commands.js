@@ -3,7 +3,7 @@
 import { aboutShort, profile } from "../data/content.js";
 import { downloadResume } from "../utils/downloadResume.js";
 
-const plain = (text) => ({ kind: "plain", text });
+const plain = (text) => ({ text });
 
 // A command that opens an app and prints one short line.
 const opensApp = (id, label, description) => ({
@@ -20,7 +20,6 @@ const commands = {
     description: "List all commands",
     run: () =>
       Object.entries(commands).map(([name, command]) => ({
-        kind: "plain",
         label: name,
         text: command.description,
       })),

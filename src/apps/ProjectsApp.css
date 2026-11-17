@@ -56,13 +56,6 @@
   background: #000;
 }
 
-.project-credit {
-  color: var(--text);
-  font-size: 0.8125rem;
-  font-weight: 600;
-  line-height: 1.4;
-}
-
 .project-actions {
   display: flex;
   flex-wrap: wrap;

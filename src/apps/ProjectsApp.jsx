@@ -48,7 +48,6 @@ export default function ProjectsApp() {
                 <h2 className="project-name">{project.name}</h2>
                 <StatusLabel status={project.status} />
               </div>
-              {project.credit && <p className="project-credit">{project.credit}</p>}
               <p className="project-description">{project.description}</p>
               <TechList tech={project.tech} />
               {(project.url || project.repo || project.opensApp) && (
