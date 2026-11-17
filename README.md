@@ -59,6 +59,14 @@ flowchart TD
 - `src/components/intro/` is the intro. `introTimeline.js` has every timing in one place, and `sceneLayout.js` has the camera maths.
 - `src/simple/renderSimplePage.js` turns `content.js` into plain HTML for Simple view during the build.
 
+## What I learned
+
+- **State with a reducer.** The window manager uses `useReducer`, so every window change (open, focus, move, minimize, close) goes through one function that is easy to follow and test.
+- **Animating from one number.** The intro is driven by a single `progress` value from 0 to 1, and every layer works out its position from it. Keeping one source of truth is what keeps the zoom in sync and landing exactly on the real Terminal window.
+- **Accessibility is part of the build, not an extra.** Reduced motion, keyboard focus moving into and back out of windows, `inert` behind the intro and screen reader text for the counting numbers all had to be planned in from the start.
+- **Keeping content separate from code.** Putting every bit of text in `content.js` meant I could build Simple view from the same data and update the site without touching components.
+- **Making sound in code.** Every sound effect is built from oscillators and filtered noise with the Web Audio API, so the site ships no audio files.
+
 ## Running it
 
 You need Node.js 22.12 or newer.
