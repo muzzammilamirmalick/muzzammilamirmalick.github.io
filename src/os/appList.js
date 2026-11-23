@@ -37,7 +37,7 @@ export const apps = [
   { id: "experience", label: "Experience", icon: "experience", width: 560, height: 480, Component: lazy(loaders.experience) },
   { id: "skills", label: "Skills", icon: "skills", width: 520, height: 400, Component: lazy(loaders.skills) },
   { id: "certifications", label: "Certifications", icon: "certifications", width: 540, height: 360, Component: lazy(loaders.certifications) },
-  { id: "contact", label: "Contact", icon: "contact", width: 400, height: 270, Component: lazy(loaders.contact) },
+  { id: "contact", label: "Contact", icon: "contact", width: 400, height: 330, Component: lazy(loaders.contact) },
   // Hidden until profile.resume is set in content.js.
   { id: "resume", label: "Resume.pdf", icon: "resume", width: 320, height: 290, Component: lazy(loaders.resume), hidden: !profile.resume },
   { id: "trash", label: "Trash", icon: "trash", width: 400, height: 260, Component: lazy(loaders.trash) },
