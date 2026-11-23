@@ -1,5 +1,5 @@
 // Builds the content of Simple view (simple.html) as plain HTML from content.js.
-// vite.config.js runs this, so the finished page needs no JavaScript in the browser.
+// vite.config.js runs this, so all of the content works without JavaScript in the browser.
 import {
   about,
   certifications,
@@ -12,6 +12,7 @@ import {
   operationsTool,
   profile,
   projects,
+  simpleBoot,
   skills,
   trainingTool,
 } from "../data/content.js";
@@ -82,8 +83,16 @@ function renderCertification(cert) {
   return `<li>${escape(cert.name)} <span class="status">${escape(cert.status)}${date}</span>${verify}</li>`;
 }
 
+// One typed line. CSS does the typing, using the line's number and its count of letters.
+function renderBootLine(line, index) {
+  const { length } = line;
+  return `<span class="boot-line" style="--line: ${index}; --chars: ${length}; --typing: steps(${length})">${escape(line)}</span>`;
+}
+
 export function renderSimplePage() {
-  return `<header>
+  return `<div class="crt" aria-hidden="true"></div>
+<div class="boot" aria-hidden="true">${list(simpleBoot, renderBootLine)}</div>
+<header>
   <h1>${escape(profile.name)}</h1>
   <p>${escape(profile.role)}</p>
   <p class="highlight">${escape(profile.availability)}</p>

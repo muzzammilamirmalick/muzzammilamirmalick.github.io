@@ -106,20 +106,69 @@
       .project > :last-child {
         margin-bottom: 0;
       }
-      /* Sections fade and slide in one after another. Skipped for reduced motion and printing. */
+      /* The old monitor look: a faint grid behind the page and scanlines over it. */
+      .crt,
+      .boot {
+        display: none;
+      }
+      @media screen {
+        body {
+          background-image:
+            linear-gradient(rgba(255, 176, 0, 0.03) 1px, transparent 1px),
+            linear-gradient(90deg, rgba(255, 176, 0, 0.03) 1px, transparent 1px);
+          background-size: 48px 48px;
+        }
+        .crt {
+          position: fixed;
+          inset: 0;
+          z-index: 1;
+          display: block;
+          pointer-events: none;
+          background: repeating-linear-gradient(
+            to bottom,
+            rgba(0, 0, 0, 0.2) 0 1px,
+            transparent 1px 3px
+          );
+        }
+      }
+      /* All of the motion. It is skipped for reduced motion and printing. */
       @media screen and (prefers-reduced-motion: no-preference) {
+        .crt {
+          animation: flicker 5s ease-in-out infinite;
+        }
+        .boot {
+          display: grid;
+          justify-items: start;
+          margin-bottom: 2rem;
+          color: var(--amber);
+          font: 0.875rem/1.6 ui-monospace, Consolas, monospace;
+        }
+        /* Each line grows one letter at a time. The right border is the cursor. */
+        .boot-line {
+          width: calc(var(--chars) * 1ch + 0.5em);
+          overflow: hidden;
+          white-space: pre;
+          border-right: 0.5em solid transparent;
+          animation:
+            type 300ms var(--typing) calc(var(--line) * 350ms) backwards,
+            cursor 350ms calc(var(--line) * 350ms);
+        }
+        .boot-line:last-child {
+          animation:
+            type 300ms var(--typing) calc(var(--line) * 350ms) backwards,
+            blink 1s step-end calc(var(--line) * 350ms) infinite;
+        }
+        /* The real content appears once the last line has been typed. */
         header,
         section {
-          animation: rise 500ms ease-out both;
+          animation: rise 450ms ease-out 1400ms backwards;
         }
-        section:nth-child(1) {
-          animation-delay: 80ms;
+        section:nth-child(n + 2) {
+          animation-delay: 1500ms;
         }
-        section:nth-child(2) {
-          animation-delay: 160ms;
-        }
-        section:nth-child(n + 3) {
-          animation-delay: 240ms;
+        /* The script at the bottom of the page adds this when a heading scrolls into view. */
+        h2.in-view {
+          animation: heading 550ms steps(14) both;
         }
         .project {
           transition: transform 180ms ease, border-color 180ms ease, box-shadow 180ms ease;
@@ -138,6 +187,49 @@
           transform: translateY(14px);
         }
       }
+      @keyframes type {
+        from {
+          width: 0;
+        }
+      }
+      @keyframes cursor {
+        from,
+        to {
+          border-color: var(--amber);
+        }
+      }
+      @keyframes blink {
+        0% {
+          border-color: var(--amber);
+        }
+        50% {
+          border-color: transparent;
+        }
+      }
+      /* Slow and faint on purpose, so it is safe and the text stays easy to read. */
+      @keyframes flicker {
+        50% {
+          opacity: 0.7;
+        }
+      }
+      /* Types the heading in, with a small glitch at the end. */
+      @keyframes heading {
+        from {
+          clip-path: inset(0 100% 0 0);
+        }
+        70% {
+          clip-path: inset(0);
+          text-shadow: -3px 0 var(--amber);
+          transform: translateX(3px);
+        }
+        85% {
+          text-shadow: 3px 0 var(--amber-dim);
+          transform: translateX(-2px);
+        }
+        to {
+          clip-path: inset(0);
+        }
+      }
       /* Prints cleanly on white paper, for recruiters who print a copy. */
       @media print {
         :root {
@@ -152,5 +244,18 @@
   </head>
   <body>
     <!-- simple-page-content -->
+    <!-- The only script here. It plays each heading's animation once, after the boot lines. -->
+    <script>
+      const observer = new IntersectionObserver((entries) => {
+        for (const entry of entries) {
+          if (!entry.isIntersecting) continue;
+          entry.target.classList.add("in-view");
+          observer.unobserve(entry.target);
+        }
+      });
+      setTimeout(() => {
+        document.querySelectorAll("h2").forEach((heading) => observer.observe(heading));
+      }, 1400);
+    </script>
   </body>
 </html>

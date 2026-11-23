@@ -21,6 +21,14 @@ export const boot = {
   steps: ["Loading skills", "Mounting projects", "Starting detailing app"],
 };
 
+// The lines typed at the top of Simple view. Keep them under 34 letters so they fit on a phone.
+export const simpleBoot = [
+  "> open quick_view",
+  "[ OK ] Loading projects",
+  "[ OK ] Loading experience",
+  "[ OK ] Ready",
+];
+
 // The full About text. It appears in Simple view. Each string is one paragraph.
 export const about = [
   "I've been writing code since I was 8 and taking computers apart for almost as long. During COVID I turned that into a business, repairing phones and computers across the GTA and setting up home offices.",

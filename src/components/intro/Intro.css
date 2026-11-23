@@ -55,11 +55,10 @@
 .intro-chooser {
   position: relative;
   display: grid;
-  grid-template-columns: 9rem 1fr;
-  gap: 1.25rem;
-  align-items: center;
-  width: min(100%, 36rem);
-  padding: 1.25rem;
+  gap: 0.75rem;
+  justify-items: center;
+  width: min(100%, 30rem);
+  padding: 1.75rem 1.5rem 1.5rem;
   text-align: center;
   background: rgba(10, 10, 8, 0.92);
   border: 1px solid var(--window-line);
@@ -67,34 +66,18 @@
   border-radius: 4px;
   box-shadow: 0 0 0 1px rgba(255, 176, 0, 0.06), 0 24px 64px rgba(0, 0, 0, 0.7);
   pointer-events: auto;
-  /* Sit a little above centre, on the monitor and clear of the person in front of it. */
-  margin-bottom: min(14vh, 8rem);
+  /* Sit above centre, clear of the person in front of the monitor. The last part
+     follows the size of the room in sceneLayout.js, so it works on every screen. */
+  margin-bottom: max(min(14vh, 8rem), 16vh + 20.5rem - min(24vw, 49vh));
 }
 
-/* The portrait slot for the intro video. It keeps its size when there is no video. */
-.intro-peek {
-  position: relative;
-  display: grid;
-  place-items: center;
-  aspect-ratio: 9 / 16;
-  overflow: hidden;
-  border: 1px solid var(--window-line);
-  border-radius: 4px;
-  color: var(--amber-dim);
-  background: var(--surface);
-}
-
-.intro-peek video {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-
-.intro-chooser-text {
-  display: grid;
-  gap: 0.75rem;
+/* A phone has no spare room above the person, so the card sits near the top. */
+@media (max-width: 759px) {
+  .intro-chooser {
+    align-self: start;
+    margin-top: 1.75rem;
+    margin-bottom: 0;
+  }
 }
 
 .intro-chooser-name {
@@ -113,7 +96,8 @@
 
 .intro-chooser-buttons {
   display: grid;
-  gap: 0.75rem;
+  gap: 0.875rem;
+  justify-items: center;
   width: 100%;
   margin-top: 0.5rem;
 }
@@ -135,8 +119,9 @@
 /* Full experience is the main choice: bigger, with a soft pulsing glow. */
 .intro-chooser-main {
   position: relative;
-  padding: 1.125rem 1rem;
-  font-size: 1.125rem;
+  width: 100%;
+  padding: 1.375rem 1rem;
+  font-size: 1.25rem;
   font-weight: 700;
 }
 
@@ -161,20 +146,10 @@
 }
 
 .intro-chooser-quiet {
+  padding: 0.5rem 1.25rem;
+  font-size: 0.8125rem;
   border-color: var(--window-line);
   color: var(--amber-dim);
-}
-
-@media (max-width: 520px) {
-  .intro-chooser {
-    grid-template-columns: 1fr;
-    gap: 0.875rem;
-  }
-
-  .intro-peek {
-    justify-self: center;
-    width: 5.5rem;
-  }
 }
 
 .intro-skip {
