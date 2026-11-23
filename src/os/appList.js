@@ -4,7 +4,7 @@
 import { lazy } from "react";
 import TerminalApp from "../apps/TerminalApp.jsx";
 import WelcomeApp from "../apps/WelcomeApp.jsx";
-import { profile } from "../data/content.js";
+import { operationsTool, profile, trainingTool } from "../data/content.js";
 
 const loaders = {
   journey: () => import("../apps/JourneyApp.jsx"),
@@ -12,6 +12,8 @@ const loaders = {
   detailing: () => import("../apps/DetailingApp.jsx"),
   mxm: () => import("../apps/MxmProjectApp.jsx"),
   flight: () => import("../apps/FlightProjectApp.jsx"),
+  operations: () => import("../apps/OperationsDashboardApp.jsx"),
+  training: () => import("../apps/TrainingSimulatorApp.jsx"),
   experience: () => import("../apps/ExperienceApp.jsx"),
   skills: () => import("../apps/SkillsApp.jsx"),
   certifications: () => import("../apps/CertificationsApp.jsx"),
@@ -29,6 +31,9 @@ export const apps = [
   { id: "mxm", label: "MXM booking app", icon: "car", width: 760, height: 620, Component: lazy(loaders.mxm), hidden: true },
   // The My Sky flight tracker project. Opens from Projects, so it has no desktop icon.
   { id: "flight", label: "My Sky flight tracker", icon: "projects", width: 800, height: 640, Component: lazy(loaders.flight), hidden: true },
+  // The two standalone tools. "iconLabel" is a shorter name that fits under the icon.
+  { id: "operations", label: operationsTool.name, iconLabel: "Team Ops Dashboard", icon: "dashboard", width: 1000, height: 660, Component: lazy(loaders.operations) },
+  { id: "training", label: trainingTool.name, iconLabel: "Training Simulator", icon: "school", width: 900, height: 660, Component: lazy(loaders.training) },
   { id: "experience", label: "Experience", icon: "experience", width: 560, height: 480, Component: lazy(loaders.experience) },
   { id: "skills", label: "Skills", icon: "skills", width: 520, height: 400, Component: lazy(loaders.skills) },
   { id: "certifications", label: "Certifications", icon: "certifications", width: 540, height: 360, Component: lazy(loaders.certifications) },
@@ -46,7 +51,10 @@ export const appById = Object.fromEntries(apps.map((app) => [app.id, app]));
 export const desktopApps = apps.filter((app) => !app.hidden);
 
 // The apps that always sit in the dock.
-export const dockAppIds = ["terminal", "projects", "journey", "contact"];
+export const dockAppIds = ["terminal", "projects", "operations", "training", "journey", "contact"];
+
+// A phone's dock only has room for four. The other apps are in the grid above it.
+export const phoneDockAppIds = ["terminal", "projects", "journey", "contact"];
 
 // Quietly downloads the other apps once the browser is idle, so they open instantly later.
 export function preloadApps() {

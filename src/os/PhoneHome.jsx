@@ -6,7 +6,7 @@ import { playWindowClose, playWindowOpen } from "../audio/sounds.js";
 import WelcomeApp from "../apps/WelcomeApp.jsx";
 import Icon from "../components/ui/Icon.jsx";
 import AppIcon from "./AppIcon.jsx";
-import { appById, desktopApps, dockAppIds } from "./appList.js";
+import { appById, desktopApps, phoneDockAppIds } from "./appList.js";
 import { OsContext } from "./OsContext.js";
 import TopBar from "./TopBar.jsx";
 
@@ -106,7 +106,7 @@ export default function PhoneHome({ whoamiMode, reboot }) {
   );
 
   // Apps in the dock are not repeated in the grid.
-  const gridApps = desktopApps.filter((app) => !dockAppIds.includes(app.id));
+  const gridApps = desktopApps.filter((app) => !phoneDockAppIds.includes(app.id));
 
   return (
     <OsContext.Provider value={os}>
@@ -123,7 +123,7 @@ export default function PhoneHome({ whoamiMode, reboot }) {
           </nav>
         </main>
         <nav className="dock phone-dock" aria-label="Dock" inert={stack.length > 0}>
-          {dockAppIds.map((id) => (
+          {phoneDockAppIds.map((id) => (
             <AppIcon key={id} app={appById[id]} place="phone" />
           ))}
         </nav>

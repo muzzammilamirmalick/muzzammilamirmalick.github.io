@@ -80,21 +80,21 @@ export const journey = [
     icon: "projects",
   },
   {
-    when: "Nov 2026",
-    title: "Launched the MXM Detailing booking app",
-    detail: "Built for my own detailing business",
-    status: "Live",
-    link: "https://mxmdetailing.com",
-    icon: "car",
-  },
-  {
-    when: "Nov 2026",
+    when: "Oct 2026",
     title: "Built the My Sky flight tracker",
     detail:
       "A live map of planes over Hamilton from my own ADS-B antenna on a Raspberry Pi.",
     status: "Built",
     link: "https://github.com/muzzammilamirmalick/flight-tracker",
     icon: "projects",
+  },
+  {
+    when: "Nov 2026",
+    title: "Launched the MXM Detailing booking app",
+    detail: "Built for my own detailing business",
+    status: "Live",
+    link: "https://mxmdetailing.com",
+    icon: "car",
   },
   {
     when: "Nov 2026",
@@ -106,7 +106,7 @@ export const journey = [
   },
   {
     when: "Now",
-    title: "Shot AI is up next",
+    title: "Working on the Drone and Object Tracker",
     icon: "spark",
   },
 ];
@@ -241,10 +241,43 @@ export const flightApp = {
   ],
 };
 
+// The two standalone tools in public/tools/. Their windows, Projects and Simple view
+// all read from here, so a change made once shows up everywhere.
+export const operationsTool = {
+  name: "Team Operations Dashboard",
+  status: "Built",
+  url: "/tools/operations-dashboard.html",
+  description:
+    "A live operations screen for running a shift. It shows the order breakdown, a daily priority recommendation, alerts, team and breaks, a task board and task assignment. Built from scratch with no libraries. It has light and dark themes and saves its state in the browser.",
+  tech: ["HTML", "CSS", "JavaScript"],
+  image: {
+    src: "/projects/tools/operations-dashboard.webp",
+    width: 1200,
+    height: 750,
+    alt: "The Team Operations Dashboard with sample orders and a priority recommendation",
+  },
+};
+
+export const trainingTool = {
+  name: "Click & Collect Training Simulator",
+  status: "Built",
+  url: "/tools/training-simulator.html",
+  description:
+    "An interactive trainer that walks new staff through the order pickup process with hands-on modules and a quiz.",
+  tech: ["React"],
+  image: {
+    src: "/projects/tools/training-simulator.webp",
+    width: 1200,
+    height: 750,
+    alt: "The Click & Collect Training Simulator home page with its list of modules",
+  },
+};
+
 // To add a project, copy one block and change the values.
-// Status can be "Live", "Building", "Up next" or "Planned". Planned projects go in the
-// "Coming later" folder. To add a video preview, put the file in public/videos/ and
-// add a line like this to the project: video: "/videos/shot-ai.mp4",
+// Status can be "Live", "Built", "Working on it" or "Planned". Live and Built projects are
+// shown first, then the ones in progress. Planned projects go in the "Coming later" folder.
+// To add a video preview, put the file in public/videos/ and
+// add a line like this to the project: video: "/videos/drone-tracker.mp4",
 // "preview" picks the animated placeholder shown until there is a video.
 export const projects = [
   {
@@ -266,6 +299,7 @@ export const projects = [
     // Shows the first screenshot on the card, and opens the MXM project window.
     image: mxmApp.screenshots[0],
     opensApp: "mxm",
+    opensLabel: "Screenshots",
     preview: "calendar",
   },
   {
@@ -278,6 +312,27 @@ export const projects = [
     // Shows the first screenshot on the card, and opens the My Sky project window.
     image: flightApp.screenshots[0],
     opensApp: "flight",
+    opensLabel: "Screenshots",
+  },
+  {
+    name: operationsTool.name,
+    description: operationsTool.description,
+    tech: operationsTool.tech,
+    status: operationsTool.status,
+    tool: operationsTool.url, // Simple view links straight to the tool.
+    image: operationsTool.image,
+    opensApp: "operations",
+    opensLabel: "Open dashboard",
+  },
+  {
+    name: trainingTool.name,
+    description: trainingTool.description,
+    tech: trainingTool.tech,
+    status: trainingTool.status,
+    tool: trainingTool.url, // Simple view links straight to the tool.
+    image: trainingTool.image,
+    opensApp: "training",
+    opensLabel: "Open simulator",
   },
   {
     name: "Gesture control",
@@ -289,33 +344,12 @@ export const projects = [
     preview: "hand",
   },
   {
-    name: "Shot AI",
+    name: "Drone and Object Tracker",
     description:
-      "An AI basketball coach that counts my makes and misses, tracks my shot arc, checks my form and maps my hot spots.",
-    tech: ["Computer vision", "Python", "OpenCV"],
-    status: "Up next",
-    preview: "basketball",
-  },
-  {
-    name: "PC health monitor",
-    description:
-      "A custom desk display that shows my PC's live temperatures and CPU and GPU usage, streamed from the computer over USB.",
-    tech: ["ESP32", "C++", "serial communication"],
-    status: "Planned",
-  },
-  {
-    name: "Logistics workflow tool",
-    description:
-      "A web app that tracks and schedules warehouse tasks, built around real bottlenecks I see at work.",
-    tech: ["C#", "ASP.NET Core", "SQL"],
-    status: "Planned",
-  },
-  {
-    name: "Mini flight instrument",
-    description:
-      "A working artificial horizon like the one in a cockpit, driven by a motion sensor and drawn on a small screen in real time.",
-    tech: ["Microcontroller", "C++", "motion sensor"],
-    status: "Planned",
+      "A computer vision system that detects and identifies small flying objects like a drone, tracks it across the frame, and locks on as it moves.",
+    tech: ["Python", "OpenCV", "Machine learning"],
+    status: "Working on it",
+    preview: "tracker",
   },
 ];
 
@@ -400,18 +434,19 @@ export const skills = [
 ];
 
 // When you earn one, change its status and add the date, like this:
-// { name: "GitHub Foundations", status: "Earned", date: "June 2027" },
+// { name: "Microsoft Azure Fundamentals (AZ-900)", status: "Earned", date: "June 2027" },
 // image and url are optional: a picture of the certificate and the link to verify it.
 export const certifications = [
   {
-    name: "Foundational C# with Microsoft (freeCodeCamp)",
+    name: "Foundational C# with Microsoft",
     status: "Earned",
     date: "November 2026",
     image: "/certifications/foundational-csharp.webp",
     url: "https://freecodecamp.org/certification/fcc26fe8de7-3980-49b0-ac7e-e56cce1c8cf8/foundational-c-sharp-with-microsoft",
   },
-  { name: "GitHub Foundations", status: "In progress" },
-  { name: "Oracle Cloud Infrastructure Foundations", status: "Planned" },
+  { name: "Microsoft Azure Fundamentals (AZ-900)", status: "In progress" },
+  { name: "Microsoft Azure Developer Associate (AZ-204)", status: "Planned" },
+  { name: "Microsoft Azure AI Fundamentals (AI-900)", status: "Planned" },
 ];
 
 // Everything in the MXM Detailing app.

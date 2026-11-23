@@ -23,6 +23,7 @@
 
 /* Things in motion get an amber outline. */
 .status-building,
+.status-working-on-it,
 .status-in-progress,
 .status-up-next {
   border-color: var(--amber);

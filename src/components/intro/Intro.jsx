@@ -23,6 +23,7 @@ import { boot } from "../../data/content.js";
 import { appById } from "../../os/appList.js";
 import WindowChrome from "../../os/WindowChrome.jsx";
 import BootLog from "../terminal/BootLog.jsx";
+import Icon from "../ui/Icon.jsx";
 import BreachScreen from "./BreachScreen.jsx";
 import { FADE_SECONDS, TIMELINE, ZOOM_EASE } from "./introTimeline.js";
 import { HoodedFigure, RedAlertGlow, RoomBackground } from "./RoomScene.jsx";
@@ -69,6 +70,8 @@ export default function Intro({ autoStart, onReveal, onFinish }) {
   const [typed, setTyped] = useState(NOTHING_TYPED);
   const [breach, setBreach] = useState(NO_BREACH);
   const [flickering, setFlickering] = useState(false);
+  // True when there is no intro video yet, so the empty box shows instead.
+  const [videoMissing, setVideoMissing] = useState(false);
   const reducedMotion = useReducedMotion();
 
   // progress runs from 0 to 1 during the zoom. Every moving layer is worked out from it,
@@ -308,24 +311,42 @@ export default function Intro({ autoStart, onReveal, onFinish }) {
             transition={{ duration: 0.2, ease: "easeOut" }}
           >
             <div className="intro-chooser">
-              <p className="intro-chooser-name">Muzzammil Malick</p>
-              <p className="intro-chooser-role">
-                Software developer, looking for a May 2027 co-op
-              </p>
-              <div className="intro-chooser-buttons">
-                <a className="btn intro-chooser-pick" href="/simple.html">
-                  Quick view
-                  <span className="intro-chooser-note">A 30 second summary</span>
-                </a>
-                <button
-                  className="btn btn-primary intro-chooser-pick"
-                  type="button"
-                  onClick={start}
-                  autoFocus
-                >
-                  Full experience
-                  <span className="intro-chooser-note">Animated MuzzOS desktop</span>
-                </button>
+              <div className="intro-peek" aria-hidden="true">
+                <Icon name="play" size={22} />
+                {/* intro video goes here, drop the file in public/intro/ and swap the src */}
+                {!videoMissing && (
+                  <video
+                    src="/intro/intro.mp4"
+                    autoPlay={!reducedMotion}
+                    muted
+                    loop
+                    playsInline
+                    onError={() => setVideoMissing(true)}
+                  />
+                )}
+              </div>
+              <div className="intro-chooser-text">
+                <p className="intro-chooser-name">Muzzammil Malick</p>
+                <p className="intro-chooser-role">
+                  Software developer, looking for a May 2027 co-op
+                </p>
+                <div className="intro-chooser-buttons">
+                  <button
+                    className="btn btn-primary intro-chooser-pick intro-chooser-main"
+                    type="button"
+                    onClick={start}
+                    autoFocus
+                  >
+                    Full experience
+                    <span className="intro-chooser-note">
+                      the real thing, drag windows around, open a terminal.
+                    </span>
+                  </button>
+                  <a className="btn intro-chooser-pick intro-chooser-quiet" href="/simple.html">
+                    Quick view
+                    <span className="intro-chooser-note">just the highlights.</span>
+                  </a>
+                </div>
               </div>
             </div>
           </motion.div>

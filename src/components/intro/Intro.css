@@ -55,10 +55,11 @@
 .intro-chooser {
   position: relative;
   display: grid;
-  gap: 0.75rem;
-  justify-items: center;
-  width: min(100%, 30rem);
-  padding: 1.75rem 1.5rem 1.5rem;
+  grid-template-columns: 9rem 1fr;
+  gap: 1.25rem;
+  align-items: center;
+  width: min(100%, 36rem);
+  padding: 1.25rem;
   text-align: center;
   background: rgba(10, 10, 8, 0.92);
   border: 1px solid var(--window-line);
@@ -68,6 +69,32 @@
   pointer-events: auto;
   /* Sit a little above centre, on the monitor and clear of the person in front of it. */
   margin-bottom: min(14vh, 8rem);
+}
+
+/* The portrait slot for the intro video. It keeps its size when there is no video. */
+.intro-peek {
+  position: relative;
+  display: grid;
+  place-items: center;
+  aspect-ratio: 9 / 16;
+  overflow: hidden;
+  border: 1px solid var(--window-line);
+  border-radius: 4px;
+  color: var(--amber-dim);
+  background: var(--surface);
+}
+
+.intro-peek video {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.intro-chooser-text {
+  display: grid;
+  gap: 0.75rem;
 }
 
 .intro-chooser-name {
@@ -86,7 +113,6 @@
 
 .intro-chooser-buttons {
   display: grid;
-  grid-template-columns: 1fr 1fr;
   gap: 0.75rem;
   width: 100%;
   margin-top: 0.5rem;
@@ -106,9 +132,48 @@
   opacity: 0.8;
 }
 
-@media (max-width: 420px) {
-  .intro-chooser-buttons {
+/* Full experience is the main choice: bigger, with a soft pulsing glow. */
+.intro-chooser-main {
+  position: relative;
+  padding: 1.125rem 1rem;
+  font-size: 1.125rem;
+  font-weight: 700;
+}
+
+/* The glow only changes opacity, which is cheap to draw. */
+.intro-chooser-main::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  box-shadow: 0 0 26px rgba(255, 176, 0, 0.6);
+  pointer-events: none;
+  animation: intro-pulse 2.4s ease-in-out infinite alternate;
+}
+
+@keyframes intro-pulse {
+  from {
+    opacity: 0.35;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.intro-chooser-quiet {
+  border-color: var(--window-line);
+  color: var(--amber-dim);
+}
+
+@media (max-width: 520px) {
+  .intro-chooser {
     grid-template-columns: 1fr;
+    gap: 0.875rem;
+  }
+
+  .intro-peek {
+    justify-self: center;
+    width: 5.5rem;
   }
 }
 
@@ -334,7 +399,8 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .intro-start {
+  .intro-start,
+  .intro-chooser-main::after {
     animation: none;
   }
 }

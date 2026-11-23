@@ -98,6 +98,46 @@
         font-size: 0.8125rem;
         font-weight: 400;
       }
+      .project {
+        padding: 1rem;
+        border: 1px solid var(--line);
+        border-radius: 6px;
+      }
+      .project > :last-child {
+        margin-bottom: 0;
+      }
+      /* Sections fade and slide in one after another. Skipped for reduced motion and printing. */
+      @media screen and (prefers-reduced-motion: no-preference) {
+        header,
+        section {
+          animation: rise 500ms ease-out both;
+        }
+        section:nth-child(1) {
+          animation-delay: 80ms;
+        }
+        section:nth-child(2) {
+          animation-delay: 160ms;
+        }
+        section:nth-child(n + 3) {
+          animation-delay: 240ms;
+        }
+        .project {
+          transition: transform 180ms ease, border-color 180ms ease, box-shadow 180ms ease;
+        }
+      }
+      @media (hover: hover) and (prefers-reduced-motion: no-preference) {
+        .project:hover {
+          border-color: var(--amber-dim);
+          box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+          transform: translateY(-3px);
+        }
+      }
+      @keyframes rise {
+        from {
+          opacity: 0;
+          transform: translateY(14px);
+        }
+      }
       /* Prints cleanly on white paper, for recruiters who print a copy. */
       @media print {
         :root {

@@ -6,6 +6,12 @@ const shapes = {
       <path d="M7 9l3 3-3 3M13 15h4" />
     </>
   ),
+  dashboard: (
+    <>
+      <rect x="3" y="4" width="18" height="16" rx="2" />
+      <path d="M3 9h18M8 17v-4M12 17v-6M16 17v-2" />
+    </>
+  ),
   journey: (
     <>
       <circle cx="6" cy="18" r="2" />

@@ -25,13 +25,19 @@ function CalendarScene() {
   );
 }
 
-function BasketballScene() {
+// Drone tracker: a drone flying across with a target box locked onto it.
+function TrackerScene() {
   return (
-    <div className="scene scene-basketball">
-      <svg viewBox="0 0 320 180" className="court" aria-hidden="true">
-        <path className="shot-arc" d="M40 150 C110 10 210 10 262 62" pathLength="1" />
-        <path className="hoop" d="M248 62h32M254 62l4 22h12l4-22" />
-        <circle className="ball" r="9" />
+    <div className="scene scene-tracker">
+      <svg viewBox="0 0 320 180" aria-hidden="true">
+        <path className="tracker-grid" d="M0 60h320M0 120h320M107 0v180M213 0v180" />
+        <g className="tracker-target">
+          <path d="M-16 -6L0 2L16 -6M-24 -8h16M8 -8h16M-7 1h14v7h-14z" />
+          <path className="tracker-box" d="M-34 -14v-12h12M22 -26h12v12M34 14v12h-12M-22 26h-12v-12" />
+          <text className="tracker-text" x="0" y="42">
+            LOCKED
+          </text>
+        </g>
       </svg>
     </div>
   );
@@ -77,7 +83,7 @@ function HandScene() {
   );
 }
 
-const scenes = { desktop: DesktopScene, calendar: CalendarScene, basketball: BasketballScene, hand: HandScene };
+const scenes = { desktop: DesktopScene, calendar: CalendarScene, tracker: TrackerScene, hand: HandScene };
 
 export default function ProjectPreview({ project }) {
   const [playing, setPlaying] = useState(false);

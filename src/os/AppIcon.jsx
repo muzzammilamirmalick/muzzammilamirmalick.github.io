@@ -18,7 +18,7 @@ export default function AppIcon({ app, place, isOpen }) {
       <span className="app-icon-tile">
         <Icon name={app.icon} size={place === "dock" ? 22 : 26} />
       </span>
-      {place !== "dock" && <span className="app-icon-label">{app.label}</span>}
+      {place !== "dock" && <span className="app-icon-label">{app.iconLabel ?? app.label}</span>}
       {isOpen && <span className="app-icon-dot" />}
     </button>
   );

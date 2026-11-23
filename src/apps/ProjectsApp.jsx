@@ -1,4 +1,4 @@
-// Project cards with previews. Planned projects are tucked away in a "Coming later" folder.
+// Project cards with previews, finished ones first. Planned projects are tucked away in a "Coming later" folder.
 // A live project with screenshots shows one on its card and can open its own window.
 import StatusLabel from "../components/layout/StatusLabel.jsx";
 import Icon from "../components/ui/Icon.jsx";
@@ -32,69 +32,91 @@ function ProjectImage({ image }) {
   );
 }
 
-export default function ProjectsApp() {
+function ProjectCard({ project }) {
   const { openApp } = useOs();
-  const active = projects.filter((project) => project.status !== "Planned");
-  const planned = projects.filter((project) => project.status === "Planned");
+
+  return (
+    <li className="project-card">
+      {project.image ? <ProjectImage image={project.image} /> : <ProjectPreview project={project} />}
+      <div className="project-info">
+        <div className="project-heading">
+          <h3 className="project-name">{project.name}</h3>
+          <StatusLabel status={project.status} />
+        </div>
+        <p className="project-description">{project.description}</p>
+        <TechList tech={project.tech} />
+        {(project.url || project.repo || project.opensApp) && (
+          <div className="project-actions">
+            {project.url && <LiveSiteButton url={project.url} />}
+            {project.repo && (
+              <a className="btn" href={project.repo} target="_blank" rel="noopener noreferrer">
+                View code
+                <span className="sr-only"> (opens in a new tab)</span>
+              </a>
+            )}
+            {project.opensApp && (
+              <button
+                type="button"
+                className={project.tool ? "btn btn-primary" : "btn"}
+                onClick={(event) => openApp(project.opensApp, event.currentTarget)}
+              >
+                {project.opensLabel}
+              </button>
+            )}
+          </div>
+        )}
+        {project.codeNote && <p className="project-code-note">{project.codeNote}</p>}
+      </div>
+    </li>
+  );
+}
+
+function ProjectGroup({ title, items }) {
+  return (
+    <section className="project-group">
+      <h2 className="project-group-title">{title}</h2>
+      <ul className="project-grid">
+        {items.map((project) => (
+          <ProjectCard project={project} key={project.name} />
+        ))}
+      </ul>
+    </section>
+  );
+}
+
+export default function ProjectsApp() {
+  const isFinished = (project) => project.status === "Live" || project.status === "Built";
+  const isPlanned = (project) => project.status === "Planned";
+  const finished = projects.filter(isFinished);
+  const planned = projects.filter(isPlanned);
+  const inProgress = projects.filter((project) => !isFinished(project) && !isPlanned(project));
 
   return (
     <div className="app-pad projects">
-      <ul className="project-grid">
-        {active.map((project) => (
-          <li className="project-card" key={project.name}>
-            {project.image ? <ProjectImage image={project.image} /> : <ProjectPreview project={project} />}
-            <div className="project-info">
-              <div className="project-heading">
-                <h2 className="project-name">{project.name}</h2>
-                <StatusLabel status={project.status} />
-              </div>
-              <p className="project-description">{project.description}</p>
-              <TechList tech={project.tech} />
-              {(project.url || project.repo || project.opensApp) && (
-                <div className="project-actions">
-                  {project.url && <LiveSiteButton url={project.url} />}
-                  {project.repo && (
-                    <a className="btn" href={project.repo} target="_blank" rel="noopener noreferrer">
-                      View code
-                      <span className="sr-only"> (opens in a new tab)</span>
-                    </a>
-                  )}
-                  {project.opensApp && (
-                    <button
-                      type="button"
-                      className="btn"
-                      onClick={(event) => openApp(project.opensApp, event.currentTarget)}
-                    >
-                      Screenshots
-                    </button>
-                  )}
-                </div>
-              )}
-              {project.codeNote && <p className="project-code-note">{project.codeNote}</p>}
-            </div>
-          </li>
-        ))}
-      </ul>
+      <ProjectGroup title="Finished" items={finished} />
+      {inProgress.length > 0 && <ProjectGroup title="In progress" items={inProgress} />}
 
       {/* The folder opens with the browser's built-in click, and each project inside can too. */}
-      <details className="later-folder">
-        <summary className="later-summary">
-          <Icon name="projects" size={22} />
-          <span className="later-name">Coming later</span>
-          <span className="later-count">{planned.length} projects</span>
-        </summary>
-        <ul className="later-list">
-          {planned.map((project) => (
-            <li key={project.name}>
-              <details className="later-project">
-                <summary className="later-project-name">{project.name}</summary>
-                <p className="project-description">{project.description}</p>
-                <TechList tech={project.tech} />
-              </details>
-            </li>
-          ))}
-        </ul>
-      </details>
+      {planned.length > 0 && (
+        <details className="later-folder">
+          <summary className="later-summary">
+            <Icon name="projects" size={22} />
+            <span className="later-name">Coming later</span>
+            <span className="later-count">{planned.length} projects</span>
+          </summary>
+          <ul className="later-list">
+            {planned.map((project) => (
+              <li key={project.name}>
+                <details className="later-project">
+                  <summary className="later-project-name">{project.name}</summary>
+                  <p className="project-description">{project.description}</p>
+                  <TechList tech={project.tech} />
+                </details>
+              </li>
+            ))}
+          </ul>
+        </details>
+      )}
     </div>
   );
 }

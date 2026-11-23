@@ -1,5 +1,5 @@
 // Ways to reach me. Clicking the email copies it and shows a small toast.
-import { profile } from "../data/content.js";
+import { detailing, profile } from "../data/content.js";
 import Icon from "../components/ui/Icon.jsx";
 import { copyEmail } from "../utils/copyEmail.js";
 import "./ContactApp.css";
@@ -19,6 +19,16 @@ export default function ContactApp() {
       <a className="btn contact-button" href={profile.github} target="_blank" rel="noreferrer">
         <Icon name="terminal" size={18} />
         GitHub
+      </a>
+      <a
+        className="btn contact-button"
+        href={detailing.instagram}
+        target="_blank"
+        rel="noopener noreferrer"
+        aria-label="MXM Detailing on Instagram"
+      >
+        <Icon name="instagram" size={18} />
+        Instagram
       </a>
     </div>
   );

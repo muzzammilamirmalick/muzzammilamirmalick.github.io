@@ -9,9 +9,11 @@ import {
   flightApp,
   journey,
   mxmApp,
+  operationsTool,
   profile,
   projects,
   skills,
+  trainingTool,
 } from "../data/content.js";
 
 // Makes text safe to put inside HTML, so "Click & Collect" doesn't break the page.
@@ -42,12 +44,13 @@ function renderJourneyStop(stop) {
 
 function renderProject(project) {
   const { highlights } = project;
-  return `<li>
+  return `<li class="project">
     <h3>${escape(project.name)} <span class="status">${escape(project.status)}</span></h3>
     <p>${escape(project.description)}</p>
     ${highlights ? `<ul class="points">${list(highlights, (item) => `<li>${escape(item)}</li>`)}</ul>` : ""}
     <p class="meta">${escape(project.tech.join(", "))}</p>
     ${project.url ? `<p><a href="${escape(project.url)}" target="_blank" rel="noopener noreferrer">Visit live site</a></p>` : ""}
+    ${project.tool ? `<p><a href="${escape(project.tool)}" target="_blank" rel="noopener noreferrer">Open the tool</a></p>` : ""}
     ${project.repo ? `<p><a href="${escape(project.repo)}" target="_blank" rel="noopener noreferrer">View on GitHub</a></p>` : ""}
     ${project.codeNote ? `<p class="meta">${escape(project.codeNote)}</p>` : ""}
   </li>`;
@@ -100,6 +103,7 @@ export function renderSimplePage() {
       <li>Built and launched <a href="${escape(mxmApp.url)}" target="_blank" rel="noopener noreferrer">mxmdetailing.com</a>, a full booking platform for my own detailing business, with React, C#, ASP.NET Core and Azure.</li>
       <li>Built My Sky, a live flight tracker fed by my own ADS-B antenna on a Raspberry Pi. <a href="${escape(flightApp.repo)}" target="_blank" rel="noopener noreferrer">Code on GitHub</a>.</li>
       <li>Built gesture control for my computer: both hands tracked at 60 fps, gestures I train myself and offline voice commands. <a href="https://github.com/muzzammilamirmalick/gesture-desktop" target="_blank" rel="noopener noreferrer">Code on GitHub</a>.</li>
+      <li>Built two tools you can try now: <a href="${escape(operationsTool.url)}" target="_blank" rel="noopener noreferrer">${escape(operationsTool.name)}</a> and <a href="${escape(trainingTool.url)}" target="_blank" rel="noopener noreferrer">${escape(trainingTool.name)}</a>.</li>
       <li>Promoted through five roles at IKEA to acting warehouse supervisor, and ran my own detailing business to about 1,000 cars.</li>
       <li>Certified in Foundational C# with Microsoft.</li>
     </ul>

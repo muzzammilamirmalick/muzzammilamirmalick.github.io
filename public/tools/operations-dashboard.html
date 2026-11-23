@@ -1,0 +1,1569 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Daily Team Operations Dashboard</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&family=Barlow+Semi+Condensed:wght@500;600;700&display=swap">
+<style>
+/* Layout: one 16:9 operations screen. Header, then a 3-column grid (team | task board | assignments) under an aligned overview band (orders | priority | alerts). Below 1360px wide it becomes tabbed. */
+:root{
+  --bg:#eef1f3;--panel:#ffffff;--raised:#f4f6f8;--sunk:#e7ebee;--line:#dde3e7;--line-strong:#c4cdd3;
+  --ink:#12181c;--ink-2:#46525a;--muted:#67747d;
+  --focus:#2a78d6;--cc:#2a78d6;--del:#c94a7a;--ret:#71808a;
+  --ok:#1d7a42;--ok-bg:#e2f2e8;--warn:#d99a00;--warn-ink:#845700;--warn-bg:#fbf1d3;--bad:#c3302a;--bad-bg:#fae4e2;--off:#8b969d;
+  --btn:#12181c;--btn-ink:#ffffff;--scrim:rgba(10,14,17,.45);--track:#e5e9ec;--shift:#b5c0c7;
+  --f-display:"Barlow Semi Condensed","Arial Narrow",system-ui,sans-serif;
+  --f-body:"Atkinson Hyperlegible",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0c1013;--panel:#141a1e;--raised:#1a2126;--sunk:#0f1418;--line:#242d34;--line-strong:#34414b;
+  --ink:#e8edf0;--ink-2:#b2bec5;--muted:#86939b;
+  --focus:#6aa8ee;--cc:#3987e5;--del:#d55181;--ret:#8796a0;
+  --ok:#5ccb8b;--ok-bg:rgba(92,203,139,.13);--warn:#f2c94c;--warn-ink:#f2c94c;--warn-bg:rgba(242,201,76,.13);--bad:#ff7b72;--bad-bg:rgba(255,123,114,.14);--off:#6d7a83;
+  --btn:#e8edf0;--btn-ink:#0c1013;--scrim:rgba(0,0,0,.6);--track:#1d252b;--shift:#3d4a54;color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0c1013;--panel:#141a1e;--raised:#1a2126;--sunk:#0f1418;--line:#242d34;--line-strong:#34414b;
+  --ink:#e8edf0;--ink-2:#b2bec5;--muted:#86939b;
+  --focus:#6aa8ee;--cc:#3987e5;--del:#d55181;--ret:#8796a0;
+  --ok:#5ccb8b;--ok-bg:rgba(92,203,139,.13);--warn:#f2c94c;--warn-ink:#f2c94c;--warn-bg:rgba(242,201,76,.13);--bad:#ff7b72;--bad-bg:rgba(255,123,114,.14);--off:#6d7a83;
+  --btn:#e8edf0;--btn-ink:#0c1013;--scrim:rgba(0,0,0,.6);--track:#1d252b;--shift:#3d4a54;color-scheme:dark}
+html{box-sizing:border-box;font-size:16px}
+*,*::before,*::after{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:1rem;line-height:1.35;-webkit-font-smoothing:antialiased}
+button,input,select,textarea{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--focus);outline-offset:2px}
+.ico{width:1.1em;height:1.1em;flex:none;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.num{font-family:var(--f-display);font-variant-numeric:tabular-nums}
+#app{display:flex;flex-direction:column;gap:.7rem;padding-block:.7rem;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+
+/* top bar */
+.top{display:flex;align-items:center;gap:1.1rem;flex-wrap:wrap}
+.brand .eyebrow{font-family:var(--f-display);font-weight:600;font-size:.8rem;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
+.brand .date{font-family:var(--f-display);font-weight:700;font-size:1.45rem;line-height:1.05}
+.clock{font-family:var(--f-display);font-weight:600;font-size:2.1rem;line-height:1;font-variant-numeric:tabular-nums;letter-spacing:.01em}
+.chipline{display:flex;gap:.5rem;flex-wrap:wrap;align-items:center}
+.stat{display:flex;align-items:baseline;gap:.35rem;padding:.25rem .65rem;border-radius:.4rem;background:var(--panel);border:1px solid var(--line);font-size:.88rem;color:var(--ink-2);white-space:nowrap}
+.stat b{font-family:var(--f-display);font-size:1.25rem;color:var(--ink);font-variant-numeric:tabular-nums}
+.spacer{flex:1}
+.sync{display:flex;align-items:center;gap:.4rem;font-size:.82rem;color:var(--muted);white-space:nowrap}
+.sync i{width:.55rem;height:.55rem;border-radius:50%;background:var(--off)}
+.sync.live i{background:var(--ok)}.sync.err{color:var(--bad)}.sync.err i{background:var(--bad)}.sync.busy i{background:var(--warn)}
+.menu-wrap{position:relative}
+.menu{position:absolute;right:0;top:calc(100% + .35rem);z-index:30;min-width:15rem;background:var(--panel);border:1px solid var(--line-strong);border-radius:.5rem;padding:.3rem;box-shadow:0 10px 30px rgba(0,0,0,.18)}
+.menu button{display:flex;align-items:center;gap:.6rem;width:100%;text-align:left;background:none;border:0;padding:.6rem .7rem;border-radius:.35rem;cursor:pointer;font-weight:700;font-size:.95rem}
+.menu button:hover{background:var(--raised)}
+.banner{display:flex;align-items:center;gap:.8rem;flex-wrap:wrap;padding:.5rem .85rem;border-radius:.5rem;background:var(--warn-bg);color:var(--ink);border:1px solid var(--line);font-size:.92rem}
+.banner .ico{color:var(--warn-ink)}
+
+/* buttons */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:.4em;min-height:2.35rem;padding:0 .85rem;border-radius:.45rem;border:1px solid var(--line-strong);background:var(--panel);color:var(--ink);font-weight:700;font-size:.92rem;cursor:pointer;white-space:nowrap}
+.btn:hover{background:var(--raised)}
+.btn.primary{background:var(--btn);color:var(--btn-ink);border-color:var(--btn)}
+.btn.primary:hover{opacity:.9}
+.btn.danger{color:var(--bad);border-color:var(--bad)}
+.btn.ghost{background:transparent;border-color:transparent}
+.btn.sm{min-height:1.95rem;padding:0 .6rem;font-size:.84rem}
+.btn.block{width:100%}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+.btn.on{border-color:var(--ok);color:var(--ok)}
+.icon-btn{display:inline-grid;place-items:center;width:2rem;height:2rem;border-radius:.4rem;border:1px solid transparent;background:transparent;cursor:pointer;color:var(--ink-2)}
+.icon-btn:hover{background:var(--raised);color:var(--ink)}
+
+/* main grid */
+.main{display:grid;gap:.7rem}
+.panel{background:var(--panel);border:1px solid var(--line);border-radius:.6rem;display:flex;flex-direction:column;min-height:0;min-width:0}
+.panel-h{display:flex;align-items:center;gap:.6rem;padding:.55rem .85rem;border-bottom:1px solid var(--line);flex-wrap:wrap;min-height:2.9rem}
+.panel-t{margin:0;font-family:var(--f-display);font-weight:700;font-size:1rem;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-2)}
+.panel-b{padding:.6rem .85rem;min-height:0}
+.muted{color:var(--muted)}.small{font-size:.84rem}
+.empty{display:flex;flex-direction:column;align-items:flex-start;gap:.6rem;padding:1rem .2rem;color:var(--ink-2)}
+.empty h3{margin:0;font-family:var(--f-display);font-size:1.25rem;color:var(--ink)}
+.empty p{margin:0;max-width:34rem}
+.row{display:flex;gap:.5rem;align-items:center;flex-wrap:wrap}
+
+/* pills */
+.pill{display:inline-flex;align-items:center;gap:.35em;font-size:.8rem;font-weight:700;padding:.14em .55em;border-radius:99px;background:var(--raised);color:var(--ink-2);white-space:nowrap}
+.pill .dot{width:.5em;height:.5em;border-radius:50%;background:currentColor}
+.pill.ok{color:var(--ok);background:var(--ok-bg)}.pill.warn{color:var(--warn-ink);background:var(--warn-bg)}.pill.bad{color:var(--bad);background:var(--bad-bg)}.pill.off{color:var(--off)}
+.pill.lg{font-size:.9rem}
+
+/* orders */
+.orders{display:grid;grid-template-columns:7.6rem minmax(0,1fr) minmax(0,1fr);gap:.9rem;align-items:center}
+.pie{width:7.6rem;height:7.6rem;display:block}
+.pie text{fill:var(--ink);font-family:var(--f-display)}
+.ocat .lab{display:flex;align-items:center;gap:.4rem;font-weight:700;font-size:.88rem;color:var(--ink-2);white-space:nowrap}
+.sw{width:.75rem;height:.75rem;border-radius:2px;flex:none}
+.ocat .big{font-family:var(--f-display);font-weight:700;font-size:2.4rem;line-height:1;margin:.15rem 0 .25rem;font-variant-numeric:tabular-nums}
+.ocat .big small{font-size:.95rem;font-weight:600;color:var(--muted);margin-left:.25rem}
+.prog{height:.4rem;border-radius:99px;background:var(--track);position:relative;overflow:hidden}
+.prog span{position:absolute;inset:0 auto 0 0;border-radius:99px}
+.prog .p1{opacity:.45}
+.ocat .sub{font-size:.8rem;color:var(--muted);margin-top:.25rem;font-variant-numeric:tabular-nums}
+
+/* recommendation */
+.rec-head{font-family:var(--f-display);font-weight:600;font-size:1.55rem;line-height:1.15;margin:.1rem 0 .45rem;text-wrap:balance}
+.rec ul{margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:.3rem}
+.rec li{display:flex;gap:.5rem;font-size:.95rem;color:var(--ink-2)}
+.rec li::before{content:"";width:.35rem;height:.35rem;border-radius:50%;background:var(--muted);flex:none;margin-top:.5em}
+.rec .foot{font-size:.76rem;color:var(--muted);margin-top:.45rem}
+
+/* alerts */
+.alerts{list-style:none;margin:0;padding:0;display:flex;flex-direction:column}
+.al{display:grid;grid-template-columns:1.3rem minmax(0,1fr) auto;gap:.5rem;align-items:start;padding:.4rem 0;border-bottom:1px solid var(--line);font-size:.9rem}
+.al:last-child{border-bottom:0}
+.al .ico{margin-top:.12rem}
+.al.s3 .ico{color:var(--bad)}.al.s2 .ico{color:var(--warn-ink)}.al.s1 .ico{color:var(--muted)}
+.al.s3 .t{font-weight:700}
+
+/* team */
+.counts{display:flex;gap:.9rem;flex-wrap:wrap;font-size:.84rem;color:var(--ink-2)}
+.counts b{font-family:var(--f-display);font-size:1.1rem;color:var(--ink);margin-right:.15rem}
+.strip{padding:.35rem .2rem .2rem calc(2rem + .5rem + 6.4rem + .5rem + .2rem);padding-right:calc(8.8rem + .5rem + .2rem)}
+.strip-axis{position:relative;height:1rem;font-size:.72rem;color:var(--muted);font-variant-numeric:tabular-nums}
+.strip-axis span{position:absolute;transform:translateX(-50%);white-space:nowrap}
+.strip-load{position:relative;height:1.5rem;display:flex;align-items:flex-end;gap:1px;border-bottom:1px solid var(--line-strong)}
+.strip-load i{flex:1;background:var(--warn);opacity:.75;min-height:0;border-radius:1px 1px 0 0}
+.strip-load i.low{background:var(--bad);opacity:.9}
+.strip-cap{display:flex;justify-content:space-between;gap:.5rem;font-size:.72rem;color:var(--muted);margin-top:.15rem;white-space:nowrap}
+.emp{display:grid;grid-template-columns:2rem minmax(0,1fr) 8.8rem;gap:.1rem .5rem;align-items:center;padding:.4rem .2rem;border-bottom:1px solid var(--line)}
+.emp:last-child{border-bottom:0}
+.emp input[type=checkbox]{width:1.35rem;height:1.35rem;margin:0 0 0 .3rem;accent-color:var(--ok);cursor:pointer}
+.emp-l1{display:flex;align-items:center;gap:.5rem;min-width:0}
+.emp-name{font-weight:700;font-size:1.06rem;background:none;border:0;padding:0;cursor:pointer;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0;text-align:left;color:var(--ink)}
+.emp-name:hover{text-decoration:underline}
+.n-absent{color:var(--bad)!important}.n-break{color:var(--warn-ink)!important}.n-off{color:var(--off)!important}
+.emp-act{display:flex;flex-direction:column;align-items:stretch;gap:.2rem}.emp-act .bk{font-size:.78rem;color:var(--muted);white-space:nowrap;text-align:center;font-variant-numeric:tabular-nums;overflow:hidden;text-overflow:ellipsis}
+.bk .timer{font-family:var(--f-display);font-weight:700;font-size:1.2rem;color:var(--warn-ink)}
+.bk.over .timer,.bk .over{color:var(--bad)}
+.emp-l2{display:grid;grid-template-columns:6.4rem minmax(0,1fr);gap:.5rem;align-items:center;margin-top:.15rem}
+.shift-t{font-family:var(--f-display);font-size:.95rem;color:var(--muted);font-variant-numeric:tabular-nums;white-space:nowrap}
+.tl{position:relative;height:.75rem;background:var(--track);border-radius:99px;overflow:hidden}
+.tl .sh{position:absolute;top:0;bottom:0;background:var(--shift);border-radius:99px}
+.tl .bp{position:absolute;top:0;bottom:0;border:2px solid var(--warn);border-radius:3px;background:var(--warn-bg)}
+.tl .bt{position:absolute;top:0;bottom:0;background:var(--warn);border-radius:3px;opacity:.55}
+.tl .bo{position:absolute;top:0;bottom:0;background:var(--warn);border-radius:3px}
+.tl .nw{position:absolute;top:-2px;bottom:-2px;width:2px;background:var(--ink);opacity:.8}
+.emp-act .btn{width:100%}
+
+/* board */
+.board{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:.6rem;min-height:0}
+.col{display:flex;flex-direction:column;min-height:0;min-width:0;background:var(--raised);border-radius:.5rem;border:2px solid transparent}
+.col.drop{border-color:var(--focus)}
+.col-h{padding:.55rem .65rem .4rem;display:flex;flex-direction:column;gap:.35rem}
+.col-t{display:flex;align-items:center;gap:.45rem;font-weight:700;font-size:.98rem}
+.col-t .name{min-width:0;line-height:1.15}
+.col-t .cnt{margin-left:auto;font-family:var(--f-display);font-size:1rem;background:var(--panel);border:1px solid var(--line);border-radius:99px;padding:0 .5rem;font-variant-numeric:tabular-nums}
+.col-p{display:flex;align-items:center;gap:.5rem;font-size:.78rem;color:var(--muted);font-variant-numeric:tabular-nums}
+.col-p .prog{flex:1}
+.col-team{font-size:.8rem;color:var(--ink-2);line-height:1.3}
+.col-team b{font-weight:700;color:var(--muted);font-size:.74rem;text-transform:uppercase;letter-spacing:.06em}
+.col-list{flex:1;min-height:0;overflow:auto;padding:.1rem .45rem .5rem;display:flex;flex-direction:column;gap:.4rem}
+.col-empty{font-size:.85rem;color:var(--muted);padding:.6rem .3rem;border:1px dashed var(--line-strong);border-radius:.4rem;text-align:center}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:.45rem;padding:.48rem .6rem;cursor:pointer;touch-action:pan-y;-webkit-user-select:none;user-select:none}
+.card:hover{border-color:var(--line-strong)}
+.card.s-done{opacity:.6;background:var(--sunk)}
+.card.drag-src{opacity:.3}
+.card.ghost{position:fixed;z-index:50;pointer-events:none;box-shadow:0 12px 30px rgba(0,0,0,.25);opacity:.95;margin:0}
+.card-l1{display:flex;gap:.4rem;align-items:flex-start}
+.card-title{font-weight:700;font-size:.95rem;min-width:0;overflow-wrap:anywhere;flex:1}
+.s-done .card-title{text-decoration:line-through;text-decoration-thickness:1px}
+.tchip{font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.05em;padding:.1em .45em;border-radius:.3rem;border:1px solid var(--line-strong);color:var(--ink-2);white-space:nowrap}
+.card-l2{display:flex;align-items:center;gap:.45rem;margin-top:.3rem;font-size:.82rem;color:var(--ink-2);min-width:0}
+.card-l2 .own{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.card-l1 .btn{margin-left:auto;flex:none;margin-top:-.15rem}.card-l2 .tchip{margin-left:auto}
+.card-note{font-size:.8rem;color:var(--muted);margin-top:.25rem;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.prio{display:inline-flex;align-items:center;gap:.2rem;font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--ink)}
+.st{display:inline-flex;align-items:center;gap:.25rem;white-space:nowrap}
+.st svg{width:.95em;height:.95em}
+.s-done .st{color:var(--ok)}
+.sdot{width:.55rem;height:.55rem;border-radius:50%;display:inline-block;flex:none}
+.sd-available{background:var(--ok)}.sd-break,.sd-over{background:var(--warn)}.sd-absent,.sd-notyet{background:var(--bad)}.sd-off{background:var(--off)}
+
+/* assignments */
+.lockstate{margin-left:auto}
+.as-form{display:grid;grid-template-columns:1fr 1fr;gap:.45rem;padding:.6rem;border:1px solid var(--line);border-radius:.5rem;background:var(--raised);margin-bottom:.7rem}
+.as-form .full{grid-column:1/-1}
+.fld{display:flex;flex-direction:column;gap:.2rem;font-size:.8rem;font-weight:700;color:var(--ink-2);min-width:0}
+.fld input,.fld select,.fld textarea{font-weight:400;font-size:.98rem;padding:.42rem .5rem;border-radius:.4rem;border:1px solid var(--line-strong);background:var(--panel);color:var(--ink);min-width:0;width:100%}
+.fld textarea{resize:vertical;min-height:4rem}
+.fld .hint{font-weight:400;color:var(--muted);font-size:.78rem}
+.ferr{color:var(--bad);font-size:.85rem;font-weight:700;margin:0}
+.fwarn{color:var(--warn-ink);background:var(--warn-bg);border-radius:.4rem;padding:.45rem .6rem;font-size:.86rem;margin:0}
+.fok{color:var(--ok);font-size:.85rem;margin:0}
+.as-g{padding:.55rem 0;border-bottom:1px solid var(--line)}
+.as-g:last-child{border-bottom:0}
+.as-gh{display:flex;align-items:center;gap:.45rem;font-weight:700;font-size:.98rem;margin-bottom:.35rem}
+.as-row{display:grid;grid-template-columns:4.6rem minmax(0,1fr);gap:.5rem;align-items:start;margin:.3rem 0}
+.as-lab{font-size:.74rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);padding-top:.3rem}
+.chips{display:flex;flex-wrap:wrap;gap:.3rem}
+.chip{display:inline-flex;align-items:center;gap:.35rem;padding:.2rem .5rem;border-radius:.4rem;background:var(--raised);border:1px solid var(--line);font-size:.9rem;font-weight:700;max-width:100%}
+.chip .nm{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.chip button{background:none;border:0;padding:0;cursor:pointer;color:var(--muted);display:inline-grid;place-items:center}
+.chip button:hover{color:var(--ink)}
+.none{font-size:.85rem;color:var(--muted);padding-top:.22rem}
+.as-warn{font-size:.82rem;color:var(--warn-ink);margin-top:.25rem;display:flex;gap:.35rem;align-items:flex-start}
+
+/* tabs (narrow) */
+.tabs{display:none;gap:.3rem;background:var(--panel);border:1px solid var(--line);border-radius:.55rem;padding:.25rem;position:sticky;top:env(safe-area-inset-top,0px);z-index:20}
+.tabs button{flex:1;border:0;background:none;padding:.55rem .3rem;border-radius:.4rem;font-weight:700;cursor:pointer;color:var(--ink-2)}
+.tabs button[aria-selected=true]{background:var(--btn);color:var(--btn-ink)}
+
+/* dialogs */
+dialog{border:1px solid var(--line-strong);border-radius:.7rem;padding:0;background:var(--panel);color:var(--ink);width:min(36rem,calc(100vw - 32px));max-height:calc(100vh - 32px)}
+dialog.wide{width:min(52rem,calc(100vw - 32px))}
+dialog::backdrop{background:var(--scrim)}
+.dlg{display:flex;flex-direction:column;max-height:calc(100vh - 34px)}
+.dlg-h{display:flex;align-items:center;gap:.6rem;padding:.8rem 1rem;border-bottom:1px solid var(--line)}
+.dlg-h h2{margin:0;font-family:var(--f-display);font-size:1.35rem;flex:1}
+.dlg-b{padding:1rem;overflow:auto;display:flex;flex-direction:column;gap:.8rem}
+.dlg-f{display:flex;gap:.5rem;justify-content:flex-end;flex-wrap:wrap;padding:.75rem 1rem;border-top:1px solid var(--line)}
+.dlg-f .left{margin-right:auto}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:.6rem}
+.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:.5rem}
+.seg{display:inline-flex;border:1px solid var(--line-strong);border-radius:.45rem;overflow:hidden}
+.seg button{border:0;background:var(--panel);padding:.45rem .9rem;font-weight:700;cursor:pointer}
+.seg button+button{border-left:1px solid var(--line-strong)}
+.seg button[aria-pressed=true]{background:var(--btn);color:var(--btn-ink)}
+.stepper{display:flex;align-items:stretch}
+.stepper input{text-align:center;border-radius:0!important;font-family:var(--f-display);font-size:1.15rem!important;font-variant-numeric:tabular-nums}
+.stepper button{width:2.2rem;border:1px solid var(--line-strong);background:var(--raised);cursor:pointer;font-weight:700;font-size:1.1rem}
+.stepper button:first-child{border-radius:.4rem 0 0 .4rem;border-right:0}
+.stepper button:last-child{border-radius:0 .4rem .4rem 0;border-left:0}
+.sect{font-family:var(--f-display);font-weight:700;font-size:.85rem;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin:.2rem 0 -.2rem}
+.box{border:1px solid var(--line);border-radius:.5rem;padding:.7rem;display:flex;flex-direction:column;gap:.55rem}
+.bigchoice{display:grid;grid-template-columns:1fr 1fr;gap:.6rem}
+.bigchoice .btn{min-height:4rem;font-size:1.15rem;flex-direction:column;gap:.1rem}
+.bigchoice .btn small{font-weight:400;font-size:.78rem;color:inherit;opacity:.75}
+.pin-dots{display:flex;gap:.7rem;justify-content:center;margin:.3rem 0}
+.pin-dots i{width:1.1rem;height:1.1rem;border-radius:50%;border:2px solid var(--line-strong)}
+.pin-dots i.f{background:var(--ink);border-color:var(--ink)}
+.keypad{display:grid;grid-template-columns:repeat(3,1fr);gap:.45rem;max-width:18rem;margin:0 auto;width:100%}
+.keypad button{min-height:3.2rem;font-size:1.35rem;font-family:var(--f-display);font-weight:700;border-radius:.5rem;border:1px solid var(--line-strong);background:var(--raised);cursor:pointer}
+.pin-in{position:absolute;opacity:0;width:1px;height:1px;pointer-events:none}
+pre.ho{white-space:pre-wrap;font-family:var(--f-body);font-size:.9rem;background:var(--raised);border:1px solid var(--line);border-radius:.5rem;padding:.8rem;margin:0;max-height:50vh;overflow:auto}
+.loglist{list-style:none;margin:0;padding:0}
+.loglist li{display:grid;grid-template-columns:4rem 1fr;gap:.6rem;padding:.4rem 0;border-bottom:1px solid var(--line);font-size:.9rem}
+.loglist time{color:var(--muted);font-variant-numeric:tabular-nums}
+.toasts{position:fixed;right:max(16px,env(safe-area-inset-right,0px));bottom:calc(16px + env(safe-area-inset-bottom,0px));display:flex;flex-direction:column;gap:.5rem;z-index:60;max-width:min(26rem,calc(100vw - 32px))}
+.toast{display:flex;align-items:center;gap:.7rem;background:var(--btn);color:var(--btn-ink);padding:.65rem .85rem;border-radius:.5rem;font-size:.92rem;box-shadow:0 8px 24px rgba(0,0,0,.25)}
+.toast.warn{background:var(--warn-bg);color:var(--ink);border:1px solid var(--warn)}
+.toast.err{background:var(--bad-bg);color:var(--ink);border:1px solid var(--bad)}
+.toast button{background:none;border:1px solid currentColor;color:inherit;border-radius:.35rem;padding:.15rem .5rem;font-weight:700;cursor:pointer}
+
+/* wide screens: everything on one screen */
+@media (min-width:1360px) and (min-height:600px){
+  html{font-size:clamp(12.5px,min(.88vw,1.58vh),40px)}
+  html,body{height:100%}
+  body{overflow:hidden}
+  #app{height:100%}
+  .main{flex:1;min-height:0;grid-template-columns:33rem minmax(0,1fr) 21rem;grid-template-rows:11.6rem minmax(0,1fr);
+    grid-template-areas:"orders rec alerts" "team board assign"}
+  #p-orders{grid-area:orders}#p-rec{grid-area:rec}#p-alerts{grid-area:alerts}#p-team{grid-area:team}#p-board{grid-area:board}#p-assign{grid-area:assign}
+  .panel{overflow:hidden}
+  .panel-b{flex:1;overflow:auto}
+  #p-board .panel-b{display:flex;flex-direction:column;overflow:hidden}
+  .board{flex:1}
+  #p-team .panel-b{padding-top:.2rem}
+}
+/* narrow: tabs */
+@media not all and (min-width:1360px) and (min-height:600px){
+  .tabs{display:flex}
+  .main [data-tab]{display:none}
+  body[data-view=overview] .main [data-tab=overview],body[data-view=team] .main [data-tab=team],body[data-view=tasks] .main [data-tab=tasks],body[data-view=assign] .main [data-tab=assign]{display:flex}
+  .top .clock{font-size:1.6rem}
+  .col-list{max-height:none}
+}
+@media (max-width:900px){.board{grid-template-columns:1fr}.orders{grid-template-columns:6.5rem 1fr 1fr}.pie{width:6.5rem;height:6.5rem}}
+@media (max-width:560px){
+  .top{gap:.6rem}.top .stat{display:none}
+  .orders{grid-template-columns:1fr 1fr}.orders .pie{grid-column:1/-1;margin:0 auto}
+  .grid2,.grid3{grid-template-columns:1fr}
+  .emp{grid-template-columns:2rem minmax(0,1fr) 6.2rem}
+  .strip{display:none}
+  .emp-l2{grid-template-columns:5.6rem minmax(0,1fr)}
+  .tbtn-label{display:none}
+}
+@media (prefers-reduced-motion:no-preference){.btn,.card,.chip{transition:background-color .12s,border-color .12s}}
+</style>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="i-lock" viewBox="0 0 24 24"><rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></symbol>
+  <symbol id="i-unlock" viewBox="0 0 24 24"><rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 7.8-1.3"/></symbol>
+  <symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></symbol>
+  <symbol id="i-check" viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></symbol>
+  <symbol id="i-x" viewBox="0 0 24 24"><path d="M18 6 6 18M6 6l12 12"/></symbol>
+  <symbol id="i-alert" viewBox="0 0 24 24"><path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/><path d="M12 9v4M12 17h.01"/></symbol>
+  <symbol id="i-info" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 16v-4M12 8h.01"/></symbol>
+  <symbol id="i-flag" viewBox="0 0 24 24"><path d="M5 21V4M5 4h11l-2 4 2 4H5"/></symbol>
+  <symbol id="i-more" viewBox="0 0 24 24"><path d="M5 12h.01M12 12h.01M19 12h.01"/></symbol>
+  <symbol id="i-edit" viewBox="0 0 24 24"><path d="M12 20h9M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/></symbol>
+  <symbol id="i-copy" viewBox="0 0 24 24"><rect x="9" y="9" width="12" height="12" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></symbol>
+  <symbol id="i-down" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"/></symbol>
+  <symbol id="i-full" viewBox="0 0 24 24"><path d="M8 3H5a2 2 0 0 0-2 2v3M21 8V5a2 2 0 0 0-2-2h-3M16 21h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"/></symbol>
+  <symbol id="i-gear" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M4.9 4.9 7 7M17 17l2.1 2.1M2 12h3M19 12h3M4.9 19.1 7 17M17 7l2.1-2.1"/></symbol>
+  <symbol id="i-hist" viewBox="0 0 24 24"><path d="M3 12a9 9 0 1 0 3-6.7L3 8M3 3v5h5M12 7v5l3 2"/></symbol>
+  <symbol id="i-list" viewBox="0 0 24 24"><path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/></symbol>
+  <symbol id="i-sun" viewBox="0 0 24 24"><path d="M17 18a5 5 0 0 0-10 0M12 2v7M4.2 10.2l1.4 1.4M1 18h2M21 18h2M18.4 11.6l1.4-1.4M23 22H1M8 6l4-4 4 4"/></symbol>
+  <symbol id="i-doc" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6M8 13h8M8 17h6"/></symbol>
+  <symbol id="i-todo" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8"/></symbol>
+  <symbol id="i-doing" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8"/><path d="M12 4a8 8 0 0 1 0 16z" fill="currentColor"/></symbol>
+  <symbol id="i-done" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="m8 12 3 3 5-6"/></symbol>
+</svg>
+
+<div id="app">
+  <header class="top">
+    <div class="brand"><div class="eyebrow">Team Operations</div><div class="date" id="t-date">Loading…</div></div>
+    <div class="clock" id="t-clock">--:--</div>
+    <div class="chipline" id="t-stats"></div>
+    <div class="spacer"></div>
+    <div class="sync" id="t-sync"><i></i><span>Connecting…</span></div>
+    <button class="btn" type="button" data-act="handover"><svg class="ico"><use href="#i-doc"/></svg><span class="tbtn-label">Handover</span></button>
+    <button class="btn" type="button" id="lockbtn" data-act="lock-toggle"></button>
+    <div class="menu-wrap">
+      <button class="btn" type="button" data-act="menu" aria-haspopup="true" aria-expanded="false" id="menubtn"><svg class="ico"><use href="#i-more"/></svg><span class="tbtn-label">More</span></button>
+      <div class="menu" id="menu" hidden>
+        <button type="button" data-act="orders-edit"><svg class="ico"><use href="#i-edit"/></svg>Enter orders &amp; cutoff</button>
+        <button type="button" data-act="activity"><svg class="ico"><use href="#i-list"/></svg>Activity log</button>
+        <button type="button" data-act="history"><svg class="ico"><use href="#i-hist"/></svg>Past days</button>
+        <button type="button" data-act="newday"><svg class="ico"><use href="#i-sun"/></svg>Start a new day</button>
+        <button type="button" data-act="settings"><svg class="ico"><use href="#i-gear"/></svg>Settings</button>
+        <button type="button" data-act="fullscreen"><svg class="ico"><use href="#i-full"/></svg>Full screen (TV)</button>
+      </div>
+    </div>
+  </header>
+  <div id="banner"></div>
+  <nav class="tabs" id="tabs" role="tablist" aria-label="Sections">
+    <button type="button" role="tab" data-act="tab" data-id="overview">Overview</button>
+    <button type="button" role="tab" data-act="tab" data-id="team">Team</button>
+    <button type="button" role="tab" data-act="tab" data-id="tasks">Tasks</button>
+    <button type="button" role="tab" data-act="tab" data-id="assign">Assign</button>
+  </nav>
+  <main class="main">
+    <section class="panel" id="p-orders" data-tab="overview" aria-labelledby="h-orders">
+      <div class="panel-h"><h2 class="panel-t" id="h-orders">Today's orders</h2><span id="cutchip"></span><span class="spacer"></span><button class="btn sm" type="button" data-act="orders-edit"><svg class="ico"><use href="#i-edit"/></svg>Edit</button></div>
+      <div class="panel-b" id="orders-b"></div>
+    </section>
+    <section class="panel rec" id="p-rec" data-tab="overview" aria-labelledby="h-rec">
+      <div class="panel-h"><h2 class="panel-t" id="h-rec">Daily Priority Recommendation</h2><span class="spacer"></span><span id="rec-level"></span></div>
+      <div class="panel-b" id="rec-b"></div>
+    </section>
+    <section class="panel" id="p-alerts" data-tab="overview" aria-labelledby="h-alerts">
+      <div class="panel-h"><h2 class="panel-t" id="h-alerts">Alerts</h2><span id="al-count"></span></div>
+      <div class="panel-b"><ul class="alerts" id="alerts-b" aria-live="polite"></ul></div>
+    </section>
+    <section class="panel" id="p-team" data-tab="team" aria-labelledby="h-team">
+      <div class="panel-h"><h2 class="panel-t" id="h-team">Team &amp; Breaks</h2><div class="counts" id="team-counts"></div><span class="spacer"></span><button class="btn sm" type="button" data-act="emp-add"><svg class="ico"><use href="#i-plus"/></svg>Add</button></div>
+      <div class="panel-b" id="team-b"></div>
+    </section>
+    <section class="panel" id="p-board" data-tab="tasks" aria-labelledby="h-board">
+      <div class="panel-h"><h2 class="panel-t" id="h-board">Daily Task Board</h2><span class="muted small" id="board-hint"></span></div>
+      <div class="panel-b"><div class="board" id="board"></div></div>
+    </section>
+    <section class="panel" id="p-assign" data-tab="assign" aria-labelledby="h-assign">
+      <div class="panel-h"><h2 class="panel-t" id="h-assign">Task Assignment</h2><span class="lockstate" id="as-lock"></span></div>
+      <div class="panel-b"><div id="as-form-wrap"></div><div id="as-b"></div></div>
+    </section>
+  </main>
+</div>
+<dialog id="dlg"></dialog>
+<dialog id="dlg2"></dialog>
+<div class="toasts" id="toasts" aria-live="polite"></div>
+
+<script>
+(function () {
+'use strict';
+/* ================= constants & utils ================= */
+var LS_KEY = 'teamops.v1', DEV_KEY = 'teamops.device', UNLOCK_KEY = 'teamops.unlockUntil', PINFAIL_KEY = 'teamops.pinFail', VIEW_KEY = 'teamops.view', THEME_KEY = 'teamops.theme';
+var CATS = {
+  del: { name: 'Deliveries', short: 'Deliveries', types: ['pick', 'check'], color: 'var(--del)' },
+  cc: { name: 'Click and Collect', short: 'Click & Collect', types: ['pick', 'check'], color: 'var(--cc)' },
+  ret: { name: '320 Returns / Uncollected Back to Stock', short: '320 Returns', types: [], color: 'var(--ret)' }
+};
+var CAT_ORDER = ['del', 'cc', 'ret'];
+var TYPE_NAME = { pick: 'Picking', check: 'Checking' };
+var TASK_STATUS = { todo: 'Not started', doing: 'In progress', done: 'Completed' };
+var DEFAULT_CONFIG = { minWorking: 2, autoEnd: true, allowMulti: false, rates: { ccPick: 12, ccCheck: 30, delPick: 8, delCheck: 20 }, taskMin: 20, autoLock: 10 };
+
+function $(s, r) { return (r || document).querySelector(s); }
+function $$(s, r) { return Array.prototype.slice.call((r || document).querySelectorAll(s)); }
+function esc(s) { return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); }
+function clone(o) { return o == null ? o : JSON.parse(JSON.stringify(o)); }
+function pad(n) { return String(n).padStart(2, '0'); }
+function uid() { return Date.now().toString(36) + Math.random().toString(36).slice(2, 8); }
+function isObj(x) { return x && typeof x === 'object' && !Array.isArray(x); }
+function deepMerge(t, s) { Object.keys(s).forEach(function (k) { if (isObj(s[k]) && isObj(t[k])) deepMerge(t[k], s[k]); else t[k] = isObj(s[k]) ? clone(s[k]) : s[k]; }); return t; }
+function withDefaults(def, v) { return deepMerge(clone(def), clone(v || {})); }
+function todayKey(d) { d = d || new Date(); return d.getFullYear() + '-' + pad(d.getMonth() + 1) + '-' + pad(d.getDate()); }
+function parseHM(s) { var m = /^(\d{1,2}):(\d{2})/.exec(String(s || '').trim()); if (!m) return null; var h = +m[1], mi = +m[2]; if (h > 23 || mi > 59) return null; return h * 60 + mi; }
+function fmtHM(min) { if (min == null || !isFinite(min)) return '--:--'; var t = ((Math.floor(min) % 1440) + 1440) % 1440; return pad(Math.floor(t / 60)) + ':' + pad(t % 60); }
+function fmtDur(min) { min = Math.max(0, Math.round(min)); var h = Math.floor(min / 60), m = min % 60; return h ? (m ? h + 'h ' + m + 'm' : h + 'h') : m + 'm'; }
+function fmtMS(ms) { var s = Math.round(Math.abs(ms) / 1000); return Math.floor(s / 60) + ':' + pad(s % 60); }
+function plural(n, one, many) { return n + ' ' + (n === 1 ? one : (many || one + 's')); }
+function listNames(a) { if (a.length <= 1) return a.join(''); return a.slice(0, -1).join(', ') + ' and ' + a[a.length - 1]; }
+function icon(n, cls) { return '<svg class="ico' + (cls ? ' ' + cls : '') + '" aria-hidden="true"><use href="#i-' + n + '"/></svg>'; }
+function lsGet(k, d) { try { var v = localStorage.getItem(k); return v == null ? d : JSON.parse(v); } catch (e) { return d; } }
+function lsSet(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) {} }
+function ssGet(k, d) { try { var v = sessionStorage.getItem(k); return v == null ? d : JSON.parse(v); } catch (e) { return d; } }
+function ssSet(k, v) { try { sessionStorage.setItem(k, JSON.stringify(v)); } catch (e) {} }
+function dateLabel(key, long) { var p = key.split('-').map(Number); var d = new Date(p[0], p[1] - 1, p[2]); return d.toLocaleDateString(undefined, long ? { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' } : { weekday: 'long', day: 'numeric', month: 'long' }); }
+
+var DEVICE = (function () { var d = lsGet(DEV_KEY, null); if (!d || !d.id) { d = { id: uid(), name: 'TV screen' }; lsSet(DEV_KEY, d); } return d; })();
+
+/* ================= state ================= */
+function defaultDay(date) { return { date: date, shiftLabel: '', cutoff: '', orders: { cc: { total: 0, picked: 0, checked: 0 }, del: { total: 0, picked: 0, checked: 0 } }, acks: {}, note: '' }; }
+var S = { day: defaultDay(todayKey()), dayExists: false, config: clone(DEFAULT_CONFIG), security: null, staff: {}, roster: {}, tasks: {}, assign: {}, log: [], history: {} };
+var Store = { backend: null, mode: 'local', ready: false, readOnly: false, canAdmin: true, pending: 0, error: null, user: null, downloads: null, storageOK: true };
+
+function dayBase() { var p = (S.day.date || todayKey()).split('-').map(Number); return new Date(p[0], p[1] - 1, p[2]); }
+function msToMin(ms) { var n = new Date(ms), b = dayBase(); var nd = new Date(n.getFullYear(), n.getMonth(), n.getDate()); var dd = Math.round((nd - b) / 86400000); return dd * 1440 + n.getHours() * 60 + n.getMinutes() + n.getSeconds() / 60 + n.getMilliseconds() / 60000; }
+function minToMs(min) { var b = dayBase(); var dd = Math.floor(min / 1440), r = min - dd * 1440; var h = Math.floor(r / 60), mm = Math.floor(r - h * 60), sec = Math.round((r - h * 60 - mm) * 60); return new Date(b.getFullYear(), b.getMonth(), b.getDate() + dd, h, mm, sec).getTime(); }
+function shiftOf(e) { var s = parseHM(e.start), en = parseHM(e.end); if (s == null || en == null) return null; return { start: s, end: en <= s ? en + 1440 : en }; }
+function planOf(e, sh) { var p = parseHM(e.breakPlan); if (p == null || !sh) return null; if (p < sh.start) p += 1440; return p; }
+function staffName(id) { var e = S.staff[id] || S.roster[id]; return e ? e.name : 'Removed member'; }
+
+/* ================= storage backends ================= */
+function LocalBackend() {
+  var docs = {}, onChange = function () {};
+  function read() { try { var raw = localStorage.getItem(LS_KEY); docs = raw ? (JSON.parse(raw).docs || {}) : {}; } catch (e) { docs = {}; Store.storageOK = false; } }
+  function persist() { localStorage.setItem(LS_KEY, JSON.stringify({ v: 1, docs: docs })); }
+  read();
+  try { window.addEventListener('storage', function (e) { if (e.key === LS_KEY) { read(); onChange(docs); } }); } catch (e) {}
+  function guard(fn) { return new Promise(function (res, rej) { var snap = JSON.stringify(docs); try { fn(); persist(); } catch (e) { docs = JSON.parse(snap); return rej(e && e.code ? e : { code: 'storage_failed', message: 'This browser could not save the change. Storage may be full or blocked.' }); } onChange(docs); res(); }); }
+  return {
+    mode: 'local',
+    start: function (cb, onErr, onReady) { onChange = cb; cb(docs); onReady(); },
+    set: function (p, d) { return guard(function () { docs[p] = clone(d); }); },
+    update: function (p, d) { return guard(function () { if (!docs[p]) throw { code: 'invalid_argument', message: 'Missing record' }; deepMerge(docs[p], clone(d)); }); },
+    del: function (p) { return guard(function () { delete docs[p]; }); }
+  };
+}
+function SharedBackend(db) {
+  var docs = {}, onChange = function () {}, seen = {}, readyFired = false;
+  var DOCS = ['ops/day', 'ops/config', 'ops/security'];
+  var COLS = [['staff'], ['roster'], ['tasks'], ['assign'], ['log', function (q) { return q.orderBy('ts', 'desc').limit(250); }], ['history', function (q) { return q.orderBy('savedAt', 'desc').limit(60); }]];
+  var total = DOCS.length + COLS.length, onReadyCb = null;
+  function mark(k) { seen[k] = 1; if (!readyFired && Object.keys(seen).length >= total) { readyFired = true; onReadyCb && onReadyCb(); } }
+  function retry(fn) { return fn().catch(function (e) { if (e && (e.code === 'unavailable' || e.code === 'resource_exhausted')) { return new Promise(function (r) { setTimeout(r, 400 + Math.random() * 900); }).then(fn); } throw e; }); }
+  return {
+    mode: 'shared',
+    start: function (cb, onErr, onReady) {
+      onChange = cb; onReadyCb = onReady;
+      setTimeout(function () { if (!readyFired) { readyFired = true; onReady(); } }, 6000);
+      DOCS.forEach(function (p) { db.doc(p).onSnapshot(function (s) { if (s.exists) docs[p] = s.data(); else delete docs[p]; mark(p); onChange(docs); }, function (e) { mark(p); onErr(e); }); });
+      COLS.forEach(function (c) { var q = db.collection(c[0]); if (c[1]) q = c[1](q); q.onSnapshot(function (snap) { Object.keys(docs).forEach(function (k) { if (k.indexOf(c[0] + '/') === 0) delete docs[k]; }); snap.docs.forEach(function (d) { docs[c[0] + '/' + d.id] = d.data(); }); mark(c[0]); onChange(docs); }, function (e) { mark(c[0]); onErr(e); }); });
+    },
+    set: function (p, d) { return retry(function () { return db.doc(p).set(d); }); },
+    update: function (p, d) { return retry(function () { return db.doc(p).update(d); }); },
+    del: function (p) { return retry(function () { return db.doc(p).delete(); }); }
+  };
+}
+function applyDocs(docs) {
+  var day = docs['ops/day'];
+  S.dayExists = !!day;
+  S.day = withDefaults(defaultDay(todayKey()), day);
+  S.config = withDefaults(DEFAULT_CONFIG, docs['ops/config']);
+  S.security = docs['ops/security'] || null;
+  S.staff = {}; S.roster = {}; S.tasks = {}; S.assign = {}; S.history = {}; var log = [];
+  Object.keys(docs).forEach(function (p) {
+    var i = p.indexOf('/'), c = p.slice(0, i), id = p.slice(i + 1), d = docs[p];
+    if (c === 'staff') S.staff[id] = d; else if (c === 'roster') S.roster[id] = d; else if (c === 'tasks') S.tasks[id] = d; else if (c === 'assign') S.assign[id] = d; else if (c === 'history') S.history[id] = d; else if (c === 'log') log.push(Object.assign({ id: id }, d));
+  });
+  S.log = log.sort(function (a, b) { return b.ts - a.ts; });
+}
+function stamp(o) { o.by = DEVICE.name; o.at = Date.now(); return o; }
+function write(op, path, data) {
+  if (Store.readOnly) { toast('This screen is view only. Ask the board owner for edit access.', 'warn'); return Promise.reject({ code: 'read_only' }); }
+  Store.pending++; renderSync();
+  return Store.backend[op](path, data).then(function () { Store.error = null; }, function (e) {
+    Store.error = e || { code: 'unknown' };
+    var code = e && e.code;
+    if (code === 'invalid_argument' && Store.mode === 'shared' && op !== 'update') { toast("You don't have permission to change this. Ask the board owner for edit access.", 'err'); }
+    else if (code === 'quota_exceeded') toast('Storage is full. Start a new day to clear old records, then try again.', 'err');
+    else if (code === 'storage_failed') toast(e.message, 'err');
+    else toast("Couldn't save the change. Check the connection and try again.", 'err');
+    throw e;
+  }).finally(function () { Store.pending--; renderSync(); });
+}
+function save(op, path, data) { return write(op, path, data).then(function () { return true; }, function () { return false; }); }
+function patchDay(patch) { if (S.dayExists) return save('update', 'ops/day', stamp(patch)); return save('set', 'ops/day', stamp(deepMerge(clone(S.day), patch))); }
+function logEvent(text) { if (Store.readOnly) return; var id = Date.now() + '-' + Math.random().toString(36).slice(2, 7); Store.backend.set('log/' + id, { ts: Date.now(), text: text, dev: DEVICE.name, uid: Store.uid || null, day: S.day.date }).catch(function () {}); }
+
+/* ================= lock / PIN ================= */
+function isUnlocked() { var u = ssGet(UNLOCK_KEY, 0); return u && u > Date.now(); }
+function touchUnlock() { if (isUnlocked()) ssSet(UNLOCK_KEY, Date.now() + Math.max(1, S.config.autoLock) * 60000); }
+function setUnlocked(on) { ssSet(UNLOCK_KEY, on ? Date.now() + Math.max(1, S.config.autoLock) * 60000 : 0); renderAll(); }
+function hashPin(pin, salt) {
+  var data = salt + ':' + pin;
+  if (window.crypto && crypto.subtle && window.TextEncoder) {
+    return crypto.subtle.digest('SHA-256', new TextEncoder().encode(data)).then(function (b) { return Array.prototype.map.call(new Uint8Array(b), function (x) { return x.toString(16).padStart(2, '0'); }).join(''); });
+  }
+  var h = 2166136261; for (var i = 0; i < data.length; i++) { h ^= data.charCodeAt(i); h = Math.imul(h, 16777619); } return Promise.resolve('f' + (h >>> 0).toString(16));
+}
+function pinCooldown() { var f = ssGet(PINFAIL_KEY, { n: 0, until: 0 }); return f.until > Date.now() ? Math.ceil((f.until - Date.now()) / 1000) : 0; }
+function pinFail() { var f = ssGet(PINFAIL_KEY, { n: 0, until: 0 }); f.n++; if (f.n >= 5) { f.until = Date.now() + 30000; f.n = 0; } ssSet(PINFAIL_KEY, f); }
+function verifyPin(pin) { if (!S.security) return Promise.resolve(false); return hashPin(pin, S.security.salt).then(function (h) { return h === S.security.hash; }); }
+function storePin(pin) { var salt = uid() + uid(); return hashPin(pin, salt).then(function (h) { return save('set', 'ops/security', { salt: salt, hash: h, at: Date.now(), by: DEVICE.name }); }); }
+
+function pinDialog(steps) {
+  // steps: [{title, sub, check(pin, ctx) -> Promise<string|null>}]; resolves true when all pass
+  return new Promise(function (resolve) {
+    var i = 0, pin = '', ctx = {}, busy = false;
+    openDialog({ title: steps[0].title, html: '<p class="muted" id="pin-sub"></p><div class="pin-dots" id="pin-dots"><i></i><i></i><i></i><i></i></div><p class="ferr" id="pin-err" role="alert"></p><input class="pin-in" id="pin-in" inputmode="numeric" autocomplete="off" aria-label="PIN"><div class="keypad">' + [1, 2, 3, 4, 5, 6, 7, 8, 9].map(function (n) { return '<button type="button" data-k="' + n + '">' + n + '</button>'; }).join('') + '<button type="button" data-k="c">Clear</button><button type="button" data-k="0">0</button><button type="button" data-k="b" aria-label="Delete">⌫</button></div>', foot: '<button type="button" class="btn" data-close>Cancel</button>',
+      onMount: function (root) {
+        var dots = $$('#pin-dots i', root), err = $('#pin-err', root), sub = $('#pin-sub', root), inp = $('#pin-in', root), title = $('.dlg-h h2', root);
+        function show() { if (i >= steps.length) return; title.textContent = steps[i].title; sub.textContent = steps[i].sub || ''; dots.forEach(function (d, k) { d.classList.toggle('f', k < pin.length); }); }
+        function press(k) {
+          if (busy || i >= steps.length) return; var cd = pinCooldown(); if (cd) { err.textContent = 'Too many wrong tries. Wait ' + cd + ' seconds.'; return; }
+          if (k === 'c') pin = ''; else if (k === 'b') pin = pin.slice(0, -1); else if (/^\d$/.test(k) && pin.length < 4) pin += k;
+          err.textContent = ''; show();
+          if (pin.length === 4) { busy = true; Promise.resolve(steps[i].check(pin, ctx)).then(function (msg) { busy = false; if (msg) { err.textContent = msg; pin = ''; show(); return; } i++; pin = ''; if (i >= steps.length) { closeDialog(); resolve(true); } else show(); }); }
+        }
+        root.addEventListener('click', function (e) { var b = e.target.closest('[data-k]'); if (b) press(b.dataset.k); });
+        root.addEventListener('keydown', function (e) { if (/^\d$/.test(e.key)) { press(e.key); e.preventDefault(); } else if (e.key === 'Backspace') { press('b'); e.preventDefault(); } });
+        show(); setTimeout(function () { try { inp.focus(); } catch (e) {} }, 30);
+      },
+      onClose: function () { resolve(false); }
+    });
+  });
+}
+function unlockFlow() {
+  if (Store.mode === 'shared' && Store.canAdmin === false) { toast('Only the board owner or an editor can unlock editing.', 'warn'); return Promise.resolve(false); }
+  if (!S.security) {
+    return pinDialog([
+      { title: 'Create a 4-digit PIN', sub: 'This PIN unlocks task assignment, task planning, settings and new-day reset. Choose one your team does not know.', check: function (p, c) { c.p = p; return null; } },
+      { title: 'Confirm your PIN', sub: 'Enter the same 4 digits again.', check: function (p, c) { if (p !== c.p) return 'The PINs did not match. Enter the confirmation again.'; return storePin(p).then(function (ok) { if (!ok) return 'The PIN could not be saved. Try again.'; logEvent('PIN created'); return null; }); } }
+    ]).then(function (ok) { if (ok) { setUnlocked(true); toast('Unlocked. Editing locks again after ' + S.config.autoLock + ' minutes without activity.'); } return ok; });
+  }
+  return pinDialog([{ title: 'Enter PIN to unlock', sub: 'Unlocks assignment and planning changes on this screen.', check: function (p) { return verifyPin(p).then(function (ok) { if (ok) { ssSet(PINFAIL_KEY, { n: 0, until: 0 }); return null; } pinFail(); return 'Wrong PIN. Try again.'; }); } }])
+    .then(function (ok) { if (ok) { setUnlocked(true); logEvent('Editing unlocked'); } return ok; });
+}
+function ensureUnlocked() { if (isUnlocked()) { touchUnlock(); return Promise.resolve(true); } return unlockFlow(); }
+function changePinFlow() {
+  return pinDialog([
+    { title: 'Enter current PIN', check: function (p) { return verifyPin(p).then(function (ok) { if (!ok) { pinFail(); return 'Wrong PIN.'; } return null; }); } },
+    { title: 'Enter new PIN', sub: 'Choose 4 new digits.', check: function (p, c) { c.p = p; return null; } },
+    { title: 'Confirm new PIN', check: function (p, c) { if (p !== c.p) return 'The PINs did not match. Enter the confirmation again.'; return storePin(p).then(function (ok) { if (!ok) return 'The PIN could not be saved.'; logEvent('PIN changed'); return null; }); } }
+  ]).then(function (ok) { if (ok) toast('PIN changed.'); });
+}
+
+/* ================= model ================= */
+function buildModel() {
+  var now = Date.now(), nm = msToMin(now), cfg = S.config, emps = [], byId = {};
+  Object.keys(S.staff).forEach(function (id) {
+    var e = S.staff[id], sh = shiftOf(e), b = e.brk || {}, info = { id: id, e: e, name: e.name || 'Unnamed', sh: sh, start: sh ? sh.start : 0, end: sh ? sh.end : 0, present: !!e.present };
+    info.plan = planOf(e, sh);
+    info.brk = b.status === 'on' ? 'on' : b.status === 'done' ? 'done' : 'none';
+    info.dur = (info.brk !== 'none' && b.dur) ? b.dur : (+e.breakType === 30 ? 30 : 15);
+    info.paused = info.brk === 'on' && !!b.pausedAt;
+    if (info.brk === 'on') { var ref = b.pausedAt || now; info.remainMs = info.dur * 60000 - (ref - b.startTs - (b.pausedMs || 0)); info.bStart = msToMin(b.startTs); }
+    if (info.brk === 'done') { info.bStart = msToMin(b.startTs); info.bEnd = msToMin(b.endTs); info.actual = (b.endTs - b.startTs - (b.pausedMs || 0)) / 60000; info.overMin = Math.max(0, Math.round(info.actual - info.dur)); }
+    var st;
+    if (!info.present) st = (sh && nm < sh.start) ? 'notyet' : 'absent';
+    else if (info.brk === 'on') st = (info.remainMs < 0 && !cfg.autoEnd) ? 'over' : 'break';
+    else if (sh && nm >= sh.end) st = 'off';
+    else st = 'available';
+    info.status = st;
+    info.iv = [];
+    if (info.brk === 'on') info.iv.push({ a: info.bStart, b: Math.max(nm, nm + info.remainMs / 60000), k: 'on' });
+    else if (info.brk === 'done') info.iv.push({ a: info.bStart, b: info.bEnd, k: 'taken' });
+    else if (info.plan != null) info.iv.push({ a: info.plan, b: info.plan + info.dur, k: 'planned' });
+    info.future = [];
+    if (info.brk === 'on') info.future.push([nm, nm + Math.max(0, info.remainMs) / 60000]);
+    else if (info.brk === 'none' && info.plan != null) { var a0 = Math.max(info.plan, nm); info.future.push([a0, a0 + info.dur]); }
+    info.dueSoon = info.present && info.brk === 'none' && info.plan != null && info.plan - nm <= 10 && info.plan - nm > 0;
+    info.missed = info.present && info.brk === 'none' && info.plan != null && nm - info.plan >= 10 && nm < info.end;
+    emps.push(info); byId[id] = info;
+  });
+  emps.sort(function (a, b) { return a.start - b.start || a.name.localeCompare(b.name); });
+  var m = { now: now, nm: nm, emps: emps, byId: byId };
+  m.counts = { total: emps.length, present: 0, available: 0, onBreak: 0, absent: 0 };
+  emps.forEach(function (i) { if (i.present) m.counts.present++; else m.counts.absent++; if (i.status === 'available') m.counts.available++; if (i.status === 'break' || i.status === 'over') m.counts.onBreak++; });
+  var w0 = 6 * 60, w1 = 22 * 60;
+  if (emps.length) { w0 = Math.min.apply(null, emps.map(function (i) { return i.start; })); w1 = Math.max.apply(null, emps.map(function (i) { return i.end; })); w0 = Math.floor(w0 / 60) * 60; w1 = Math.ceil(w1 / 60) * 60; if (w1 - w0 < 240) w1 = w0 + 240; }
+  m.w0 = w0; m.w1 = w1;
+  // assignments
+  m.as = { del: { pick: [], check: [] }, cc: { pick: [], check: [] }, ret: { all: [] } }; m.badAs = []; m.asByEmp = {};
+  Object.keys(S.assign).forEach(function (aid) {
+    var a = S.assign[aid]; var ok = CATS[a.cat] && S.staff[a.emp] && (CATS[a.cat].types.length ? CATS[a.cat].types.indexOf(a.type) >= 0 : !a.type);
+    if (!ok) { m.badAs.push(aid); return; }
+    var rec = { aid: aid, emp: a.emp, cat: a.cat, type: a.type || null, info: byId[a.emp] };
+    (a.cat === 'ret' ? m.as.ret.all : m.as[a.cat][a.type]).push(rec);
+    (m.asByEmp[a.emp] = m.asByEmp[a.emp] || []).push(rec);
+  });
+  Object.keys(m.as).forEach(function (c) { Object.keys(m.as[c]).forEach(function (t) { m.as[c][t].sort(function (x, y) { return staffName(x.emp).localeCompare(staffName(y.emp)); }); }); });
+  // tasks
+  m.tasks = { del: [], cc: [], ret: [] }; m.openByEmp = {};
+  Object.keys(S.tasks).forEach(function (id) { var t = Object.assign({ id: id }, S.tasks[id]); if (!m.tasks[t.cat]) t.cat = 'del'; m.tasks[t.cat].push(t); if (t.status !== 'done' && t.owner) (m.openByEmp[t.owner] = m.openByEmp[t.owner] || []).push(t); });
+  var rank = { doing: 0, todo: 1, done: 2 };
+  CAT_ORDER.forEach(function (c) { m.tasks[c].sort(function (a, b) { return (rank[a.status] - rank[b.status]) || ((b.priority ? 1 : 0) - (a.priority ? 1 : 0)) || ((a.created || 0) - (b.created || 0)); }); });
+  m.rec = buildRec(m);
+  m.alerts = buildAlerts(m);
+  return m;
+}
+function workingAt(m, t, excl) {
+  var w = 0, b = 0, names = [];
+  m.emps.forEach(function (i) {
+    if (i.id === excl || !i.sh || t < i.start || t >= i.end || i.status === 'absent') return;
+    if (!i.present && t < m.nm) return;
+    var onB = i.iv.some(function (x) { return t >= x.a && t < x.b; });
+    if (onB) { b++; names.push(i.name); } else w++;
+  });
+  return { w: w, b: b, names: names };
+}
+function capMin(m, i, from, to) {
+  if (!i || !i.sh || i.status === 'absent') return 0;
+  var a = Math.max(from, i.start), b = Math.min(to, i.end); if (b <= a) return 0;
+  var mins = b - a; i.future.forEach(function (f) { mins -= Math.max(0, Math.min(b, f[1]) - Math.max(a, f[0])); });
+  return Math.max(0, mins);
+}
+function checkBreakPlan(m, empId, plan, dur) {
+  var worst = null;
+  for (var t = plan; t < plan + dur; t += 5) { var r = workingAt(m, t + 0.01, empId); if (r.w < S.config.minWorking && (!worst || r.w < worst.w)) worst = { t: t, w: r.w, b: r.b, names: r.names }; }
+  return worst;
+}
+function suggestBreak(m, empId, desired, dur, sh) {
+  var lo = sh.start + 60, hi = sh.end - 60 - dur; if (hi < lo) { lo = sh.start; hi = sh.end - dur; }
+  lo = Math.max(lo, Math.ceil(m.nm / 5) * 5);
+  var c = []; for (var t = Math.ceil(lo / 5) * 5; t <= hi; t += 5) c.push(t);
+  c.sort(function (a, b) { return Math.abs(a - desired) - Math.abs(b - desired); });
+  for (var k = 0; k < c.length; k++) if (c[k] !== desired && !checkBreakPlan(m, empId, c[k], dur)) return c[k];
+  return null;
+}
+
+/* ================= recommendation ================= */
+function buildRec(m) {
+  var o = S.day.orders, R = S.config.rates, nm = m.nm, cc = o.cc, del = o.del;
+  var ccLeft = Math.max(0, cc.total - cc.checked), ccPickLeft = Math.max(0, cc.total - cc.picked);
+  var delLeft = Math.max(0, del.total - del.checked), delPickLeft = Math.max(0, del.total - del.picked);
+  var hasOrders = cc.total + del.total > 0, reasons = [], level = 'ok', head = '';
+  function team(c, t) { return (t ? m.as[c][t] : m.as[c].all).map(function (r) { return r.info; }).filter(Boolean); }
+  function availNow(list) { return list.filter(function (i) { return i.status === 'available'; }); }
+  function cap(list, to) { return list.reduce(function (s, i) { return s + capMin(m, i, nm, to); }, 0); }
+  var ccTeam = team('cc', 'pick').concat(team('cc', 'check')).map(function (i) { return i.id; });
+  function candidates() {
+    var free = m.emps.filter(function (i) { return i.status === 'available' && ccTeam.indexOf(i.id) < 0; });
+    function rank(i) { var a = m.asByEmp[i.id] || []; if (!a.length) return 0; if (a.some(function (r) { return r.cat === 'del' && r.type === 'pick'; }) && team('del', 'pick').length > 1) return 1; if (a.some(function (r) { return r.cat === 'ret'; })) return 2; return 3; }
+    return free.sort(function (a, b) { return rank(a) - rank(b); }).filter(function (i) { return rank(i) < 3; });
+  }
+  function fromWhere(i) { var a = m.asByEmp[i.id] || []; if (!a.length) return i.name + ' (unassigned)'; return i.name + ' (from ' + CATS[a[0].cat].short + ')'; }
+  var cut = parseHM(S.day.cutoff);
+  var openTasks = function (c) { return m.tasks[c].filter(function (t) { return t.status !== 'done'; }).length; };
+  if (!hasOrders && !openTasks('del') && !openTasks('cc') && !openTasks('ret')) {
+    return { level: 'idle', head: "Enter today's order counts to get a priority recommendation.", reasons: ['Use Edit on Today’s orders to enter Click and Collect and Delivery totals' + (cut == null ? ', and set the Click and Collect cutoff time.' : '.')], provisional: true };
+  }
+  if (cc.total > 0 && ccLeft === 0) { level = 'ok'; head = 'Click and Collect is complete. Redirect available staff to delivery preparation.'; }
+  else if (cc.total === 0 && hasOrders) { level = 'ok'; head = 'No Click and Collect orders entered. Focus on delivery preparation.'; }
+  else if (cut == null) {
+    level = 'provisional';
+    head = ccLeft > 0 ? 'Provisional: keep Click and Collect moving (' + plural(ccLeft, 'order') + ' left) until the cutoff time is entered.' : 'Provisional: enter order counts and the Click and Collect cutoff.';
+    reasons.push('No Click and Collect cutoff is set, so this does not account for the deadline. Add it with Edit on Today’s orders.');
+  } else {
+    var minsLeft = cut - nm, pickers = team('cc', 'pick'), checkers = team('cc', 'check');
+    if (minsLeft <= 0) {
+      level = 'urgent'; head = 'Click and Collect cutoff (' + S.day.cutoff + ') has passed with ' + plural(ccLeft, 'order') + ' not ready.';
+      reasons.push('Finish these before other work; customers may already be waiting.');
+      var cs = candidates().slice(0, 2); if (cs.length) reasons.push('Move ' + listNames(cs.map(fromWhere)) + ' to Click and Collect now.');
+    } else {
+      var pickCap = cap(pickers, cut) * R.ccPick / 60, checkCap = cap(checkers, cut) * R.ccCheck / 60;
+      var perPick = R.ccPick / 60 * minsLeft, perCheck = R.ccCheck / 60 * minsLeft;
+      var addPick = ccPickLeft > pickCap ? Math.ceil((ccPickLeft - pickCap) / Math.max(perPick, 0.01)) : 0;
+      var addCheck = ccLeft > checkCap ? Math.ceil((ccLeft - checkCap) / Math.max(perCheck, 0.01)) : 0;
+      var reqPick = Math.ceil(ccPickLeft / Math.max(perPick, 0.01));
+      if (addPick || addCheck) {
+        level = minsLeft <= 60 ? 'urgent' : 'watch';
+        head = 'Prioritize Click and Collect: ' + plural(ccLeft, 'order') + ' remain and the cutoff is in ' + fmtDur(minsLeft) + '.';
+        if (addPick) reasons.push('At the estimated pace, picking needs about ' + plural(reqPick, 'person', 'people') + ' until ' + S.day.cutoff + '; ' + availNow(pickers).length + ' assigned and available now.');
+        var cands = candidates(), need = addPick + (addPick ? 0 : addCheck), pickNames = cands.slice(0, need);
+        if (pickNames.length) reasons.push('Move ' + listNames(pickNames.map(fromWhere)) + ' to Click and Collect ' + (addPick ? 'picking' : 'checking') + '.');
+        else reasons.push('Nobody else is free right now. Consider delaying planned breaks or pausing returns work.');
+        if (addCheck && !addPick) reasons.unshift('Checking is the bottleneck: add ' + plural(addCheck, 'checker') + ' to Click and Collect.');
+        if (team('del', 'pick').length <= 1 && delLeft > 0) reasons.push('Keep at least one person on delivery preparation.');
+      } else if (minsLeft <= 60) {
+        level = 'watch'; head = 'Click and Collect is on track for the ' + S.day.cutoff + ' cutoff. Maintain delivery preparation.';
+        reasons.push(plural(ccLeft, 'order') + ' left with ' + pickers.length + ' picking and ' + checkers.length + ' checking.');
+      } else {
+        var spare = pickCap > ccPickLeft * 1.6 && pickers.length > 1;
+        level = 'ok'; head = spare ? 'Click and Collect is under control. Redirect available staff to delivery preparation.' : 'Click and Collect is on track: ' + plural(ccLeft, 'order') + ' left, cutoff in ' + fmtDur(minsLeft) + '.';
+        if (spare) reasons.push('Estimated picking capacity before ' + S.day.cutoff + ' is well above the ' + ccPickLeft + ' orders left to pick.');
+      }
+    }
+  }
+  // deliveries
+  if (delLeft > 0) {
+    var dp = team('del', 'pick'), dc = team('del', 'check');
+    if (!dp.length && !dc.length) reasons.push('Nobody is assigned to Deliveries; ' + plural(delLeft, 'order') + ' are waiting.');
+    else {
+      var needP = delPickLeft / R.delPick * 60, haveP = cap(dp, Infinity), needC = delLeft / R.delCheck * 60, haveC = cap(dc, Infinity);
+      if (haveP < needP || haveC < needC) { reasons.push('Deliveries: ' + plural(delLeft, 'order') + ' left need about ' + fmtDur(Math.max(needP - haveP, 0) + Math.max(needC - haveC, 0)) + ' more staff time than the delivery team has left on shift.'); m.delShort = true; if (level === 'ok') level = 'watch'; }
+    }
+  }
+  // checking lag
+  ['cc', 'del'].forEach(function (c) {
+    var wait = Math.max(0, o[c].picked - o[c].checked);
+    if (wait >= Math.max(5, Math.round(o[c].picked * 0.25))) {
+      var ch = availNow(team(c, 'check'));
+      if (ch.length < 1 || wait >= 12) reasons.push('Checking is falling behind on ' + CATS[c].name + ': ' + plural(wait, 'order') + ' picked and waiting to be checked. Consider moving one picker to checking.');
+    }
+  });
+  // breaks in next 30 min
+  var soon = m.emps.filter(function (i) { return i.status === 'break' || i.status === 'over' || (i.present && i.brk === 'none' && i.plan != null && i.plan >= nm && i.plan < nm + 30); });
+  if (soon.length >= 3 || (soon.length >= 1 && workingAt(m, nm + 15, null).w < S.config.minWorking)) reasons.push('Staffing is limited during the next 30 minutes because ' + plural(soon.length, 'employee is', 'employees are') + ' on or scheduled for break (' + listNames(soon.map(function (i) { return i.name; })) + ').');
+  // task progress
+  var tp = CAT_ORDER.filter(function (c) { return m.tasks[c].length; }).map(function (c) { var d = m.tasks[c].filter(function (t) { return t.status === 'done'; }).length; return CATS[c].short + ' ' + d + '/' + m.tasks[c].length; });
+  if (tp.length && reasons.length < 3) reasons.push('Task progress: ' + tp.join(' · ') + ' completed.');
+  return { level: level, head: head, reasons: reasons.slice(0, 4), provisional: level === 'provisional' };
+}
+
+/* ================= alerts ================= */
+function buildAlerts(m) {
+  var A = [], nm = m.nm, o = S.day.orders, acks = S.day.acks || {};
+  function add(key, sev, text, ackable) { if (ackable && acks[key]) return; A.push({ key: key, sev: sev, text: text, ack: !!ackable }); }
+  if (S.day.date !== todayKey()) add('stale', 2, 'This board still shows ' + dateLabel(S.day.date) + '. Start a new day from More when ready.', false);
+  var cut = parseHM(S.day.cutoff), ccLeft = Math.max(0, o.cc.total - o.cc.checked);
+  if (cut != null && ccLeft > 0) { var ml = cut - nm; if (ml <= 0) add('cut', 3, 'Click and Collect cutoff (' + S.day.cutoff + ') passed with ' + plural(ccLeft, 'order') + ' not ready.'); else if (ml <= 30) add('cut', 3, 'Click and Collect cutoff in ' + fmtDur(ml) + ': ' + plural(ccLeft, 'order') + ' left.'); else if (ml <= 60) add('cut', 2, 'Click and Collect cutoff in ' + fmtDur(ml) + ': ' + plural(ccLeft, 'order') + ' left.'); }
+  m.emps.forEach(function (i) {
+    if (i.status === 'over') add('over:' + i.id, 3, i.name + "'s break is " + fmtMS(-i.remainMs) + ' over.');
+    if (i.brk === 'done' && i.e.brk && i.e.brk.auto && nm - i.bEnd < 5) add('fin:' + i.id + ':' + i.e.brk.endTs, 1, i.name + "'s break timer finished at " + fmtHM(i.bEnd) + '. Now marked available.', true);
+    if (i.status === 'absent' && i.sh && nm >= i.start + 5 && nm < i.end) add('att:' + i.id, 2, i.name + ' is not checked in (shift started ' + fmtHM(i.start) + ').', true);
+    if (i.missed) add('miss:' + i.id + ':' + i.e.breakPlan, 2, i.name + "'s planned break (" + i.e.breakPlan + ") hasn't been recorded.", true);
+    if (i.dueSoon) add('due:' + i.id + ':' + i.e.breakPlan, 1, i.name + "'s break is due at " + i.e.breakPlan + '.', true);
+    if (i.brk === 'done' && i.overMin >= 1) add('long:' + i.id + ':' + i.e.brk.startTs, 1, i.name + "'s break ran " + i.overMin + ' min over the ' + i.dur + '-minute limit.', true);
+    var open = m.openByEmp[i.id] || [];
+    if (open.length && i.present && i.sh && i.end - nm <= 30 && i.end - nm > -60) add('end:' + i.id + ':' + open.length, 2, i.name + "'s shift " + (i.end > nm ? 'ends at ' : 'ended at ') + fmtHM(i.end) + ' with ' + plural(open.length, 'open task') + '. Reassign or hand over.', true);
+    if (open.length >= 2 && i.status !== 'absent') { var left = capMin(m, i, nm, i.end); if (open.length * S.config.taskMin > left) add('load:' + i.id + ':' + open.length, 2, i.name + ' has ' + plural(open.length, 'open task') + ' (about ' + fmtDur(open.length * S.config.taskMin) + ') but about ' + fmtDur(left) + ' left on shift.', true); }
+    (m.asByEmp[i.id] || []).forEach(function (r) { if (i.status === 'absent') add('asabs:' + r.aid, 2, i.name + ' is assigned to ' + CATS[r.cat].short + ' but not checked in.', true); });
+  });
+  var wnow = workingAt(m, nm, null); if (m.emps.length && wnow.b > 0 && wnow.w < S.config.minWorking && wnow.w + wnow.b >= S.config.minWorking) add('low', 2, 'Only ' + plural(wnow.w, 'person is', 'people are') + ' working right now (' + wnow.b + ' on break). Minimum is ' + S.config.minWorking + '.');
+  CAT_ORDER.forEach(function (c) {
+    var hasWork = m.tasks[c].some(function (t) { return t.status !== 'done'; }) || (c !== 'ret' && (o[c].total - o[c].checked) > 0);
+    var n = c === 'ret' ? m.as.ret.all.length : m.as[c].pick.length + m.as[c].check.length;
+    if (hasWork && !n) add('noas:' + c, 2, 'Nobody is assigned to ' + CATS[c].name + '.', true);
+    var nOwner = m.tasks[c].filter(function (t) { return t.status !== 'done' && !t.owner; });
+    var pr = nOwner.filter(function (t) { return t.priority; });
+    if (pr.length) add('noown:p:' + c + ':' + pr.length, 2, plural(pr.length, 'priority task') + ' in ' + CATS[c].short + ' ' + (pr.length === 1 ? 'has' : 'have') + ' no owner.', true);
+    else if (nOwner.length) add('noown:' + c + ':' + nOwner.length, 1, plural(nOwner.length, 'task') + ' in ' + CATS[c].short + ' ' + (nOwner.length === 1 ? 'has' : 'have') + ' no owner.', true);
+  });
+  if (m.delShort) add('delshort', 2, 'Delivery work may not be finished before shifts end at the current staffing.', true);
+  if (m.badAs.length) add('badas', 2, plural(m.badAs.length, 'assignment') + ' no longer match a team member or category. Unlock and review assignments.', false);
+  A.sort(function (a, b) { return b.sev - a.sev; });
+  return A;
+}
+
+/* ================= rendering ================= */
+var M = null, lastFull = 0, renderQueued = false, deferRender = false;
+function scheduleRender() { if (renderQueued) return; renderQueued = true; requestAnimationFrame(function () { renderQueued = false; if (deferRender) { renderQueued = false; setTimeout(scheduleRender, 300); return; } renderAll(); }); }
+function renderAll() {
+  lastFull = Date.now();
+  M = buildModel();
+  renderTop(); renderBanner(); renderOrders(); renderRec(); renderAlerts(); renderTeam(); renderBoard(); renderAssign(); renderSync(); tickTimers();
+}
+function renderSync() {
+  var el = $('#t-sync'); if (!el) return; var cls = 'sync', txt;
+  if (!Store.ready) txt = 'Loading…';
+  else if (Store.pending) { cls += ' busy'; txt = 'Saving…'; }
+  else if (Store.error) { cls += ' err'; txt = 'Last change not saved'; }
+  else if (Store.readOnly) txt = 'View only';
+  else if (Store.mode === 'shared') { cls += ' live'; txt = 'Live · synced'; }
+  else txt = Store.storageOK ? 'Saved on this device' : 'Not saved (storage blocked)';
+  el.className = cls; el.innerHTML = '<i></i><span>' + txt + '</span>';
+}
+function renderTop() {
+  $('#t-date').textContent = dateLabel(S.day.date);
+  var c = M.counts, span = M.emps.length ? fmtHM(M.w0) + '–' + fmtHM(M.w1) : '';
+  var shift = (S.day.shiftLabel || '') + (S.day.shiftLabel && span ? ' · ' : '') + span;
+  $('#t-stats').innerHTML = (shift ? '<span class="stat">' + esc(shift) + '</span>' : '') +
+    '<span class="stat"><b>' + c.present + '</b>of ' + c.total + ' present</span>' +
+    '<span class="stat"><b>' + c.available + '</b>available</span>';
+  var lb = $('#lockbtn'), un = isUnlocked();
+  lb.innerHTML = un ? icon('unlock') + '<span class="tbtn-label">Lock</span>' : icon('lock') + '<span class="tbtn-label">Unlock</span>';
+  lb.classList.toggle('on', un); lb.setAttribute('aria-label', un ? 'Lock editing' : 'Unlock editing with PIN');
+  tickClock();
+}
+function tickClock() { var d = new Date(); $('#t-clock').textContent = pad(d.getHours()) + ':' + pad(d.getMinutes()); }
+function renderBanner() {
+  var ex = Object.keys(S.staff).some(function (k) { return S.staff[k].example; }) || Object.keys(S.tasks).some(function (k) { return S.tasks[k].example; });
+  $('#banner').innerHTML = ex ? '<div class="banner">' + icon('info') + '<span><b>Example data.</b> These people, orders and tasks are samples so you can see how the board works.</span><span class="spacer"></span><button class="btn sm" type="button" data-act="example-clear">Clear examples</button></div>' : '';
+}
+function pieSVG(cc, del) {
+  var tot = cc + del, r = 40, C = 2 * Math.PI * r, gap = tot && cc && del ? 1.4 : 0, s = '';
+  s += '<svg class="pie" viewBox="0 0 100 100" role="img" aria-label="Click and Collect ' + cc + ', Delivery ' + del + ', total ' + tot + '">';
+  s += '<circle cx="50" cy="50" r="' + r + '" fill="none" stroke="var(--track)" stroke-width="16"/>';
+  if (tot) {
+    var l1 = C * cc / tot, l2 = C * del / tot;
+    if (cc) s += '<circle cx="50" cy="50" r="' + r + '" fill="none" stroke="var(--cc)" stroke-width="16" stroke-dasharray="' + Math.max(0, l1 - gap) + ' ' + (C - Math.max(0, l1 - gap)) + '" transform="rotate(-90 50 50)"/>';
+    if (del) s += '<circle cx="50" cy="50" r="' + r + '" fill="none" stroke="var(--del)" stroke-width="16" stroke-dasharray="' + Math.max(0, l2 - gap) + ' ' + (C - Math.max(0, l2 - gap)) + '" stroke-dashoffset="' + (-l1) + '" transform="rotate(-90 50 50)"/>';
+  }
+  s += '<text x="50" y="52" text-anchor="middle" font-size="22" font-weight="700">' + tot + '</text><text x="50" y="66" text-anchor="middle" font-size="9" fill="var(--muted)" style="fill:var(--muted)">total orders</text></svg>';
+  return s;
+}
+function renderOrders() {
+  var o = S.day.orders, cc = o.cc, del = o.del, tot = cc.total + del.total;
+  function pct(n) { return tot ? Math.round(n / tot * 100) : 0; }
+  function block(k, label, d) {
+    var p1 = d.total ? d.picked / d.total * 100 : 0, p2 = d.total ? d.checked / d.total * 100 : 0;
+    return '<div class="ocat"><div class="lab"><span class="sw" style="background:var(--' + k + ')"></span>' + label + '</div>' +
+      '<div class="big" data-o="' + k + '">' + d.total + '<small>orders \u00b7 <span class="num">' + pct(d.total) + '%</span></small></div>' +
+      '<div class="prog" title="Picked and checked"><span class="p1" style="width:' + p1 + '%;background:var(--' + k + ')"></span><span style="width:' + p2 + '%;background:var(--' + k + ')"></span></div>' +
+      '<div class="sub">' + d.picked + ' picked · ' + d.checked + ' checked · <b>' + Math.max(0, d.total - d.checked) + ' left</b></div></div>';
+  }
+  $('#orders-b').innerHTML = tot === 0 && !S.day.cutoff ? '<div class="orders">' + pieSVG(0, 0) + '<div style="grid-column:span 2" class="empty"><p>No orders entered for today. Enter Click and Collect and Delivery counts to see the split and get a priority recommendation.</p><button class="btn sm primary" type="button" data-act="orders-edit">' + icon('plus') + 'Enter orders</button></div></div>'
+    : '<div class="orders">' + pieSVG(cc.total, del.total) + block('cc', 'Click &amp; Collect', cc) + block('del', 'Delivery', del) + '</div>';
+  var cut = parseHM(S.day.cutoff);
+  $('#cutchip').innerHTML = cut == null ? '<span class="pill">No C&amp;C cutoff set</span>' : (function () { var ml = cut - M.nm, cls = ml <= 0 ? 'bad' : ml <= 30 ? 'bad' : ml <= 60 ? 'warn' : ''; return '<span class="pill ' + cls + '">C&amp;C cutoff ' + esc(S.day.cutoff) + ' · ' + (ml > 0 ? fmtDur(ml) + ' left' : 'passed') + '</span>'; })();
+}
+function renderRec() {
+  var r = M.rec, map = { urgent: ['bad', 'Act now'], watch: ['warn', 'Watch'], ok: ['ok', 'On track'], provisional: ['', 'Provisional'], idle: ['', 'Waiting for data'] };
+  var lv = map[r.level] || map.idle;
+  $('#rec-level').innerHTML = '<span class="pill lg ' + lv[0] + '">' + lv[1] + '</span>';
+  var R = S.config.rates;
+  $('#rec-b').innerHTML = '<p class="rec-head">' + esc(r.head) + '</p>' + (r.reasons.length ? '<ul>' + r.reasons.map(function (x) { return '<li>' + esc(x) + '</li>'; }).join('') + '</ul>' : '') +
+    '<p class="foot">Estimates use these pace assumptions (change in Settings): C&amp;C picking ' + R.ccPick + '/h, checking ' + R.ccCheck + '/h; Delivery picking ' + R.delPick + '/h, checking ' + R.delCheck + '/h per person.</p>';
+}
+function renderAlerts() {
+  var A = M.alerts;
+  $('#al-count').innerHTML = A.length ? '<span class="pill ' + (A[0].sev === 3 ? 'bad' : A[0].sev === 2 ? 'warn' : '') + '">' + A.length + '</span>' : '';
+  $('#alerts-b').innerHTML = A.length ? A.map(function (a) {
+    return '<li class="al s' + a.sev + '">' + icon(a.sev >= 2 ? 'alert' : 'info') + '<span class="t">' + esc(a.text) + '</span>' + (a.ack ? '<button class="icon-btn" type="button" data-act="ack" data-id="' + esc(a.key) + '" title="Acknowledge" aria-label="Acknowledge: ' + esc(a.text) + '">' + icon('check') + '</button>' : '<span></span>') + '</li>';
+  }).join('') : '<li class="muted small" style="padding:.4rem 0">No alerts. Everything entered looks on track.</li>';
+}
+function pct(min) { return Math.max(0, Math.min(100, (min - M.w0) / (M.w1 - M.w0) * 100)); }
+function statusPill(i) {
+  switch (i.status) {
+    case 'available': return '<span class="pill ok"><span class="dot"></span>Available</span>';
+    case 'break': return '<span class="pill warn"><span class="dot"></span>' + (i.paused ? 'Break paused' : 'On break') + '</span>';
+    case 'over': return '<span class="pill bad"><span class="dot"></span>Break over time</span>';
+    case 'absent': return '<span class="pill bad">Not checked in</span>';
+    case 'notyet': return '<span class="pill">Starts ' + fmtHM(i.start) + '</span>';
+    case 'off': return '<span class="pill off">Shift ended</span>';
+  }
+  return '';
+}
+function breakInfo(i) {
+  if (i.brk === 'on') return '<span class="bk' + (i.status === 'over' ? ' over' : '') + '"><span class="timer" data-timer="' + i.id + '">' + (i.remainMs < 0 ? '+' : '') + fmtMS(i.remainMs) + '</span> ' + (i.status === 'over' ? 'over' : 'left') + '</span>';
+  if (i.brk === 'done') return '<span class="bk">' + icon('check') + ' Break done' + (i.overMin >= 1 ? ' <span class="over">(+' + i.overMin + 'm)</span>' : '') + '</span>';
+  if (i.plan != null) return '<span class="bk' + (i.missed ? ' over' : '') + '">' + (i.missed ? '<span class="over">Not taken</span> ' : i.dueSoon ? '<b style="color:var(--warn-ink)">Due</b> ' : 'Break ') + esc(i.e.breakPlan) + ' · ' + i.dur + 'm</span>';
+  return '<span class="bk">' + i.dur + 'm break · not planned</span>';
+}
+function renderTeam() {
+  var c = M.counts;
+  $('#team-counts').innerHTML = '<span><b>' + c.present + '</b>present</span><span><b>' + c.available + '</b>available</span><span><b>' + c.onBreak + '</b>on break</span><span><b>' + c.absent + '</b>absent</span>';
+  var b = $('#team-b');
+  if (!M.emps.length) {
+    var nR = Object.keys(S.roster).length;
+    b.innerHTML = '<div class="empty"><h3>No team members for today yet</h3><p>Add the people working today with their shift times and planned breaks. Attendance, break timers and the schedule show here.</p><div class="row"><button class="btn primary" type="button" data-act="emp-add">' + icon('plus') + 'Add team member</button>' + (nR ? '<button class="btn" type="button" data-act="roster-load">Load saved team (' + nR + ')</button>' : '') + '<button class="btn ghost" type="button" data-act="example-load">Load example day</button></div></div>';
+    return;
+  }
+  // load strip
+  var slots = [], maxB = 1;
+  for (var t = M.w0; t < M.w1; t += 15) { var r = workingAt(M, t + 7.5, null); slots.push({ t: t, r: r }); maxB = Math.max(maxB, r.b); }
+  var step = Math.max(60, Math.ceil((M.w1 - M.w0) / 60 / 4) * 60), ax = '';
+  for (var h = Math.ceil(M.w0 / step) * step; h <= M.w1; h += step) ax += '<span style="left:' + pct(h) + '%">' + fmtHM(h) + '</span>';
+  var low = slots.filter(function (s) { return s.r.w < S.config.minWorking && s.r.w + s.r.b >= S.config.minWorking; }).length;
+  var strip = '<div class="strip" aria-label="Breaks across the day"><div class="strip-axis">' + ax + '</div><div class="strip-load">' + slots.map(function (s) { return '<i class="' + (s.r.w < S.config.minWorking && s.r.w + s.r.b >= S.config.minWorking ? 'low' : '') + '" style="height:' + (s.r.b ? Math.max(18, s.r.b / maxB * 100) : 0) + '%" title="' + fmtHM(s.t) + ': ' + s.r.b + ' on break, ' + s.r.w + ' working' + (s.r.names.length ? ' (' + esc(s.r.names.join(', ')) + ')' : '') + '"></i>'; }).join('') + '</div><div class="strip-cap"><span>People on break at once</span><span>' + (low ? '<b style="color:var(--bad)">' + plural(low, 'slot') + ' below ' + S.config.minWorking + ' working</b>' : 'Never below ' + S.config.minWorking + ' working') + '</span></div></div>';
+  b.innerHTML = strip + M.emps.map(function (i) {
+    var ncls = i.status === 'absent' || i.status === 'notyet' ? 'n-absent' : (i.status === 'break' || i.status === 'over') ? 'n-break' : i.status === 'off' ? 'n-off' : '';
+    var bars = i.sh ? '<span class="sh" style="left:' + pct(i.start) + '%;width:' + (pct(i.end) - pct(i.start)) + '%"></span>' : '';
+    i.iv.forEach(function (x) { bars += '<span class="' + (x.k === 'planned' ? 'bp' : x.k === 'on' ? 'bo' : 'bt') + '" style="left:' + pct(x.a) + '%;width:' + Math.max(0.8, pct(x.b) - pct(x.a)) + '%"></span>'; });
+    if (M.nm >= M.w0 && M.nm <= M.w1) bars += '<span class="nw" style="left:' + pct(M.nm) + '%"></span>';
+    var act = '';
+    if (i.brk === 'on') act = '<button class="btn sm" type="button" data-act="brk-end" data-id="' + i.id + '">End break</button>';
+    else if (i.present && i.status !== 'off') act = '<button class="btn sm" type="button" data-act="brk-start" data-id="' + i.id + '"' + '>' + (i.brk === 'done' ? 'Another break' : 'Start break') + '</button>';
+    return '<div class="emp" data-emp="' + i.id + '"><input type="checkbox" data-change="present" data-id="' + i.id + '"' + (i.present ? ' checked' : '') + ' aria-label="' + esc(i.name) + ' present"' + '>' +
+      '<div style="min-width:0"><div class="emp-l1"><button type="button" class="emp-name ' + ncls + '" data-act="emp-edit" data-id="' + i.id + '" title="Edit ' + esc(i.name) + '">' + esc(i.name) + '</button>' + statusPill(i) + '</div>' +
+      '<div class="emp-l2"><span class="shift-t">' + (i.sh ? fmtHM(i.start) + '–' + fmtHM(i.end) : '--') + '</span><div class="tl" title="Shift ' + (i.sh ? fmtHM(i.start) + '–' + fmtHM(i.end) : '') + (i.plan != null ? ', break ' + esc(i.e.breakPlan) : '') + '">' + bars + '</div></div></div>' +
+      '<div class="emp-act">' + act + breakInfo(i) + '</div></div>';
+  }).join('');
+}
+function ownerLine(t) {
+  if (!t.owner) return '<span class="own muted">No owner</span>';
+  var i = M.byId[t.owner]; var st = i ? i.status : 'off';
+  return '<span class="sdot sd-' + st + '" title="' + esc(st) + '"></span><span class="own">' + esc(staffName(t.owner)) + '</span>';
+}
+function renderBoard() {
+  var un = isUnlocked();
+  $('#board-hint').textContent = un ? 'Drag cards between columns to move them.' : 'Mark tasks started and completed. Unlock to add, edit or move tasks.';
+  if (deferRender) return;
+  $('#board').innerHTML = CAT_ORDER.map(function (c) {
+    var list = M.tasks[c], done = list.filter(function (t) { return t.status === 'done'; }).length;
+    var teamTxt;
+    if (c === 'ret') teamTxt = M.as.ret.all.length ? '<b>Team</b> ' + esc(M.as.ret.all.map(function (r) { return staffName(r.emp); }).join(', ')) : '<span class="muted">Nobody assigned</span>';
+    else { var p = M.as[c].pick.map(function (r) { return staffName(r.emp); }), k = M.as[c].check.map(function (r) { return staffName(r.emp); }); teamTxt = (p.length || k.length) ? '<b>Pick</b> ' + esc(p.join(', ') || '-') + ' &nbsp; <b>Check</b> ' + esc(k.join(', ') || '-') : '<span class="muted">Nobody assigned</span>'; }
+    return '<div class="col" data-cat="' + c + '"><div class="col-h"><div class="col-t"><span class="sw" style="background:' + CATS[c].color + '"></span><span class="name" title="' + esc(CATS[c].name) + '">' + esc(CATS[c].name) + '</span><span class="cnt" aria-label="' + list.length + ' tasks">' + list.length + '</span>' +
+      (un ? '<button class="icon-btn" type="button" data-act="task-add" data-id="' + c + '" title="Add task to ' + esc(CATS[c].name) + '" aria-label="Add task to ' + esc(CATS[c].name) + '">' + icon('plus') + '</button>' : '') + '</div>' +
+      (list.length ? '<div class="col-p"><div class="prog"><span style="width:' + (done / list.length * 100) + '%;background:var(--ok)"></span></div><span>' + done + ' done · ' + (list.length - done) + ' left</span>' + (un && done ? '<button class="btn sm ghost" type="button" data-act="col-clear" data-id="' + c + '">Clear done</button>' : '') + '</div>' : '') +
+      '<div class="col-team">' + teamTxt + '</div></div>' +
+      '<div class="col-list">' + (list.length ? list.map(cardHTML).join('') : '<div class="col-empty">No tasks yet.' + (un ? ' Add one with + or drag a card here.' : '') + '</div>') + '</div></div>';
+  }).join('');
+}
+function cardHTML(t) {
+  var btn = t.status === 'todo' ? '<button class="btn sm" type="button" data-act="task-adv" data-id="' + t.id + '">Start</button>' : t.status === 'doing' ? '<button class="btn sm" type="button" data-act="task-adv" data-id="' + t.id + '">' + icon('check') + 'Done</button>' : '';
+  var stIco = t.status === 'done' ? 'done' : t.status === 'doing' ? 'doing' : 'todo';
+  return '<article class="card s-' + t.status + '" data-task="' + t.id + '" tabindex="0" aria-label="' + esc(t.title) + ', ' + TASK_STATUS[t.status] + '">' +
+    '<div class="card-l1">' + (t.priority ? '<span class="prio" title="Priority">' + icon('flag') + '</span>' : '') + '<span class="card-title">' + esc(t.title) + '</span>' + btn + '</div>' +
+    '<div class="card-l2">' + ownerLine(t) + '<span class="st">' + icon(stIco) + TASK_STATUS[t.status] + '</span>' + (t.type ? '<span class="tchip">' + TYPE_NAME[t.type] + '</span>' : '') + '</div>' +
+    (t.notes ? '<div class="card-note" title="' + esc(t.notes) + '">' + esc(t.notes) + '</div>' : '') + '</article>';
+}
+function renderAssign() {
+  var un = isUnlocked();
+  $('#as-lock').innerHTML = un ? '<span class="pill ok">' + icon('unlock') + 'Editing</span>' : '<button class="btn sm" type="button" data-act="lock-toggle">' + icon('lock') + 'Locked · Unlock</button>';
+  renderAssignForm(un);
+  function chip(r) {
+    var st = r.info ? r.info.status : 'off';
+    return '<span class="chip"><span class="sdot sd-' + st + '"></span><span class="nm">' + esc(staffName(r.emp)) + '</span>' + (un ? '<button type="button" data-act="as-edit" data-id="' + r.aid + '" title="Change" aria-label="Change assignment for ' + esc(staffName(r.emp)) + '">' + icon('edit') + '</button><button type="button" data-act="as-remove" data-id="' + r.aid + '" title="Remove" aria-label="Remove ' + esc(staffName(r.emp)) + '">' + icon('x') + '</button>' : '') + '</span>';
+  }
+  function rowH(label, arr) { return '<div class="as-row"><span class="as-lab">' + label + '</span><div class="chips">' + (arr.length ? arr.map(chip).join('') : '<span class="none">Nobody assigned</span>') + '</div></div>'; }
+  var html = CAT_ORDER.map(function (c) {
+    var rows = c === 'ret' ? rowH('Team', M.as.ret.all) : rowH('Picking', M.as[c].pick) + rowH('Checking', M.as[c].check);
+    var warns = M.alerts.filter(function (a) { return a.key === 'noas:' + c; }).map(function (a) { return '<div class="as-warn">' + icon('alert') + esc(a.text) + '</div>'; }).join('');
+    var all = c === 'ret' ? M.as.ret.all : M.as[c].pick.concat(M.as[c].check);
+    all.forEach(function (r) { if (r.info && (r.info.status === 'break' || r.info.status === 'over')) warns += '<div class="as-warn">' + icon('info') + esc(staffName(r.emp)) + ' is on break.</div>'; if (r.info && r.info.status === 'absent') warns += '<div class="as-warn">' + icon('alert') + esc(staffName(r.emp)) + ' is not checked in.</div>'; });
+    return '<div class="as-g"><div class="as-gh"><span class="sw" style="background:' + CATS[c].color + '"></span>' + esc(CATS[c].name) + '</div>' + rows + warns + '</div>';
+  }).join('');
+  var unas = M.emps.filter(function (i) { return i.present && i.status !== 'off' && !(M.asByEmp[i.id] || []).length; });
+  if (unas.length) html += '<p class="small muted" style="margin:.6rem 0 0"><b>Present but not assigned:</b> ' + esc(unas.map(function (i) { return i.name; }).join(', ')) + '</p>';
+  if (M.badAs.length && un) html += '<p class="small" style="margin:.5rem 0 0"><button class="btn sm danger" type="button" data-act="as-clean">Remove ' + plural(M.badAs.length, 'invalid assignment') + '</button></p>';
+  if (!un) html += '<p class="small muted" style="margin:.7rem 0 0">' + icon('lock') + ' Assignments are locked. Everyone can view them; unlocking with the PIN lets the team leader add, change or remove them.</p>';
+  $('#as-b').innerHTML = html;
+}
+var asFormSig = '';
+function renderAssignForm(un) {
+  var wrap = $('#as-form-wrap');
+  if (!un) { wrap.innerHTML = ''; asFormSig = ''; return; }
+  var sig = M.emps.map(function (i) { return i.id + i.name + i.status; }).join('|');
+  if (sig === asFormSig && $('#as-form')) return;
+  var prev = { emp: ($('#as-emp') || {}).value, cat: ($('#as-cat') || {}).value || 'del', type: ($('#as-type') || {}).value || 'pick' };
+  asFormSig = sig;
+  wrap.innerHTML = '<form class="as-form" id="as-form" novalidate><label class="fld full">Team member<select id="as-emp"><option value="">Choose…</option>' + M.emps.map(function (i) { var tag = i.status === 'absent' ? ' (not checked in)' : i.status === 'break' ? ' (on break)' : i.status === 'off' ? ' (shift ended)' : ''; return '<option value="' + i.id + '">' + esc(i.name + tag) + '</option>'; }).join('') + '</select></label>' +
+    '<label class="fld">Work category<select id="as-cat">' + CAT_ORDER.map(function (c) { return '<option value="' + c + '">' + esc(CATS[c].short) + '</option>'; }).join('') + '</select></label>' +
+    '<label class="fld">Task type<select id="as-type"></select></label>' +
+    '<div class="full" id="as-msg"></div><button class="btn primary full" type="submit">' + icon('check') + 'Assign</button></form>';
+  $('#as-emp').value = prev.emp && S.staff[prev.emp] ? prev.emp : '';
+  $('#as-cat').value = prev.cat; fillTypeSelect($('#as-type'), prev.cat, prev.type);
+}
+function fillTypeSelect(sel, cat, val) {
+  if (CATS[cat].types.length) { sel.disabled = false; sel.innerHTML = '<option value="pick">Picking</option><option value="check">Checking</option>'; sel.value = val === 'check' ? 'check' : 'pick'; }
+  else { sel.disabled = true; sel.innerHTML = '<option value="">Name only</option>'; sel.value = ''; }
+}
+
+/* ================= timers & tick ================= */
+var autoEnding = {};
+function tickTimers() {
+  $$('[data-timer]').forEach(function (el) {
+    var e = S.staff[el.dataset.timer]; if (!e || !e.brk || e.brk.status !== 'on') return;
+    var b = e.brk, rem = b.dur * 60000 - ((b.pausedAt || Date.now()) - b.startTs - (b.pausedMs || 0));
+    el.textContent = (rem < 0 ? '+' : '') + fmtMS(rem);
+  });
+}
+function tick() {
+  tickClock(); tickTimers();
+  var now = Date.now(), changed = false;
+  Object.keys(S.staff).forEach(function (id) {
+    var e = S.staff[id], b = e.brk; if (!b || b.status !== 'on' || b.pausedAt) return;
+    var endTs = b.startTs + b.dur * 60000 + (b.pausedMs || 0);
+    if (now >= endTs) {
+      if (S.config.autoEnd && !Store.readOnly && !autoEnding[id]) {
+        autoEnding[id] = 1;
+        write('update', 'staff/' + id, stamp({ brk: { status: 'done', endTs: endTs, auto: true } })).then(function () { logEvent('Break timer finished: ' + e.name + ' (' + b.dur + ' min). Marked available.'); toast(e.name + "'s break timer finished. Marked available."); }, function () {}).finally(function () { delete autoEnding[id]; });
+      }
+      changed = true;
+    }
+  });
+  if (!isUnlocked() && $("#lockbtn").classList.contains("on")) changed = true;
+  if (changed || now - lastFull > 15000) scheduleRender();
+}
+
+/* ================= dialogs & toasts ================= */
+var dlgClose = null;
+function openDialog(o) {
+  var old = o.second ? $('#dlg2') : $('#dlg');
+  if (old.open) { try { old.close(); } catch (e) {} }
+  var d = old.cloneNode(false); old.parentNode.replaceChild(d, old);
+  d.className = o.wide ? 'wide' : '';
+  d.innerHTML = '<div class="dlg"><div class="dlg-h"><h2>' + esc(o.title) + '</h2><button type="button" class="icon-btn" data-close aria-label="Close">' + icon('x') + '</button></div><div class="dlg-b">' + o.html + '</div>' + (o.foot ? '<div class="dlg-f">' + o.foot + '</div>' : '') + '</div>';
+  var closed = false;
+  function onClose() { if (closed) return; closed = true; d.removeEventListener('close', onClose); if (o.onClose) o.onClose(); }
+  d.addEventListener('close', onClose);
+  d.onclick = function (e) { if (e.target.closest('[data-close]')) { e.preventDefault(); try { d.close(); } catch (x) {} } };
+  if (!o.second) dlgClose = function () { try { d.close(); } catch (x) {} };
+  try { d.showModal(); } catch (e) { d.setAttribute('open', ''); }
+  if (o.onMount) o.onMount(d);
+  return d;
+}
+function closeDialog() { var d = $('#dlg'); o_close(d); }
+function o_close(d) { try { d.close(); } catch (e) { d.removeAttribute('open'); } }
+function confirmBox(title, msg, okLabel, danger) {
+  return new Promise(function (res) {
+    var done = false;
+    openDialog({ second: true, title: title, html: (Array.isArray(msg) ? msg : [msg]).map(function (x) { return '<p style="margin:0">' + esc(x) + '</p>'; }).join(''), foot: '<button type="button" class="btn" data-close>Cancel</button><button type="button" class="btn ' + (danger ? 'danger' : 'primary') + '" data-ok>' + esc(okLabel || 'Confirm') + '</button>',
+      onMount: function (d) { $('[data-ok]', d).addEventListener('click', function () { done = true; res(true); o_close(d); }); setTimeout(function () { try { $('[data-ok]', d).focus(); } catch (e) {} }, 20); },
+      onClose: function () { if (!done) res(false); } });
+  });
+}
+function toast(msg, kind, action) {
+  var t = document.createElement('div'); t.className = 'toast' + (kind ? ' ' + kind : ''); t.setAttribute('role', kind === 'err' ? 'alert' : 'status');
+  t.innerHTML = '<span>' + esc(msg) + '</span>' + (action ? '<button type="button">' + esc(action.label) + '</button>' : '');
+  if (action) $('button', t).addEventListener('click', function () { action.fn(); t.remove(); });
+  $('#toasts').appendChild(t); setTimeout(function () { t.remove(); }, action ? 8000 : kind === 'err' ? 7000 : 4500);
+}
+
+/* ================= employees & breaks ================= */
+function openEmployee(id) {
+  var isNew = !id, e0 = isNew ? { name: '', start: '', end: '', breakType: 15, breakPlan: '' } : clone(S.staff[id]);
+  if (!e0) return;
+  var FIELDS = ['name', 'start', 'end', 'breakType', 'breakPlan'], orig = {}; FIELDS.forEach(function (f) { orig[f] = e0[f] == null ? '' : e0[f]; });
+  var bt = +e0.breakType === 30 ? 30 : 15;
+  var html = '<div class="grid2"><label class="fld" style="grid-column:1/-1">Name<input id="f-name" maxlength="40" value="' + esc(e0.name) + '" autocomplete="off"></label>' +
+    '<label class="fld">Shift start<input id="f-start" type="time" value="' + esc(e0.start) + '"></label><label class="fld">Shift finish<input id="f-end" type="time" value="' + esc(e0.end) + '"><span class="hint">Earlier than start = overnight shift</span></label>' +
+    '<div class="fld">Break length<div class="seg" id="f-bt"><button type="button" data-v="15" aria-pressed="' + (bt === 15) + '">15 min</button><button type="button" data-v="30" aria-pressed="' + (bt === 30) + '">30 min</button></div></div>' +
+    '<label class="fld">Planned break start<input id="f-plan" type="time" value="' + esc(e0.breakPlan) + '"></label></div><div id="f-check"></div>' +
+    (isNew ? '<label class="row small"><input type="checkbox" id="f-roster" checked> Also save to the team list for future days</label>' : '<div id="f-brk"></div>') +
+    '<p class="ferr" id="f-err" role="alert"></p>';
+  var foot = (isNew ? '' : '<button type="button" class="btn danger left" data-act2="remove">Remove from today</button>') + '<button type="button" class="btn" data-close>Cancel</button><button type="button" class="btn primary" data-act2="save">' + (isNew ? 'Add to today' : 'Save') + '</button>';
+  openDialog({ title: isNew ? 'Add team member' : 'Edit ' + e0.name, html: html, foot: foot, onMount: function (d) {
+    var segBtns = $$('#f-bt button', d);
+    segBtns.forEach(function (b) { b.addEventListener('click', function () { bt = +b.dataset.v; segBtns.forEach(function (x) { x.setAttribute('aria-pressed', x === b); }); check(); }); });
+    ['f-start', 'f-end', 'f-plan'].forEach(function (k) { $('#' + k, d).addEventListener('input', check); });
+    function vals() { return { name: $('#f-name', d).value.trim(), start: $('#f-start', d).value, end: $('#f-end', d).value, breakType: bt, breakPlan: $('#f-plan', d).value }; }
+    function validate(v) {
+      if (!v.name) return 'Enter a name.';
+      var dup = Object.keys(S.staff).some(function (k) { return k !== id && (S.staff[k].name || '').toLowerCase() === v.name.toLowerCase(); }); if (dup) return v.name + ' is already on today’s team.';
+      var s = parseHM(v.start), en = parseHM(v.end); if (s == null || en == null) return 'Enter a shift start and finish time.';
+      if (s === en) return 'Shift start and finish can’t be the same time.';
+      var sh = shiftOf(v); if (sh.end - sh.start > 16 * 60) return 'Shifts can be at most 16 hours. Check the finish time.';
+      if (v.breakPlan) { var p = planOf(v, sh); if (p < sh.start || p + v.breakType > sh.end) return 'The planned break must fit inside the shift (' + v.start + '–' + v.end + ').'; }
+      return '';
+    }
+    function check() {
+      var v = vals(), box = $('#f-check', d); box.innerHTML = '';
+      var sh = shiftOf(v); if (!sh || !v.breakPlan) return; var p = planOf(v, sh); if (p < sh.start || p + bt > sh.end) return;
+      var m = buildModel(); if (!id) { /* new member not in model: treat as excluded already */ }
+      var w = checkBreakPlan(m, id || '__new', p, bt);
+      if (w) {
+        var sug = suggestBreak(m, id || '__new', p, bt, sh);
+        box.innerHTML = '<p class="fwarn">' + icon('alert') + ' At ' + fmtHM(w.t) + ' only ' + plural(w.w, 'person', 'people') + ' would be working (minimum ' + S.config.minWorking + ')' + (w.names.length ? '; ' + esc(listNames(w.names)) + ' also on break' : '') + '. ' + (sug != null ? 'Suggested time: <b>' + fmtHM(sug) + '</b>. <button type="button" class="btn sm" id="f-usesug">Use ' + fmtHM(sug) + '</button>' : 'No time in this shift keeps enough people working.') + ' You can still keep this time.</p>';
+        var u = $('#f-usesug', d); if (u) u.addEventListener('click', function () { $('#f-plan', d).value = fmtHM(sug); check(); });
+      } else box.innerHTML = '<p class="fok">' + icon('check') + ' Enough people working during this break.</p>';
+    }
+    check();
+    if (!isNew) renderBreakControls(d, id);
+    d.addEventListener('click', function (ev) {
+      var a = ev.target.closest('[data-act2]'); if (!a) return;
+      if (a.dataset.act2 === 'save') {
+        var v = vals(), err = validate(v); $('#f-err', d).textContent = err; if (err) return;
+        if (isNew) {
+          var nid = uid(), rec = stamp({ name: v.name, start: v.start, end: v.end, breakType: v.breakType, breakPlan: v.breakPlan, present: false, brk: { status: 'none' } });
+          save('set', 'staff/' + nid, rec).then(function (ok) { if (!ok) return; if ($('#f-roster', d) && $('#f-roster', d).checked) save('set', 'roster/' + nid, { name: v.name, start: v.start, end: v.end, breakType: v.breakType, breakPlan: v.breakPlan }); logEvent('Added ' + v.name + ' to today (' + v.start + '–' + v.end + ')'); closeDialog(); toast(v.name + ' added. Tick the box when they arrive.'); });
+          return;
+        }
+        var cur = S.staff[id]; if (!cur) { $('#f-err', d).textContent = 'This person was removed on another screen.'; return; }
+        var conflicts = FIELDS.filter(function (f) { var c = cur[f] == null ? '' : cur[f]; return String(c) !== String(orig[f]) && String(c) !== String(v[f]); });
+        var go = conflicts.length ? confirmBox('Changed on another screen', ['While you were editing, someone else changed: ' + conflicts.join(', ') + '.', 'Saving will replace their changes with yours.'], 'Save mine anyway') : Promise.resolve(true);
+        go.then(function (ok) { if (!ok) return; save('update', 'staff/' + id, stamp(v)).then(function (ok2) { if (!ok2) return; if (S.roster[id]) save('update', 'roster/' + id, { name: v.name, start: v.start, end: v.end, breakType: v.breakType, breakPlan: v.breakPlan }); logEvent('Updated ' + v.name + ' (shift ' + v.start + '–' + v.end + (v.breakPlan ? ', break ' + v.breakPlan : '') + ')'); closeDialog(); }); });
+      }
+      if (a.dataset.act2 === 'remove') {
+        var nA = Object.keys(S.assign).filter(function (k) { return S.assign[k].emp === id; }), nT = Object.keys(S.tasks).filter(function (k) { return S.tasks[k].owner === id && S.tasks[k].status !== 'done'; });
+        confirmBox('Remove ' + e0.name + ' from today?', ['They will be taken off today’s team' + (nA.length ? ', ' + plural(nA.length, 'assignment') + ' will be removed' : '') + (nT.length ? ' and ' + plural(nT.length, 'open task') + ' will have no owner' : '') + '.', 'The saved team list is not changed.'], 'Remove', true).then(function (ok) {
+          if (!ok) return;
+          save('del', 'staff/' + id).then(function (ok2) { if (!ok2) return; nA.forEach(function (k) { save('del', 'assign/' + k); }); nT.forEach(function (k) { save('update', 'tasks/' + k, stamp({ owner: null })); }); logEvent('Removed ' + e0.name + ' from today'); closeDialog(); });
+        });
+      }
+    });
+  } });
+}
+function renderBreakControls(d, id) {
+  var box = $('#f-brk', d); if (!box) return;
+  var e = S.staff[id]; if (!e) return; var b = e.brk || {}, html = '<div class="sect">Break timer</div><div class="box">';
+  if (b.status === 'on') {
+    html += '<div class="row"><span>Started ' + fmtHM(msToMin(b.startTs)) + ' · ' + b.dur + ' min</span><span class="spacer"></span><b class="num" style="font-size:1.4rem" data-timer="' + id + '"></b></div>' +
+      '<div class="row"><button type="button" class="btn sm" data-b="m1">−1 min</button><button type="button" class="btn sm" data-b="p1">+1 min</button>' + (b.pausedAt ? '<button type="button" class="btn sm" data-b="resume">Resume break</button>' : '<button type="button" class="btn sm" data-b="pause">Pause (called back)</button>') + '<button type="button" class="btn sm primary" data-b="end">End break now</button></div>' +
+      '<div class="row"><label class="fld" style="flex:1">Correct start time<input type="time" id="b-start" value="' + fmtHM(msToMin(b.startTs)) + '"></label><button type="button" class="btn sm" data-b="setstart" style="align-self:flex-end">Apply</button></div>';
+  } else if (b.status === 'done') {
+    var act = Math.round((b.endTs - b.startTs - (b.pausedMs || 0)) / 60000);
+    html += '<div>Completed ' + fmtHM(msToMin(b.startTs)) + '–' + fmtHM(msToMin(b.endTs)) + ' (' + act + ' min of ' + b.dur + ')' + (act - b.dur >= 1 ? ' <b style="color:var(--bad)">+' + (act - b.dur) + ' min over</b>' : '') + '</div>' +
+      '<div class="row"><label class="fld" style="flex:1">Correct return time<input type="time" id="b-end" value="' + fmtHM(msToMin(b.endTs)) + '"></label><button type="button" class="btn sm" data-b="setend" style="align-self:flex-end">Apply</button><button type="button" class="btn sm danger" data-b="reset" style="align-self:flex-end">Reset break</button></div>';
+  } else {
+    html += '<div class="muted">Not started.</div>' + (e.present ? '<div class="row"><button type="button" class="btn sm" data-b="s15">Start 15-min break</button><button type="button" class="btn sm" data-b="s30">Start 30-min break</button></div>' : '<div class="muted small">Mark ' + esc(e.name) + ' present before starting a break.</div>');
+  }
+  box.innerHTML = html + '</div>'; tickTimers();
+  box.onclick = function (ev) {
+    var k = ev.target.closest('[data-b]'); if (!k) return; var cur = S.staff[id]; if (!cur) return; var cb = cur.brk || {}, act = k.dataset.b, p;
+    if (act === 's15' || act === 's30') p = startBreak(id, act === 's15' ? 15 : 30);
+    else if (act === 'end') p = endBreak(id);
+    else if (act === 'm1' || act === 'p1') { if (cb.status !== 'on') return; p = save('update', 'staff/' + id, stamp({ brk: { startTs: cb.startTs + (act === 'm1' ? -60000 : 60000) } })); }
+    else if (act === 'pause') p = save('update', 'staff/' + id, stamp({ brk: { pausedAt: Date.now() } })).then(function (ok) { if (ok) logEvent('Break paused: ' + cur.name); });
+    else if (act === 'resume') p = save('update', 'staff/' + id, stamp({ brk: { pausedAt: null, pausedMs: (cb.pausedMs || 0) + (Date.now() - cb.pausedAt) } })).then(function (ok) { if (ok) logEvent('Break resumed: ' + cur.name); });
+    else if (act === 'setstart') { var sm = parseHM($('#b-start', d).value); if (sm == null) return toast('Enter a valid start time.', 'warn'); var ts = minToMs(sm); if (ts > Date.now()) ts = minToMs(sm - 1440); if (ts > Date.now() || Date.now() - ts > 4 * 3600000) return toast('The start time must be within the last 4 hours.', 'warn'); p = save('update', 'staff/' + id, stamp({ brk: { startTs: ts } })).then(function (ok) { if (ok) logEvent('Break start corrected to ' + fmtHM(sm) + ': ' + cur.name); }); }
+    else if (act === 'setend') { var em = parseHM($('#b-end', d).value); if (em == null) return; var te = minToMs(em); if (te < cb.startTs) te = minToMs(em + 1440); if (te <= cb.startTs || te > Date.now() + 60000) return toast('The return time must be after the break started and not in the future.', 'warn'); p = save('update', 'staff/' + id, stamp({ brk: { endTs: te, auto: false } })).then(function (ok) { if (ok) logEvent('Break return corrected to ' + fmtHM(em) + ': ' + cur.name); }); }
+    else if (act === 'reset') p = confirmBox('Reset ' + cur.name + "'s break?", 'The break will show as Not started.', 'Reset', true).then(function (ok) { if (ok) return save('set', 'staff/' + id, stamp(Object.assign(clone(cur), { brk: { status: 'none' } }))).then(function (ok2) { if (ok2) logEvent('Break reset: ' + cur.name); }); });
+    Promise.resolve(p).then(function () { setTimeout(function () { if ($('#dlg').open) renderBreakControls(d, id); }, 60); });
+  };
+}
+function startBreak(id, dur) {
+  var e = S.staff[id]; if (!e) return Promise.resolve(false);
+  if (!e.present) { toast('Mark ' + e.name + ' present before starting a break.', 'warn'); return Promise.resolve(false); }
+  if (e.brk && e.brk.status === 'on') { toast(e.name + ' is already on break (started ' + fmtHM(msToMin(e.brk.startTs)) + ').', 'warn'); return Promise.resolve(false); }
+  var prev = clone(e.brk || { status: 'none' });
+  return save('update', 'staff/' + id, stamp({ breakType: dur, brk: { status: 'on', startTs: Date.now(), dur: dur, pausedMs: 0, pausedAt: null, endTs: null, auto: false, prevDone: prev.status === 'done' ? prev : null } })).then(function (ok) { if (ok) logEvent('Started ' + dur + '-min break: ' + e.name); return ok; });
+}
+function endBreak(id) {
+  var e = S.staff[id]; if (!e || !e.brk || e.brk.status !== 'on') return Promise.resolve(false);
+  var before = clone(e.brk), endTs = e.brk.pausedAt || Date.now();
+  return save('update', 'staff/' + id, stamp({ brk: { status: 'done', endTs: endTs, auto: false, pausedAt: null, pausedMs: (before.pausedMs || 0) } })).then(function (ok) {
+    if (!ok) return false; var mins = Math.round((endTs - before.startTs - (before.pausedMs || 0)) / 60000);
+    logEvent('Break ended: ' + e.name + ' (' + mins + ' min of ' + before.dur + ')');
+    toast('Break ended for ' + e.name + ' (' + mins + ' min).', '', { label: 'Undo', fn: function () { save('update', 'staff/' + id, stamp({ brk: { status: 'on', endTs: null, auto: false } })).then(function (o2) { if (o2) logEvent('Break end undone: ' + e.name); }); } });
+    return true;
+  });
+}
+function openStartBreak(id) {
+  var e = S.staff[id]; if (!e) return; var m = buildModel(), i = m.byId[id];
+  function warn(dur) { var r = checkBreakPlan(m, id, m.nm, dur); return r ? '<p class="fwarn">' + icon('alert') + ' Starting now leaves ' + plural(r.w, 'person', 'people') + ' working (minimum ' + S.config.minWorking + ')' + (r.names.length ? '; ' + esc(listNames(r.names)) + ' also on break' : '') + '.</p>' : ''; }
+  var planned = +e.breakType === 30 ? 30 : 15;
+  var html = (i.brk === 'done' ? '<p class="fwarn">' + esc(e.name) + ' already took a break today (' + fmtHM(i.bStart) + '–' + fmtHM(i.bEnd) + '). Starting another is allowed.</p>' : '') +
+    '<div class="bigchoice"><button type="button" class="btn ' + (planned === 15 ? 'primary' : '') + '" data-dur="15">15 minutes<small>' + (planned === 15 ? 'Planned' : '') + '</small></button><button type="button" class="btn ' + (planned === 30 ? 'primary' : '') + '" data-dur="30">30 minutes<small>' + (planned === 30 ? 'Planned' : '') + '</small></button></div>' + (warn(planned) || warn(15));
+  openDialog({ title: 'Start break: ' + e.name, html: html, foot: '<button type="button" class="btn" data-close>Cancel</button>', onMount: function (d) {
+    d.addEventListener('click', function (ev) { var b = ev.target.closest('[data-dur]'); if (!b) return; $$('[data-dur]', d).forEach(function (x) { x.disabled = true; }); startBreak(id, +b.dataset.dur).then(function () { closeDialog(); }); });
+  } });
+}
+
+/* ================= orders ================= */
+function openOrders() {
+  var o = clone(S.day.orders), cut0 = S.day.cutoff || '';
+  function stepper(id, v) { return '<div class="stepper"><button type="button" data-st="' + id + '" data-d="-1" aria-label="Decrease">−</button><input id="' + id + '" type="number" inputmode="numeric" min="0" step="1" value="' + v + '"><button type="button" data-st="' + id + '" data-d="1" aria-label="Increase">+</button></div>'; }
+  function grp(k, label) { return '<div class="sect">' + label + '</div><div class="grid3"><label class="fld">Orders' + stepper('o-' + k + '-total', o[k].total) + '</label><label class="fld">Picked' + stepper('o-' + k + '-picked', o[k].picked) + '</label><label class="fld">Checked (ready)' + stepper('o-' + k + '-checked', o[k].checked) + '</label></div>'; }
+  var html = grp('cc', 'Click and Collect') + grp('del', 'Delivery') +
+    '<div class="grid2"><label class="fld">Click and Collect cutoff<input id="o-cut" type="time" value="' + esc(cut0) + '"><span class="hint">The time C&amp;C orders must be ready for collection.</span></label><div class="fld">Summary<div id="o-sum" class="small" style="font-weight:400;padding-top:.3rem"></div></div></div>' +
+    '<p class="small muted" style="margin:0">Manual entry. No order system is connected, so counts are only what you enter here.</p><p class="ferr" id="o-err" role="alert"></p>';
+  openDialog({ title: "Today's orders", html: html, foot: '<button type="button" class="btn" data-close>Cancel</button><button type="button" class="btn primary" id="o-save">Save</button>', onMount: function (d) {
+    function read() { var r = {}; ['cc', 'del'].forEach(function (k) { r[k] = {}; ['total', 'picked', 'checked'].forEach(function (f) { var v = $('#o-' + k + '-' + f, d).value.trim(); r[k][f] = v === '' ? NaN : Number(v); }); }); return r; }
+    function validate(r) {
+      for (var k in r) for (var f in r[k]) { var v = r[k][f]; if (!isFinite(v) || v < 0 || Math.floor(v) !== v) return 'Use whole numbers of 0 or more for every count.'; if (v > 99999) return 'Counts must be below 100,000.'; }
+      for (var k2 in r) { var n = k2 === 'cc' ? 'Click and Collect' : 'Delivery'; if (r[k2].picked > r[k2].total) return n + ': picked can’t be more than orders.'; if (r[k2].checked > r[k2].picked) return n + ': checked can’t be more than picked.'; }
+      return '';
+    }
+    function sum() { var r = read(), err = validate(r); $('#o-err', d).textContent = err; if (err) { $('#o-sum', d).textContent = ''; return; } var t = r.cc.total + r.del.total; $('#o-sum', d).innerHTML = 'Total <b>' + t + '</b> = ' + r.cc.total + ' C&amp;C (' + (t ? Math.round(r.cc.total / t * 100) : 0) + '%) + ' + r.del.total + ' Delivery (' + (t ? Math.round(r.del.total / t * 100) : 0) + '%)'; }
+    d.addEventListener('input', sum);
+    d.addEventListener('click', function (ev) { var b = ev.target.closest('[data-st]'); if (!b) return; var inp = $('#' + b.dataset.st, d); inp.value = Math.max(0, (Number(inp.value) || 0) + Number(b.dataset.d)); sum(); });
+    sum();
+    $('#o-save', d).addEventListener('click', function () {
+      var r = read(), err = validate(r); if (err) { $('#o-err', d).textContent = err; return; }
+      var cut = $('#o-cut', d).value; if (cut && parseHM(cut) == null) { $('#o-err', d).textContent = 'Enter a valid cutoff time.'; return; }
+      var changedRemote = JSON.stringify(S.day.orders) !== JSON.stringify(o) || (S.day.cutoff || '') !== cut0;
+      var go = changedRemote ? confirmBox('Orders changed on another screen', 'Someone updated the order counts while you were editing. Save yours anyway?', 'Save mine') : Promise.resolve(true);
+      go.then(function (ok) { if (!ok) return; patchDay({ orders: r, cutoff: cut }).then(function (ok2) { if (!ok2) return; logEvent('Orders updated: C&C ' + r.cc.total + ' (' + r.cc.checked + ' ready), Delivery ' + r.del.total + ' (' + r.del.checked + ' ready)' + (cut ? ', cutoff ' + cut : '')); closeDialog(); }); });
+    });
+  } });
+}
+
+/* ================= tasks ================= */
+function validateTask(t) {
+  if (!t.title || !t.title.trim()) return 'Enter a task name or order reference.';
+  if (t.title.length > 80) return 'Keep the task name under 80 characters.';
+  if (!CATS[t.cat]) return 'Choose a category.';
+  if (CATS[t.cat].types.length) { if (t.type && CATS[t.cat].types.indexOf(t.type) < 0) return 'Choose Picking, Checking or no type.'; }
+  else if (t.type) return CATS[t.cat].name + ' tasks don’t use Picking or Checking.';
+  if (t.owner && !S.staff[t.owner]) return 'That team member is no longer on today’s team.';
+  if (TASK_STATUS[t.status] == null) return 'Choose a status.';
+  return '';
+}
+function checkMove(id, to) {
+  var t = S.tasks[id]; if (!t) return { block: 'This task no longer exists.' };
+  if (t.cat === to) return { noop: true };
+  if (!isUnlocked()) return { block: 'Unlock with the PIN to move tasks between categories.' };
+  if (t.status === 'done') return { block: 'Completed tasks stay where they were finished. Reopen the task first if it needs to move.' };
+  var confirms = [], patch = { cat: to };
+  if (!CATS[to].types.length && t.type) { confirms.push(CATS[to].name + ' tasks don’t use Picking or Checking, so the type "' + TYPE_NAME[t.type] + '" will be cleared.'); patch.type = null; }
+  if (t.owner) { var as = Object.keys(S.assign).map(function (k) { return S.assign[k]; }).filter(function (a) { return a.emp === t.owner; }); if (as.length && !as.some(function (a) { return a.cat === to; })) confirms.push(staffName(t.owner) + ' is assigned to ' + listNames(as.map(function (a) { return CATS[a.cat].short; })) + ', not ' + CATS[to].short + '. The task keeps its owner.'); }
+  return { patch: patch, confirms: confirms };
+}
+function moveTask(id, to) {
+  var r = checkMove(id, to); if (r.noop) return; if (r.block) { toast(r.block, 'warn'); return; }
+  var t = S.tasks[id];
+  var go = r.confirms.length ? confirmBox('Move to ' + CATS[to].name + '?', r.confirms, 'Move task') : Promise.resolve(true);
+  go.then(function (ok) { if (!ok) return; save('update', 'tasks/' + id, stamp(r.patch)).then(function (ok2) { if (ok2) { logEvent('Task moved: ' + t.title + ' → ' + CATS[to].name); toast('Moved "' + t.title + '" to ' + CATS[to].short + '.'); } }); });
+}
+function advanceTask(id) {
+  var t = S.tasks[id]; if (!t) return; var next = t.status === 'todo' ? 'doing' : t.status === 'doing' ? 'done' : null; if (!next) return;
+  save('update', 'tasks/' + id, stamp({ status: next, doneAt: next === 'done' ? Date.now() : null })).then(function (ok) { if (ok) logEvent((next === 'done' ? 'Task completed: ' : 'Task started: ') + t.title + (t.owner ? ' (' + staffName(t.owner) + ')' : '')); });
+}
+function openTask(id, cat) {
+  var isNew = !id, t0 = isNew ? { title: '', cat: cat || 'del', type: (cat || 'del') === 'ret' ? null : 'pick', owner: null, status: 'todo', priority: false, notes: '' } : clone(S.tasks[id]);
+  if (!t0) return; var un = isUnlocked(), orig = clone(t0);
+  if (!un && isNew) return;
+  if (!un) {
+    var html0 = '<div class="box"><div><b>' + esc(t0.title) + '</b></div><div class="small">' + esc(CATS[t0.cat].name) + (t0.type ? ' · ' + TYPE_NAME[t0.type] : '') + ' · ' + (t0.owner ? esc(staffName(t0.owner)) : 'No owner') + (t0.priority ? ' · Priority' : '') + '</div>' + (t0.notes ? '<div class="small muted">' + esc(t0.notes) + '</div>' : '') + '<div>Status: <b>' + TASK_STATUS[t0.status] + '</b></div></div><p class="small muted" style="margin:0">' + icon('lock') + ' Unlock with the PIN to edit, reassign or move this task.</p>';
+    openDialog({ title: 'Task', html: html0, foot: '<button type="button" class="btn" data-act="lock-toggle">Unlock</button><span class="spacer"></span>' + (t0.status !== 'done' ? '<button type="button" class="btn primary" id="t-adv">' + (t0.status === 'todo' ? 'Start task' : 'Mark completed') + '</button>' : '') + '<button type="button" class="btn" data-close>Close</button>', onMount: function (d) { var a = $('#t-adv', d); if (a) a.addEventListener('click', function () { advanceTask(id); closeDialog(); }); } });
+    return;
+  }
+  var html = '<label class="fld">Task name or order reference<input id="t-title" maxlength="80" value="' + esc(t0.title) + '" autocomplete="off"></label>' +
+    '<div class="grid2"><label class="fld">Category<select id="t-cat">' + CAT_ORDER.map(function (c) { return '<option value="' + c + '"' + (c === t0.cat ? ' selected' : '') + '>' + esc(CATS[c].name) + '</option>'; }).join('') + '</select></label>' +
+    '<label class="fld" id="t-type-w">Task type<select id="t-type"></select></label>' +
+    '<label class="fld">Assigned to<select id="t-owner"><option value="">No owner</option>' + Object.keys(S.staff).sort(function (a, b) { return staffName(a).localeCompare(staffName(b)); }).map(function (k) { return '<option value="' + k + '"' + (k === t0.owner ? ' selected' : '') + '>' + esc(staffName(k)) + '</option>'; }).join('') + '</select></label>' +
+    '<div class="fld">Status<div class="seg" id="t-st">' + ['todo', 'doing', 'done'].map(function (s) { return '<button type="button" data-v="' + s + '" aria-pressed="' + (t0.status === s) + '">' + TASK_STATUS[s] + '</button>'; }).join('') + '</div></div></div>' +
+    '<label class="row"><input type="checkbox" id="t-prio"' + (t0.priority ? ' checked' : '') + '> Priority task</label>' +
+    '<label class="fld">Notes (optional)<textarea id="t-notes" maxlength="300">' + esc(t0.notes || '') + '</textarea></label><div id="t-hint"></div><p class="ferr" id="t-err" role="alert"></p>';
+  openDialog({ title: isNew ? 'Add task' : 'Edit task', html: html, foot: (isNew ? '' : '<button type="button" class="btn danger left" id="t-del">Delete task</button>') + '<button type="button" class="btn" data-close>Cancel</button><button type="button" class="btn primary" id="t-save">' + (isNew ? 'Add task' : 'Save') + '</button>', onMount: function (d) {
+    var st = t0.status;
+    function syncType() { var c = $('#t-cat', d).value, sel = $('#t-type', d); if (CATS[c].types.length) { sel.disabled = false; var v = sel.value || t0.type || ''; sel.innerHTML = '<option value="">No type</option><option value="pick">Picking</option><option value="check">Checking</option>'; sel.value = v === 'pick' || v === 'check' ? v : ''; } else { sel.disabled = true; sel.innerHTML = '<option value="">Not used for this category</option>'; sel.value = ''; } hint(); }
+    function hint() { var o = $('#t-owner', d).value, c = $('#t-cat', d).value, h = $('#t-hint', d); h.innerHTML = ''; if (!o) return; var i = buildModel().byId[o]; var as = Object.keys(S.assign).map(function (k) { return S.assign[k]; }).filter(function (a) { return a.emp === o; }); var msgs = []; if (i && (i.status === 'absent')) msgs.push(i.name + ' is not checked in.'); if (i && (i.status === 'break' || i.status === 'over')) msgs.push(i.name + ' is on break.'); if (i && i.status === 'off') msgs.push(i.name + '’s shift has ended.'); if (as.length && !as.some(function (a) { return a.cat === c; })) msgs.push(i ? i.name + ' is assigned to ' + listNames(as.map(function (a) { return CATS[a.cat].short; })) + '.' : ''); if (msgs.length) h.innerHTML = '<p class="fwarn">' + esc(msgs.join(' ')) + ' You can still save.</p>'; }
+    $('#t-cat', d).addEventListener('change', syncType); $('#t-owner', d).addEventListener('change', hint);
+    var stb = $$('#t-st button', d); stb.forEach(function (b) { b.addEventListener('click', function () { st = b.dataset.v; stb.forEach(function (x) { x.setAttribute('aria-pressed', x === b); }); }); });
+    $('#t-type', d).innerHTML = '<option value="">No type</option><option value="pick">Picking</option><option value="check">Checking</option>'; $('#t-type', d).value = t0.type || ''; syncType();
+    setTimeout(function () { try { $('#t-title', d).focus(); } catch (e) {} }, 30);
+    $('#t-save', d).addEventListener('click', function () {
+      var t = { title: $('#t-title', d).value.trim(), cat: $('#t-cat', d).value, type: $('#t-type', d).value || null, owner: $('#t-owner', d).value || null, status: st, priority: $('#t-prio', d).checked, notes: $('#t-notes', d).value.trim() };
+      var err = validateTask(t); $('#t-err', d).textContent = err; if (err) return;
+      if (isNew) { var nid = uid(); t.created = Date.now(); t.doneAt = st === 'done' ? Date.now() : null; save('set', 'tasks/' + nid, stamp(t)).then(function (ok) { if (ok) { logEvent('Task added: ' + t.title + ' (' + CATS[t.cat].short + (t.owner ? ', ' + staffName(t.owner) : '') + ')'); closeDialog(); } }); return; }
+      var cur = S.tasks[id]; if (!cur) { $('#t-err', d).textContent = 'This task was deleted on another screen.'; return; }
+      var proceed = Promise.resolve(true);
+      if (t.cat !== orig.cat) { if (orig.status === 'done' && t.status === 'done') { $('#t-err', d).textContent = 'Completed tasks can’t be moved. Set the status back first.'; return; } }
+      var conf = ['title', 'cat', 'type', 'owner', 'status', 'priority', 'notes'].filter(function (f) { return String(cur[f] == null ? '' : cur[f]) !== String(orig[f] == null ? '' : orig[f]) && String(cur[f] == null ? '' : cur[f]) !== String(t[f] == null ? '' : t[f]); });
+      if (conf.length) proceed = confirmBox('Changed on another screen', 'Someone changed this task (' + conf.join(', ') + ') while you were editing. Save yours anyway?', 'Save mine');
+      proceed.then(function (ok) { if (!ok) return; t.doneAt = t.status === 'done' ? (cur.doneAt || Date.now()) : null; save('update', 'tasks/' + id, stamp(t)).then(function (ok2) { if (!ok2) return; var bits = []; if (t.cat !== orig.cat) bits.push('moved to ' + CATS[t.cat].short); if (t.owner !== orig.owner) bits.push('owner ' + (t.owner ? staffName(t.owner) : 'none')); if (t.status !== orig.status) bits.push(TASK_STATUS[t.status].toLowerCase()); logEvent('Task updated: ' + t.title + (bits.length ? ' (' + bits.join(', ') + ')' : '')); closeDialog(); }); });
+    });
+    var del = $('#t-del', d); if (del) del.addEventListener('click', function () { confirmBox('Delete this task?', '"' + t0.title + '" will be removed from the board.', 'Delete', true).then(function (ok) { if (ok) save('del', 'tasks/' + id).then(function (ok2) { if (ok2) { logEvent('Task deleted: ' + t0.title); closeDialog(); } }); }); });
+  } });
+}
+
+/* ================= assignments ================= */
+function validateAssignment(a, ignoreId) {
+  if (!a.emp || !S.staff[a.emp]) return { err: 'Choose a team member.' };
+  if (!CATS[a.cat]) return { err: 'Choose a work category.' };
+  if (CATS[a.cat].types.length) { if (CATS[a.cat].types.indexOf(a.type) < 0) return { err: 'Choose Picking or Checking for ' + CATS[a.cat].name + '.' }; }
+  else if (a.type) return { err: CATS[a.cat].name + ' is assigned by name only. Picking and Checking aren’t used here.' };
+  var others = Object.keys(S.assign).filter(function (k) { return k !== ignoreId && S.assign[k].emp === a.emp; });
+  var dup = others.filter(function (k) { return S.assign[k].cat === a.cat && (S.assign[k].type || null) === (a.type || null); });
+  if (dup.length) return { err: staffName(a.emp) + ' is already assigned to ' + asLabel(a) + '.' };
+  return { others: others };
+}
+function asLabel(a) { return CATS[a.cat].short + (a.type ? ' · ' + TYPE_NAME[a.type] : ''); }
+function submitAssignment(a, ignoreId, msgEl) {
+  if (!isUnlocked()) { toast('Unlock with the PIN to change assignments.', 'warn'); return Promise.resolve(false); }
+  var v = validateAssignment(a, ignoreId); if (v.err) { msgEl.innerHTML = '<p class="ferr">' + esc(v.err) + '</p>'; return Promise.resolve(false); }
+  var i = M.byId[a.emp], notes = [];
+  if (i && i.status === 'absent') notes.push(i.name + ' is not checked in.'); if (i && (i.status === 'break' || i.status === 'over')) notes.push(i.name + ' is on break.'); if (i && i.status === 'off') notes.push(i.name + '’s shift has ended.');
+  var rec = stamp({ emp: a.emp, cat: a.cat, type: CATS[a.cat].types.length ? a.type : null, created: Date.now() });
+  function doSave(removeIds) {
+    var p = removeIds.reduce(function (pp, k) { return pp.then(function () { return save('del', 'assign/' + k); }); }, Promise.resolve());
+    return p.then(function () { return save(ignoreId ? 'set' : 'set', 'assign/' + (ignoreId || uid()), rec); }).then(function (ok) {
+      if (ok) { logEvent((ignoreId ? 'Assignment changed: ' : 'Assigned ') + staffName(a.emp) + ' to ' + asLabel(a)); msgEl.innerHTML = '<p class="fok">' + icon('check') + ' ' + esc(staffName(a.emp)) + ' → ' + esc(asLabel(a)) + (notes.length ? '. Note: ' + esc(notes.join(' ')) : '') + '</p>'; }
+      return ok;
+    });
+  }
+  if (v.others.length && !S.config.allowMulti) {
+    var cur = v.others.map(function (k) { return asLabel(S.assign[k]); });
+    return confirmBox(staffName(a.emp) + ' already has an assignment', [staffName(a.emp) + ' is on ' + listNames(cur) + '.', 'Move them to ' + asLabel(a) + ' instead? (To allow one person in several categories, turn that on in Settings.)'], 'Move to ' + CATS[a.cat].short).then(function (ok) { if (!ok) { msgEl.innerHTML = ''; return false; } return doSave(v.others); });
+  }
+  return doSave([]);
+}
+function openAssignEdit(aid) {
+  var a = S.assign[aid]; if (!a) return; if (!isUnlocked()) return;
+  openDialog({ title: 'Change assignment: ' + staffName(a.emp), html: '<div class="grid2"><label class="fld">Work category<select id="e-cat">' + CAT_ORDER.map(function (c) { return '<option value="' + c + '"' + (c === a.cat ? ' selected' : '') + '>' + esc(CATS[c].short) + '</option>'; }).join('') + '</select></label><label class="fld">Task type<select id="e-type"></select></label></div><div id="e-msg"></div>',
+    foot: '<button type="button" class="btn danger left" id="e-rm">Remove</button><button type="button" class="btn" data-close>Cancel</button><button type="button" class="btn primary" id="e-save">Save</button>', onMount: function (d) {
+      fillTypeSelect($('#e-type', d), a.cat, a.type);
+      $('#e-cat', d).addEventListener('change', function () { fillTypeSelect($('#e-type', d), $('#e-cat', d).value, $('#e-type', d).value); });
+      $('#e-save', d).addEventListener('click', function () { var na = { emp: a.emp, cat: $('#e-cat', d).value, type: $('#e-type', d).value || null }; if (na.cat === a.cat && (na.type || null) === (a.type || null)) { closeDialog(); return; } submitAssignment(na, aid, $('#e-msg', d)).then(function (ok) { if (ok) closeDialog(); }); });
+      $('#e-rm', d).addEventListener('click', function () { removeAssignment(aid).then(function (ok) { if (ok) closeDialog(); }); });
+    } });
+}
+function removeAssignment(aid) {
+  var a = S.assign[aid]; if (!a) return Promise.resolve(false);
+  return confirmBox('Remove assignment?', staffName(a.emp) + ' will be taken off ' + asLabel(a) + '.', 'Remove', true).then(function (ok) { if (!ok) return false; return save('del', 'assign/' + aid).then(function (ok2) { if (ok2) logEvent('Removed ' + staffName(a.emp) + ' from ' + asLabel(a)); return ok2; }); });
+}
+
+/* ================= handover, log, history ================= */
+function handoverText() {
+  var m = buildModel(), o = S.day.orders, L = [];
+  L.push('SHIFT HANDOVER: ' + dateLabel(S.day.date, true) + (S.day.shiftLabel ? ' (' + S.day.shiftLabel + ')' : ''));
+  L.push('Prepared ' + fmtHM(m.nm) + ' on ' + DEVICE.name);
+  L.push('');
+  L.push('ORDERS');
+  L.push('Click and Collect: ' + o.cc.total + ' orders, ' + o.cc.picked + ' picked, ' + o.cc.checked + ' checked. Remaining: ' + Math.max(0, o.cc.total - o.cc.checked) + (S.day.cutoff ? ' (cutoff ' + S.day.cutoff + ')' : ''));
+  L.push('Delivery: ' + o.del.total + ' orders, ' + o.del.picked + ' picked, ' + o.del.checked + ' checked. Remaining: ' + Math.max(0, o.del.total - o.del.checked));
+  L.push('Combined: ' + (o.cc.total + o.del.total) + ' orders, ' + (o.cc.checked + o.del.checked) + ' completed, ' + (Math.max(0, o.cc.total - o.cc.checked) + Math.max(0, o.del.total - o.del.checked)) + ' remaining');
+  L.push('');
+  var all = []; CAT_ORDER.forEach(function (c) { m.tasks[c].forEach(function (t) { all.push(t); }); });
+  function tl(t) { return '- [' + CATS[t.cat].short + '] ' + t.title + (t.type ? ' (' + TYPE_NAME[t.type] + ')' : '') + ': ' + (t.owner ? staffName(t.owner) : 'no owner') + (t.status === 'doing' ? ', in progress' : t.status === 'todo' ? ', not started' : '') + (t.priority ? ', PRIORITY' : '') + (t.notes ? ': ' + t.notes : ''); }
+  var done = all.filter(function (t) { return t.status === 'done'; }), open = all.filter(function (t) { return t.status !== 'done' && t.cat !== 'ret'; });
+  L.push('COMPLETED TASKS (' + done.length + ')'); L.push(done.length ? done.map(tl).join('\n') : '- None'); L.push('');
+  L.push('OUTSTANDING TASKS (' + open.length + ')'); L.push(open.length ? open.map(tl).join('\n') : '- None'); L.push('');
+  var ret = m.tasks.ret.filter(function (t) { return t.status !== 'done'; });
+  L.push('320 RETURNS / UNCOLLECTED BACK TO STOCK'); L.push('Unfinished: ' + (ret.length ? '\n' + ret.map(tl).join('\n') : 'none')); L.push('Assigned: ' + (m.as.ret.all.length ? m.as.ret.all.map(function (r) { return staffName(r.emp); }).join(', ') : 'nobody')); L.push('');
+  L.push('STAFFING AND BREAKS');
+  var issues = [];
+  m.emps.forEach(function (i) { if (!i.present && i.sh && m.nm >= i.start + 5) issues.push(i.name + ' not checked in (shift ' + fmtHM(i.start) + '–' + fmtHM(i.end) + ')'); if (i.status === 'break' || i.status === 'over') issues.push(i.name + ' still on break'); if (i.present && i.brk === 'none' && i.plan != null && m.nm > i.plan) issues.push(i.name + "'s planned break (" + i.e.breakPlan + ') not recorded'); if (i.brk === 'done' && i.overMin >= 1) issues.push(i.name + "'s break ran " + i.overMin + ' min over'); });
+  L.push(issues.length ? issues.map(function (x) { return '- ' + x; }).join('\n') : '- No open staffing or break issues');
+  var al = m.alerts.filter(function (a) { return a.sev >= 2; }); if (al.length) { L.push(''); L.push('OPEN ALERTS'); L.push(al.map(function (a) { return '- ' + a.text; }).join('\n')); }
+  if (S.day.note) { L.push(''); L.push('NOTES FOR NEXT SHIFT'); L.push(S.day.note); }
+  return L.join('\n');
+}
+function copyText(txt) {
+  if (navigator.clipboard && navigator.clipboard.writeText) return navigator.clipboard.writeText(txt).then(function () { toast('Copied to clipboard.'); }, function () { toast('Copy was blocked. Select the text and copy it manually.', 'warn'); });
+  toast('Copy was blocked. Select the text and copy it manually.', 'warn'); return Promise.resolve();
+}
+function saveTextFile(name, txt) {
+  if (!Store.downloads) { toast('Saving files isn’t available here. Use Copy instead.', 'warn'); return; }
+  Store.downloads.save({ filename: name, data: txt }).then(function () { toast('Saved ' + name + '.'); }, function (e) { if (e && e.code === 'declined') return; toast('The file wasn’t saved. Use Copy instead.', 'warn'); });
+}
+function openHandover() {
+  openDialog({ title: 'Shift handover', wide: true, html: '<label class="fld">Notes for the next shift<textarea id="h-note" maxlength="1000" placeholder="Anything the next team leader should know">' + esc(S.day.note || '') + '</textarea></label><pre class="ho" id="h-text"></pre>',
+    foot: '<button type="button" class="btn left" id="h-hist">' + icon('hist') + 'Save to past days</button><button type="button" class="btn" id="h-copy">' + icon('copy') + 'Copy</button>' + (Store.downloads ? '<button type="button" class="btn" id="h-file">' + icon('down') + 'Save as text file</button>' : '') + '<button type="button" class="btn primary" data-close>Done</button>', onMount: function (d) {
+      var timer = null;
+      function upd() { $('#h-text', d).textContent = handoverText(); }
+      upd();
+      $('#h-note', d).addEventListener('input', function () { clearTimeout(timer); timer = setTimeout(function () { patchDay({ note: $('#h-note', d).value }).then(upd); }, 700); });
+      $('#h-copy', d).addEventListener('click', function () { copyText(handoverText()); });
+      var f = $('#h-file', d); if (f) f.addEventListener('click', function () { saveTextFile('handover-' + S.day.date + '.txt', handoverText()); });
+      $('#h-hist', d).addEventListener('click', function () { ensureUnlocked().then(function (ok) { if (!ok) return; saveHistory().then(function (ok2) { if (ok2) toast('Saved to past days.'); }); }); });
+    } });
+}
+function saveHistory() {
+  var o = S.day.orders, tasks = Object.keys(S.tasks).map(function (k) { return S.tasks[k]; });
+  return save('set', 'history/' + S.day.date, { date: S.day.date, savedAt: Date.now(), text: handoverText(), stats: { cc: o.cc, del: o.del, tasks: tasks.length, done: tasks.filter(function (t) { return t.status === 'done'; }).length, staff: Object.keys(S.staff).length } });
+}
+function openActivity() {
+  var list = S.log.slice(0, 200);
+  openDialog({ title: 'Activity log', wide: true, html: '<p class="small muted" style="margin:0">Recent changes, newest first. Use this to clear up confusion at handover, not to time people.</p>' + (list.length ? '<ul class="loglist">' + list.map(function (l) { var d = new Date(l.ts); return '<li><time>' + (l.day !== S.day.date ? d.toLocaleDateString(undefined, { day: 'numeric', month: 'short' }) + ' ' : '') + pad(d.getHours()) + ':' + pad(d.getMinutes()) + '</time><span>' + esc(l.text) + ' <span class="muted small">· ' + esc(l.dev || '') + '</span></span></li>'; }).join('') + '</ul>' : '<p class="muted">Nothing recorded yet.</p>'), foot: '<button type="button" class="btn primary" data-close>Close</button>' });
+}
+function openHistory() {
+  var keys = Object.keys(S.history).sort().reverse();
+  openDialog({ title: 'Past days', wide: true, html: keys.length ? keys.map(function (k) { var h = S.history[k]; return '<details class="box"><summary><b>' + esc(dateLabel(k, true)) + '</b> <span class="muted small">· ' + (h.stats ? (h.stats.cc.total + h.stats.del.total) + ' orders, ' + h.stats.done + '/' + h.stats.tasks + ' tasks done' : '') + '</span></summary><pre class="ho">' + esc(h.text) + '</pre><div class="row"><button type="button" class="btn sm" data-copy="' + esc(k) + '">' + icon('copy') + 'Copy</button></div></details>'; }).join('') : '<p class="muted">No past days saved yet. Days are saved when you start a new day or use "Save to past days" in the handover.</p>',
+    foot: '<button type="button" class="btn primary" data-close>Close</button>', onMount: function (d) { d.addEventListener('click', function (e) { var b = e.target.closest('[data-copy]'); if (b) copyText(S.history[b.dataset.copy].text); }); } });
+}
+
+/* ================= new day, roster, settings, examples ================= */
+function runSeq(ops, label) {
+  var i = 0, okAll = true;
+  function next() { if (i >= ops.length) return Promise.resolve(okAll); var op = ops[i++]; return write(op[0], op[1], op[2]).catch(function () { okAll = false; }).then(function () { if (i % 10 === 0 && label) toast(label + ' ' + i + '/' + ops.length); return next(); }); }
+  return next();
+}
+function openNewDay() {
+  ensureUnlocked().then(function (ok) {
+    if (!ok) return; var nR = Object.keys(S.roster).length, today = todayKey();
+    var unfinished = Object.keys(S.tasks).filter(function (k) { return S.tasks[k].status !== 'done'; }).length;
+    openDialog({ title: 'Start a new day', html: '<p style="margin:0">This clears today’s attendance, breaks, order counts, task board and assignments so the board is ready for ' + esc(dateLabel(today)) + '. Saved team members and past days are kept.</p>' +
+      '<label class="row"><input type="checkbox" id="n-hist" checked> Save today’s handover summary to past days first</label>' +
+      '<label class="row"><input type="checkbox" id="n-roster"' + (nR ? ' checked' : ' disabled') + '> Load the saved team list (' + nR + ' people, attendance unticked)</label>' +
+      '<label class="row"><input type="checkbox" id="n-carry"> Carry over ' + plural(unfinished, 'unfinished task') + ' (completed tasks are never carried over)</label>' +
+      '<label class="row"><input type="checkbox" id="n-keepas"> Keep current assignments</label>' +
+      '<label class="fld">Type NEW DAY to confirm<input id="n-confirm" autocomplete="off"></label><p class="ferr" id="n-err" role="alert"></p>',
+      foot: '<button type="button" class="btn" data-close>Cancel</button><button type="button" class="btn danger" id="n-go">Start new day</button>', onMount: function (d) {
+        $('#n-go', d).addEventListener('click', function () {
+          if ($('#n-confirm', d).value.trim().toUpperCase() !== 'NEW DAY') { $('#n-err', d).textContent = 'Type NEW DAY to confirm.'; return; }
+          var btn = $('#n-go', d); btn.disabled = true; btn.textContent = 'Starting…';
+          var hist = $('#n-hist', d).checked, loadR = $('#n-roster', d).checked, carry = $('#n-carry', d).checked, keepAs = $('#n-keepas', d).checked;
+          var p = hist ? saveHistory() : Promise.resolve(true);
+          p.then(function () {
+            var ops = [], keepStaff = {};
+            if (loadR) Object.keys(S.roster).forEach(function (k) { keepStaff[k] = 1; });
+            Object.keys(S.staff).forEach(function (k) { if (!keepStaff[k]) ops.push(['del', 'staff/' + k]); });
+            Object.keys(S.tasks).forEach(function (k) { var t = S.tasks[k]; if (carry && t.status !== 'done') { ops.push(['set', 'tasks/' + k, stamp(Object.assign(clone(t), { status: 'todo', owner: keepStaff[t.owner] ? t.owner : null, carried: true }))]); } else ops.push(['del', 'tasks/' + k]); });
+            Object.keys(S.assign).forEach(function (k) { if (!(keepAs && keepStaff[S.assign[k].emp])) ops.push(['del', 'assign/' + k]); });
+            var cutoffLog = Date.now() - 3 * 86400000; S.log.forEach(function (l) { if (l.ts < cutoffLog) ops.push(['del', 'log/' + l.id]); });
+            ops.push(['set', 'ops/day', stamp(Object.assign(defaultDay(today), { cutoff: S.day.cutoff || '', shiftLabel: S.day.shiftLabel || '' }))]);
+            if (loadR) Object.keys(S.roster).forEach(function (k) { var r = S.roster[k]; ops.push(['set', 'staff/' + k, stamp({ name: r.name, start: r.start, end: r.end, breakType: r.breakType || 15, breakPlan: r.breakPlan || '', present: false, brk: { status: 'none' } })]); });
+            return runSeq(ops, 'Resetting');
+          }).then(function (okAll) { logEvent('New day started (' + today + ')'); closeDialog(); toast(okAll ? 'New day ready.' : 'New day started, but some old records could not be removed. Try again from More.', okAll ? '' : 'warn'); });
+        });
+      } });
+  });
+}
+function loadRoster() {
+  var ids = Object.keys(S.roster).filter(function (k) { return !S.staff[k]; });
+  if (!ids.length) { toast('Everyone on the saved team list is already on today’s board.'); return; }
+  runSeq(ids.map(function (k) { var r = S.roster[k]; return ['set', 'staff/' + k, stamp({ name: r.name, start: r.start, end: r.end, breakType: r.breakType || 15, breakPlan: r.breakPlan || '', present: false, brk: { status: 'none' } })]; })).then(function () { logEvent('Loaded saved team (' + ids.length + ')'); toast(plural(ids.length, 'person', 'people') + ' added. Tick each person as they arrive.'); });
+}
+function openSettings() {
+  ensureUnlocked().then(function (ok) {
+    if (!ok) return; var c = S.config, R = c.rates, theme = lsGet(THEME_KEY, 'auto');
+    var roster = Object.keys(S.roster).sort(function (a, b) { return S.roster[a].name.localeCompare(S.roster[b].name); });
+    function num(id, v, lab, hint) { return '<label class="fld">' + lab + '<input id="' + id + '" type="number" inputmode="numeric" min="1" step="1" value="' + v + '">' + (hint ? '<span class="hint">' + hint + '</span>' : '') + '</label>'; }
+    openDialog({ title: 'Settings', wide: true, html:
+      '<div class="sect">Day</div><div class="grid2"><label class="fld">Shift name (optional)<input id="s-shift" maxlength="30" value="' + esc(S.day.shiftLabel || '') + '" placeholder="e.g. Day shift"></label>' + num('s-min', c.minWorking, 'Minimum people working at any time', 'Used for break overlap warnings.') + '</div>' +
+      '<label class="row"><input type="checkbox" id="s-auto"' + (c.autoEnd ? ' checked' : '') + '> Mark people available automatically when their break timer reaches zero</label><p class="small muted" style="margin:-.4rem 0 0 1.6rem">If off, the timer keeps counting and shows the break as over time until someone presses End break.</p>' +
+      '<label class="row"><input type="checkbox" id="s-multi"' + (c.allowMulti ? ' checked' : '') + '> Allow one person to be assigned to more than one category or task type</label>' +
+      '<div class="sect">Pace estimates (orders per person per hour)</div><p class="small muted" style="margin:0">These are estimates used only for recommendations and workload warnings. Adjust them to match your team.</p><div class="grid2">' + num('s-ccp', R.ccPick, 'Click and Collect picking') + num('s-ccc', R.ccCheck, 'Click and Collect checking') + num('s-dp', R.delPick, 'Delivery picking') + num('s-dc', R.delCheck, 'Delivery checking') + num('s-tm', c.taskMin, 'Minutes per task (estimate)', 'Used to flag people with more tasks than time left.') + '</div>' +
+      '<div class="sect">Security</div><div class="grid2">' + num('s-lock', c.autoLock, 'Auto-lock after this many idle minutes') + '<div class="fld">PIN<button type="button" class="btn" id="s-pin">Change PIN</button><span class="hint">A 4-digit PIN stops casual changes. It is not strong security.</span></div></div>' +
+      '<div class="sect">This screen</div><div class="grid2"><label class="fld">Screen name (shown in the activity log)<input id="s-dev" maxlength="30" value="' + esc(DEVICE.name) + '"></label><label class="fld">Display<select id="s-theme"><option value="auto">Match system</option><option value="dark">Dark (best for TV)</option><option value="light">Light</option></select></label></div>' +
+      '<div class="sect">Saved team list</div><p class="small muted" style="margin:0">People saved for future days. Deleting here does not remove anyone from today.</p>' + (roster.length ? '<ul class="loglist">' + roster.map(function (k) { var r = S.roster[k]; return '<li style="grid-template-columns:1fr auto"><span><b>' + esc(r.name) + '</b> <span class="muted small">' + esc(r.start + '–' + r.end) + (r.breakPlan ? ' · break ' + esc(r.breakPlan) : '') + '</span></span><button type="button" class="btn sm danger" data-rdel="' + k + '">Delete</button></li>'; }).join('') + '</ul>' : '<p class="muted small" style="margin:0">Nobody saved yet. New team members are saved here when you add them.</p>') +
+      '<p class="ferr" id="s-err" role="alert"></p>',
+      foot: '<button type="button" class="btn" data-close>Cancel</button><button type="button" class="btn primary" id="s-save">Save settings</button>', onMount: function (d) {
+        $('#s-theme', d).value = theme;
+        $('#s-pin', d).addEventListener('click', function () { changePinFlow(); });
+        d.addEventListener('click', function (e) { var b = e.target.closest('[data-rdel]'); if (!b) return; var k = b.dataset.rdel, nm = S.roster[k].name; confirmBox('Delete ' + nm + ' from the saved team list?', 'They stay on today’s board if they are on it.', 'Delete', true).then(function (ok) { if (ok) save('del', 'roster/' + k).then(function (o2) { if (o2) { logEvent('Deleted ' + nm + ' from saved team'); b.closest('li').remove(); } }); }); });
+        $('#s-save', d).addEventListener('click', function () {
+          function n(id, lo, hi) { var v = Number($('#' + id, d).value); return (isFinite(v) && Math.floor(v) === v && v >= lo && v <= hi) ? v : null; }
+          var nc = { minWorking: n('s-min', 0, 50), autoEnd: $('#s-auto', d).checked, allowMulti: $('#s-multi', d).checked, rates: { ccPick: n('s-ccp', 1, 500), ccCheck: n('s-ccc', 1, 500), delPick: n('s-dp', 1, 500), delCheck: n('s-dc', 1, 500) }, taskMin: n('s-tm', 1, 480), autoLock: n('s-lock', 1, 240) };
+          if ([nc.minWorking, nc.rates.ccPick, nc.rates.ccCheck, nc.rates.delPick, nc.rates.delCheck, nc.taskMin, nc.autoLock].some(function (x) { return x == null; })) { $('#s-err', d).textContent = 'Use whole numbers in every number field (minimum 1; people working can be 0).'; return; }
+          DEVICE.name = $('#s-dev', d).value.trim() || 'TV screen'; lsSet(DEV_KEY, DEVICE);
+          lsSet(THEME_KEY, $('#s-theme', d).value); applyTheme();
+          var shiftLabel = $('#s-shift', d).value.trim();
+          save('set', 'ops/config', stamp(nc)).then(function (ok2) { if (!ok2) return; var p = shiftLabel !== (S.day.shiftLabel || '') ? patchDay({ shiftLabel: shiftLabel }) : Promise.resolve(true); p.then(function () { logEvent('Settings updated'); closeDialog(); toast('Settings saved.'); }); });
+        });
+      } });
+  });
+}
+function applyTheme() { var t = lsGet(THEME_KEY, 'auto'); if (t === 'dark' || t === 'light') document.documentElement.setAttribute('data-theme', t); else if (lsGet(THEME_KEY, null)) document.documentElement.removeAttribute('data-theme'); }
+function loadExample() {
+  var n = new Date(), nmm = n.getHours() * 60 + n.getMinutes(), base = Math.max(0, Math.min(14 * 60, Math.floor((nmm - 180) / 60) * 60));
+  function T(min) { return fmtHM(min); }
+  var people = [
+    ['ex1', 'Amara Okafor', base, base + 510, 15, base + 150, true, null],
+    ['ex2', 'Ben Carter', base, base + 510, 30, Math.floor((nmm - 8) / 5) * 5, true, 'on'],
+    ['ex3', 'Chloe Martin', base + 60, base + 570, 15, base + 120, true, 'done'],
+    ['ex4', 'Dev Patel', base + 60, base + 570, 30, nmm + 7 - (nmm + 7) % 5 + 5, true, null],
+    ['ex5', 'Elena Rossi', base + 120, base + 630, 15, base + 300, true, null],
+    ['ex6', 'Farid Haddad', base + 120, base + 630, 15, base + 330, false, null],
+    ['ex7', 'Grace Liu', nmm + 60 - (nmm % 30), nmm + 60 - (nmm % 30) + 480, 30, nmm + 60 - (nmm % 30) + 210, false, null]
+  ];
+  var ops = [];
+  people.forEach(function (p) {
+    var brk = { status: 'none' };
+    if (p[7] === 'on') brk = { status: 'on', startTs: Date.now() - 8 * 60000, dur: 30, pausedMs: 0, pausedAt: null };
+    if (p[7] === 'done') brk = { status: 'done', startTs: Date.now() - 95 * 60000, endTs: Date.now() - 79 * 60000, dur: 15, pausedMs: 0 };
+    ops.push(['set', 'staff/' + p[0], stamp({ name: p[1], start: T(p[2]), end: T(p[3]), breakType: p[4], breakPlan: T(p[5]), present: p[6], brk: brk, example: true })]);
+  });
+  var tasks = [
+    ['Route 1 – Van A', 'del', 'pick', 'ex1', 'doing', false], ['Route 2 – Van B', 'del', 'pick', 'ex4', 'todo', false], ['Route 1 checks', 'del', 'check', 'ex5', 'todo', false], ['Route 3 – Van C', 'del', null, null, 'todo', true],
+    ['C&C wave 1 (orders 1–12)', 'cc', 'pick', 'ex3', 'done', false], ['C&C wave 2 (orders 13–24)', 'cc', 'pick', 'ex3', 'doing', true], ['Check wave 1', 'cc', 'check', 'ex2', 'todo', false],
+    ['Uncollected shelf sweep', 'ret', null, 'ex6', 'todo', false], ['320 cage 2 back to stock', 'ret', null, 'ex5', 'doing', false]
+  ];
+  tasks.forEach(function (t, k) { ops.push(['set', 'tasks/ext' + k, stamp({ title: t[0], cat: t[1], type: t[2], owner: t[3], status: t[4], priority: t[5], notes: '', created: Date.now() + k, doneAt: t[4] === 'done' ? Date.now() : null, example: true })]); });
+  [['ex1', 'del', 'pick'], ['ex4', 'del', 'pick'], ['ex5', 'del', 'check'], ['ex3', 'cc', 'pick'], ['ex2', 'cc', 'check'], ['ex6', 'ret', null]].forEach(function (a, k) { ops.push(['set', 'assign/exa' + k, stamp({ emp: a[0], cat: a[1], type: a[2], created: Date.now(), example: true })]); });
+  var cut = Math.ceil((nmm + 75) / 15) * 15;
+  ops.push(['set', 'ops/day', stamp(Object.assign(clone(S.day), { orders: { cc: { total: 24, picked: 10, checked: 6 }, del: { total: 40, picked: 20, checked: 18 } }, cutoff: T(cut), example: true }))]);
+  runSeq(ops).then(function () { toast('Example day loaded. Clear it from the banner when you’re ready to use real data.'); });
+}
+function clearExample() {
+  confirmBox('Clear example data?', 'All example people, tasks, assignments and order counts will be removed.', 'Clear examples', true).then(function (ok) {
+    if (!ok) return; var ops = [];
+    ['staff', 'tasks', 'assign'].forEach(function (c) { Object.keys(S[c === 'staff' ? 'staff' : c === 'tasks' ? 'tasks' : 'assign']).forEach(function (k) { if (S[c][k].example) ops.push(['del', c + '/' + k]); }); });
+    if (S.day.example) ops.push(['set', 'ops/day', stamp(Object.assign(defaultDay(S.day.date), { shiftLabel: S.day.shiftLabel || '' }))]);
+    runSeq(ops).then(function () { toast('Example data cleared.'); });
+  });
+}
+
+/* ================= board drag & drop ================= */
+var drag = null, suppressClick = 0;
+function initDrag() {
+  var board = $('#board');
+  board.addEventListener('pointerdown', function (e) {
+    var card = e.target.closest('.card'); if (!card || e.target.closest('button,a,input,select')) return;
+    if (e.pointerType === 'mouse' && e.button !== 0) return;
+    drag = { id: card.dataset.task, card: card, x0: e.clientX, y0: e.clientY, pid: e.pointerId, type: e.pointerType, active: false, timer: null, x: e.clientX, y: e.clientY };
+    if (e.pointerType !== 'mouse') drag.timer = setTimeout(function () { if (drag && !drag.active) begin(); }, 300);
+  });
+  function begin() {
+    var t = S.tasks[drag.id]; if (!t) return cancel();
+    if (!isUnlocked()) { toast('Unlock with the PIN to move tasks between categories.', 'warn'); return cancel(); }
+    if (t.status === 'done') { toast('Completed tasks can’t be moved. Reopen the task first.', 'warn'); return cancel(); }
+    drag.active = true; deferRender = true;
+    var r = drag.card.getBoundingClientRect(), g = drag.card.cloneNode(true); g.classList.add('ghost'); g.style.width = r.width + 'px'; g.style.left = r.left + 'px'; g.style.top = r.top + 'px';
+    drag.dx = drag.x0 - r.left; drag.dy = drag.y0 - r.top; drag.ghost = g; document.body.appendChild(g); drag.card.classList.add('drag-src');
+    move(drag.x, drag.y);
+  }
+  function colAt(x, y) { var el = document.elementFromPoint(x, y); return el && el.closest ? el.closest('.col') : null; }
+  function move(x, y) { drag.ghost.style.left = (x - drag.dx) + 'px'; drag.ghost.style.top = (y - drag.dy) + 'px'; var c = colAt(x, y); $$('.col').forEach(function (k) { k.classList.toggle('drop', k === c && c.dataset.cat !== S.tasks[drag.id].cat); }); }
+  function cancel() { if (drag) { clearTimeout(drag.timer); if (drag.ghost) drag.ghost.remove(); if (drag.card) drag.card.classList.remove('drag-src'); $$('.col.drop').forEach(function (k) { k.classList.remove('drop'); }); } var was = drag && drag.active; drag = null; deferRender = false; if (was) scheduleRender(); }
+  window.addEventListener('pointermove', function (e) {
+    if (!drag || e.pointerId !== drag.pid) return; drag.x = e.clientX; drag.y = e.clientY;
+    var dist = Math.hypot(e.clientX - drag.x0, e.clientY - drag.y0);
+    if (!drag.active) { if (drag.type === 'mouse' && dist > 6) begin(); else if (drag.type !== 'mouse' && dist > 10) cancel(); return; }
+    e.preventDefault(); move(e.clientX, e.clientY);
+  }, { passive: false });
+  document.addEventListener('touchmove', function (e) { if (drag && drag.active) e.preventDefault(); }, { passive: false });
+  window.addEventListener('pointerup', function (e) {
+    if (!drag || e.pointerId !== drag.pid) return;
+    if (drag.active) { var c = colAt(e.clientX, e.clientY), id = drag.id; suppressClick = Date.now(); cancel(); if (c && c.dataset.cat) moveTask(id, c.dataset.cat); }
+    else cancel();
+  });
+  window.addEventListener('pointercancel', function () { cancel(); });
+}
+
+/* ================= events ================= */
+var ACTS = {
+  'tab': function (id) { setView(id); },
+  'menu': function (id, el) { var m = $('#menu'), open = m.hidden; m.hidden = !open; el.setAttribute('aria-expanded', open); },
+  'lock-toggle': function () { if (isUnlocked()) { setUnlocked(false); toast('Locked.'); logEvent('Editing locked'); } else unlockFlow(); },
+  'emp-add': function () { openEmployee(null); },
+  'emp-edit': function (id) { openEmployee(id); },
+  'brk-start': function (id) { openStartBreak(id); },
+  'brk-end': function (id) { endBreak(id); },
+  'roster-load': loadRoster,
+  'example-load': loadExample,
+  'example-clear': clearExample,
+  'orders-edit': openOrders,
+  'ack': function (key) { var a = (M.alerts || []).filter(function (x) { return x.key === key; })[0]; var p = {}; p[key] = { by: DEVICE.name, at: Date.now() }; patchDay({ acks: p }).then(function (ok) { if (ok && a) logEvent('Alert acknowledged: ' + a.text); }); },
+  'task-add': function (cat) { ensureUnlocked().then(function (ok) { if (ok) openTask(null, cat); }); },
+  'task-adv': function (id) { advanceTask(id); },
+  'col-clear': function (cat) { ensureUnlocked().then(function (ok) { if (!ok) return; var ids = Object.keys(S.tasks).filter(function (k) { return S.tasks[k].cat === cat && S.tasks[k].status === 'done'; }); if (!ids.length) return; confirmBox('Clear ' + plural(ids.length, 'completed task') + '?', 'They will be removed from ' + CATS[cat].name + '. Save the handover first if you need a record.', 'Clear', true).then(function (y) { if (y) runSeq(ids.map(function (k) { return ['del', 'tasks/' + k]; })).then(function () { logEvent('Cleared ' + ids.length + ' completed tasks from ' + CATS[cat].short); }); }); }); },
+  'as-remove': function (aid) { if (isUnlocked()) removeAssignment(aid); },
+  'as-edit': function (aid) { openAssignEdit(aid); },
+  'as-clean': function () { runSeq(M.badAs.map(function (k) { return ['del', 'assign/' + k]; })); },
+  'handover': openHandover, 'activity': openActivity, 'history': openHistory, 'newday': openNewDay, 'settings': openSettings,
+  'fullscreen': function () { var el = document.documentElement; var f = el.requestFullscreen || el.webkitRequestFullscreen; if (document.fullscreenElement) { (document.exitFullscreen || function () {}).call(document); return; } if (!f) { toast('Full screen isn’t available here. Use the TV browser’s full-screen option.', 'warn'); return; } try { var r = f.call(el); if (r && r.catch) r.catch(function () { toast('Full screen was blocked here. Use the TV browser’s full-screen option.', 'warn'); }); } catch (e) { toast('Full screen was blocked here.', 'warn'); } }
+};
+function setView(v) { if (['overview', 'team', 'tasks', 'assign'].indexOf(v) < 0) v = 'overview'; document.body.setAttribute('data-view', v); $$('#tabs button').forEach(function (b) { b.setAttribute('aria-selected', b.dataset.id === v); }); lsSet(VIEW_KEY, v); }
+document.addEventListener('click', function (e) {
+  if (Date.now() - suppressClick < 250 && e.target.closest('.card')) { e.preventDefault(); return; }
+  var m = $('#menu'); if (!m.hidden && !e.target.closest('.menu-wrap')) { m.hidden = true; $('#menubtn').setAttribute('aria-expanded', 'false'); }
+  var t = e.target.closest('[data-act]');
+  if (t) { if (t.closest('.menu')) { m.hidden = true; $('#menubtn').setAttribute('aria-expanded', 'false'); } var fn = ACTS[t.dataset.act]; if (fn) { e.preventDefault(); fn(t.dataset.id, t, e); } return; }
+  var card = e.target.closest('.card'); if (card && !e.target.closest('button')) openTask(card.dataset.task);
+});
+document.addEventListener('keydown', function (e) {
+  if (e.key === 'Escape') { var m = $('#menu'); if (!m.hidden) { m.hidden = true; $('#menubtn').focus(); } }
+  if ((e.key === 'Enter' || e.key === ' ') && e.target.classList && e.target.classList.contains('card')) { e.preventDefault(); openTask(e.target.dataset.task); }
+});
+document.addEventListener('change', function (e) {
+  var t = e.target;
+  if (t.dataset && t.dataset.change === 'present') {
+    var id = t.dataset.id, emp = S.staff[id]; if (!emp) return; var on = t.checked;
+    var go = (!on && emp.brk && emp.brk.status === 'on') ? confirmBox('Mark ' + emp.name + ' as not present?', 'They are on break. Their break will be ended.', 'Mark not present', true) : Promise.resolve(true);
+    go.then(function (ok) {
+      if (!ok) { t.checked = true; return; }
+      var patch = { present: on, presentAt: on ? Date.now() : null }; if (!on && emp.brk && emp.brk.status === 'on') patch.brk = { status: 'done', endTs: Date.now(), auto: false };
+      save('update', 'staff/' + id, stamp(patch)).then(function (ok2) { if (!ok2) { t.checked = !on; return; } logEvent(emp.name + (on ? ' checked in' : ' marked not present')); });
+    });
+  }
+  if (t.id === 'as-cat') fillTypeSelect($('#as-type'), t.value, $('#as-type').value);
+});
+document.addEventListener('submit', function (e) {
+  if (e.target.id !== 'as-form') return; e.preventDefault();
+  var a = { emp: $('#as-emp').value, cat: $('#as-cat').value, type: $('#as-type').value || null };
+  submitAssignment(a, null, $('#as-msg')).then(function (ok) { if (ok) { $('#as-emp').value = ''; } });
+});
+['pointerdown', 'keydown'].forEach(function (ev) { document.addEventListener(ev, function () { touchUnlock(); }, { passive: true }); });
+
+/* ================= boot ================= */
+function onSubErr(e) { Store.error = e; renderSync(); if (e && e.code === 'revoked') { Store.readOnly = true; } }
+function afterReady() {
+  Store.ready = true;
+  if (!S.dayExists && !Store.readOnly) save('set', 'ops/day', stamp(defaultDay(todayKey())));
+  renderAll();
+}
+var wakeLock = null;
+function keepAwake() { try { if (navigator.wakeLock && document.visibilityState === 'visible') navigator.wakeLock.request('screen').then(function (l) { wakeLock = l; }, function () {}); } catch (e) {} }
+document.addEventListener('visibilitychange', function () { if (document.visibilityState === 'visible') { keepAwake(); scheduleRender(); } });
+function boot() {
+  applyTheme(); setView(lsGet(VIEW_KEY, 'overview')); initDrag();
+  try { localStorage.setItem('teamops.probe', '1'); localStorage.removeItem('teamops.probe'); } catch (e) { Store.storageOK = false; }
+  renderAll();
+  var C = window.claude;
+  var getCaps = (C && typeof C.use === 'function') ? Promise.all([C.use('db').catch(function () { return null; }), C.use('user').catch(function () { return null; }), C.use('downloads').catch(function () { return null; })]) : Promise.resolve([null, null, null]);
+  getCaps.then(function (caps) {
+    var db = caps[0]; Store.user = caps[1]; Store.downloads = caps[2];
+    Store.backend = db ? SharedBackend(db) : LocalBackend(); Store.mode = Store.backend.mode;
+    var u = Store.user, pre = u ? Promise.all([u.can('data.write').catch(function () { return null; }), u.canEdit().catch(function () { return null; }), (u.id ? u.id().catch(function () { return null; }) : null)]) : Promise.resolve([null, null, null]);
+    return pre.then(function (r) { if (Store.mode === 'shared' && r[0] === false) Store.readOnly = true; if (r[1] === false) Store.canAdmin = false; Store.uid = r[2] || null; });
+  }).then(function () {
+    Store.backend.start(function (docs) { applyDocs(docs); if (Store.ready) scheduleRender(); }, onSubErr, afterReady);
+  });
+  setInterval(tick, 1000);
+  keepAwake();
+}
+boot();
+})();
+</script>
+
+</body></html>
